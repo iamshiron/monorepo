@@ -2086,7 +2086,7 @@ function StatisticsPage() {
 								type="text"
 								value={bulkImportCharacterName}
 								onChange={(e) => setBulkImportCharacterName(e.target.value)}
-								placeholder="e.g., iamshiron"
+								placeholder="e.g., Chisa"
 								className="h-9"
 							/>
 							<p className="text-xs text-muted-foreground mt-1">
@@ -2102,7 +2102,7 @@ function StatisticsPage() {
 								value={bulkImportData}
 								onChange={(e) => setBulkImportData(e.target.value)}
 								placeholder={`Paste Discord log here, e.g.:
-Logan Yarborough
+Mudae
 APP
  — 10/22/2025 7:06 PM
 :kakera:iamshiron +121 ($k)`}
