@@ -210,15 +210,15 @@ public class KakeraLogParserTests {
     [Fact]
     public void ParseKakeraLog_WithRealWorldData_ParsesCorrectly() {
         var data = """
-            Logan Yarborough
+            Mudae
             APP
              — 10/22/2025 7:06 PM
             :kakera:iamshiron +121 ($k)
-            Logan Yarborough
+            Mudae
             APP
              — 10/22/2025 12:28 PM
             :kakera:iamshiron +142 ($k)
-            Logan Yarborough
+            Mudae
             APP
              — 10/19/2025 6:46 PM
             :kakera:iamshiron +147 ($k)
@@ -247,7 +247,7 @@ public class KakeraLogParserTests {
     [Fact]
     public void ParseKakeraLog_WithDateOnPreviousLine_ParsesDateCorrectly() {
         var data = """
-            Logan Yarborough
+            Mudae
             APP
              — 10/22/2025 7:06 PM
             :kakera:iamshiron +121 ($k)
@@ -270,7 +270,7 @@ public class KakeraLogParserTests {
     [Fact]
     public void ParseKakeraLog_WithYesterdayFormat_ParsesDateCorrectly() {
         var data = """
-            Logan Yarborough
+            Mudae
             APP
              — Yesterday at 12:04 PM
             :kakeraL:breaks down into:kakeraP:+:kakera:+:kakeraT:+:kakeraP: => iamshiron +606 ($k)
@@ -312,7 +312,7 @@ public class KakeraLogParserTests {
         var data = """
              — 2025-10-11 19:08
             :kakera:iamshiron +163 ($k)
-            Logan Yarborough
+            Mudae
             APP
              — 2025-10-09 16:41
             :kakeraT:iamshiron +218 ($k)
