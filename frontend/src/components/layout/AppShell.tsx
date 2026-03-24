@@ -8,8 +8,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
 	return (
 		<div className="min-h-screen bg-background">
-			<header className="sticky top-0 z-50 border-b border-border glass">
-				<div className="container mx-auto flex h-16 items-center justify-between px-4">
+			<header className="sticky top-4 z-50 mx-auto max-w-5xl rounded-2xl left-0 right-0 px-4 bg-background/95 backdrop-blur-md shadow-lg border border-border">
+				<div className="flex h-14 items-center justify-between px-6">
 					<Link to="/" className="flex items-center gap-2">
 						<span className="text-xl font-bold text-primary">Mutils</span>
 					</Link>

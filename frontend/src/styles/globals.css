@@ -178,3 +178,11 @@
 		@apply font-sans;
 	}
 }
+
+@utility glass {
+	background-color: oklch(1 0 0 / 75%);
+	backdrop-filter: blur(12px);
+	.dark & {
+		background-color: oklch(0.145 0.008 326 / 80%);
+	}
+}
