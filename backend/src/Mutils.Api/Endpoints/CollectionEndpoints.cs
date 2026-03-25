@@ -37,7 +37,7 @@ public static class CollectionEndpoints {
                     .Where(e => e.UserId == userId);
 
                 if (!string.IsNullOrEmpty(search)) {
-                    query = query.Where(e => e.Character.Name.Contains(search));
+                    query = query.Where(e => e.Character.Name.Contains(search) || (e.Character.Series != null && e.Character.Series.Name.Contains(search)));
                 }
 
                 if (minKeys.HasValue) {
