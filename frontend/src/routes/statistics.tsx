@@ -245,6 +245,112 @@ function StatisticsPage() {
 		URL.revokeObjectURL(url);
 	};
 
+	const handleExportStatistics = () => {
+		if (!stats || !claims) return;
+
+		const totalClaims = filteredClaims.length;
+		const typeStats = pieData.map((entry) => ({
+			type: entry.name,
+			count: entry.count,
+			totalValue: entry.value,
+			average: Math.round(entry.value / entry.count),
+			chance:
+				totalClaims > 0
+					? ((entry.count / totalClaims) * 100).toFixed(2) + "%"
+					: "0%",
+		}));
+
+		const statisticsExport = {
+			exportDate: new Date().toISOString(),
+			timeRange: {
+				selected: timeRange,
+				label: config.label,
+				daysCovered: config.days,
+			},
+			summary: {
+				totalKakera: stats.totalValue,
+				totalClaims: stats.totalCount,
+				averagePerClaim: Math.round(avgPerClaim),
+				bestClaim: Math.max(...claims.map((c) => c.value), 0),
+				last7DaysTotal,
+				dailyAverage: Math.round(dailyAvg),
+				monthlyEstimate: Math.round(dailyAvg * 30),
+				successRate:
+					claims.length > 0
+						? `${Math.round((claims.filter((c) => c.isClaimed).length / claims.length) * 100)}%`
+						: "0%",
+			},
+			distributionByType: typeStats,
+			dayOfWeekActivity: dowData,
+			advancedStatistics: {
+				rolling7DayAverage: recentRollingAvg,
+				medianDaily: Math.round(medianDaily),
+				standardDeviation: Math.round(stdDev),
+				consistencyScore: consistencyScore.toFixed(1) + "%",
+				activeDays: activeDaysCount,
+				totalDays: dailyData.length,
+				momentum: {
+					value: momentum.toFixed(1) + "%",
+					trend: momentum >= 0 ? "increasing" : "decreasing",
+				},
+				volatilityCV: coefficientOfVariation.toFixed(1) + "%",
+				longestStreak: maxStreak + " days",
+				bestDay,
+				worstDay,
+				percentiles: {
+					p25: percentile25,
+					p50: Math.round(medianDaily),
+					p75: percentile75,
+				},
+			},
+			thresholdCalculator: {
+				target: targetValue,
+				estimates: {
+					usingDailyAvg:
+						daysToTargetDailyAvg === Infinity ? null : daysToTargetDailyAvg,
+					usingMedian:
+						daysToTargetMedian === Infinity ? null : daysToTargetMedian,
+					usingLast7Days:
+						daysToTargetLast7 === Infinity ? null : daysToTargetLast7,
+					usingRecentTrend:
+						daysToTargetTrend === Infinity ? null : daysToTargetTrend,
+				},
+			},
+			linearGrowthModel: linearResult
+				? {
+						slope: linearResult.slope,
+						intercept: linearResult.intercept,
+						rSquared: linearResult.rSquared,
+						rSquaredPercent: (linearResult.rSquared * 100).toFixed(2) + "%",
+						currentBaseline: linearResult.currentBaseline,
+						predictions: linearResult.predictions.map((p) => ({
+							day: p.day,
+							daysAhead: p.day - linearResult.lastDayInData,
+							predictedDailyIncome: p.dailyIncome,
+							predictedCumulative: p.cumulative,
+						})),
+					}
+				: null,
+			dailyData: dailyData.map((d, i) => ({
+				date: d.date,
+				dailyValue: d.value,
+				dailyClaims: d.count,
+				cumulativeValue: cumulativeData[i]?.cumulativeValue || 0,
+				rolling7DayAvg: rolling7DayData[i]?.rollingAvg || 0,
+			})),
+		};
+
+		const blob = new Blob([JSON.stringify(statisticsExport, null, 2)], {
+			type: "application/json",
+		});
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = `kakera-statistics-${format(new Date(), "yyyy-MM-dd")}.json`;
+		a.click();
+		URL.revokeObjectURL(url);
+	};
+
 	const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
@@ -657,6 +763,14 @@ function StatisticsPage() {
 					>
 						<DownloadIcon size={18} />
 						Export
+					</Button>
+					<Button
+						variant="secondary"
+						className="h-9 px-4 text-sm"
+						onClick={handleExportStatistics}
+					>
+						<ChartBarIcon size={18} />
+						Export Stats
 					</Button>
 					<Button variant="secondary" className="h-9 px-4 text-sm" asChild>
 						<label className="cursor-pointer">
