@@ -112,6 +112,7 @@ export const collectionApi = {
 		isDisabled?: boolean;
 		keyTypes?: string;
 		wishStatus?: "wish" | "starwish" | "inwishlist";
+		isFavorite?: boolean;
 	}) => {
 		const { data } = await api.get<PaginatedResponse<CollectionEntry>>(
 			"/collection",
@@ -166,6 +167,13 @@ export const collectionApi = {
 
 	delete: async (id: string) => {
 		await api.delete(`/collection/${id}`);
+	},
+
+	toggleFavorite: async (id: string) => {
+		const { data } = await api.post<{ isFavorite: boolean }>(
+			`/collection/${id}/toggle-favorite`,
+		);
+		return data;
 	},
 
 	export: async (request: CollectionExportRequest) => {

@@ -39,6 +39,7 @@ export interface CollectionEntry {
 	createdAt: string;
 	updatedAt: string;
 	isDisabled?: boolean;
+	isFavorite?: boolean;
 }
 
 export interface PaginatedResponse<T> {

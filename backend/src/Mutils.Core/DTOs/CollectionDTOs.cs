@@ -5,7 +5,8 @@ public sealed record CollectionEntryDto(
     CharacterDto Character,
     DateTime? AcquiredAt,
     string? Notes,
-    bool IsDisabled = false
+    bool IsDisabled = false,
+    bool IsFavorite = false
 );
 
 public sealed record CharacterDto(

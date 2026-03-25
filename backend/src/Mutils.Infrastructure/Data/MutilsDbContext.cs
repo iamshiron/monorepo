@@ -70,6 +70,7 @@ public class MutilsDbContext : DbContext {
         modelBuilder.Entity<CollectionEntry>(entity => {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.IsFavorite);
             entity.HasAlternateKey(e => new { e.UserId, e.CharacterId });
             entity.HasOne(e => e.User)
                 .WithMany(u => u.Collection)

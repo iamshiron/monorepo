@@ -3,6 +3,7 @@ import {
 	DownloadIcon,
 	FolderOpenIcon,
 	FunnelIcon,
+	HeartIcon,
 	ImagesIcon,
 	KeyIcon,
 	ListBulletsIcon,
@@ -102,6 +103,7 @@ const CharacterCard = memo(function CharacterCard({
 	onDelete,
 	onAddToWishlist,
 	onRemoveFromWishlist,
+	onToggleFavorite,
 	wishlistStatus,
 }: {
 	entry: CollectionEntry;
@@ -109,6 +111,7 @@ const CharacterCard = memo(function CharacterCard({
 	onDelete: (entry: CollectionEntry) => void;
 	onAddToWishlist: (entry: CollectionEntry, isStarwish: boolean) => void;
 	onRemoveFromWishlist: (wishlistEntryId: string) => void;
+	onToggleFavorite: (entry: CollectionEntry) => void;
 	wishlistStatus?: { id: string; type: "wish" | "starwish" } | null;
 }) {
 	const character = entry.character;
@@ -142,10 +145,26 @@ const CharacterCard = memo(function CharacterCard({
 							Disabled
 						</Badge>
 					)}
-					{wishlistStatus && (
+					{entry.isFavorite && (
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<div className="absolute top-2 left-2 z-10">
+									<HeartIcon
+										size={18}
+										weight="fill"
+										className="text-destructive"
+									/>
+								</div>
+							</TooltipTrigger>
+							<TooltipContent>Favorite</TooltipContent>
+						</Tooltip>
+					)}
+					{wishlistStatus && (
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<div
+									className={`absolute z-10 ${entry.isFavorite ? "top-6 left-2" : "top-2 left-2"}`}
+								>
 									<StarIcon
 										size={18}
 										weight={
@@ -282,6 +301,15 @@ const CharacterCard = memo(function CharacterCard({
 				</div>
 			</ContextMenuTrigger>
 			<ContextMenuContent>
+				<ContextMenuItem onClick={() => onToggleFavorite(entry)}>
+					<HeartIcon
+						size={14}
+						className="mr-2"
+						weight={entry.isFavorite ? "fill" : "regular"}
+					/>
+					{entry.isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+				</ContextMenuItem>
+				<ContextMenuSeparator />
 				{wishlistStatus ? (
 					<ContextMenuItem
 						onClick={() => onRemoveFromWishlist(wishlistStatus.id)}
@@ -694,6 +722,9 @@ function CollectionPage() {
 	const [wishStatus, setWishStatus] = useState<
 		"wish" | "starwish" | "inwishlist" | null
 	>(null);
+	const [isFavoriteFilter, setIsFavoriteFilter] = useState<boolean | null>(
+		null,
+	);
 	const queryClient = useQueryClient();
 	const { isAuthenticated, isLoading: authLoading } = useAuth();
 	const navigate = useNavigate();
@@ -705,7 +736,8 @@ function CollectionPage() {
 		minKakera > 0 ||
 		disabledFilter !== "all" ||
 		selectedKeyTypes.length > 0 ||
-		wishStatus !== null;
+		wishStatus !== null ||
+		isFavoriteFilter !== null;
 
 	const clearAllFilters = () => {
 		setMinKeys(0);
@@ -713,6 +745,7 @@ function CollectionPage() {
 		setDisabledFilter("all");
 		setSelectedKeyTypes([]);
 		setWishStatus(null);
+		setIsFavoriteFilter(null);
 	};
 
 	const toggleKeyType = (keyType: string) => {
@@ -732,6 +765,7 @@ function CollectionPage() {
 		disabledFilter,
 		selectedKeyTypes,
 		wishStatus,
+		isFavoriteFilter,
 	]);
 
 	const { data, isLoading, error } = useQuery({
@@ -749,6 +783,7 @@ function CollectionPage() {
 				keyTypes:
 					selectedKeyTypes.length > 0 ? selectedKeyTypes.join(",") : undefined,
 				wishStatus: wishStatus ?? undefined,
+				isFavorite: isFavoriteFilter ?? undefined,
 			},
 		],
 		queryFn: () =>
@@ -765,6 +800,7 @@ function CollectionPage() {
 				keyTypes:
 					selectedKeyTypes.length > 0 ? selectedKeyTypes.join(",") : undefined,
 				wishStatus: wishStatus ?? undefined,
+				isFavorite: isFavoriteFilter ?? undefined,
 			}),
 		enabled: isAuthenticated,
 		placeholderData: keepPreviousData,
@@ -898,6 +934,13 @@ function CollectionPage() {
 		},
 	});
 
+	const toggleFavoriteMutation = useMutation({
+		mutationFn: (id: string) => collectionApi.toggleFavorite(id),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["collection"] });
+		},
+	});
+
 	const handleAddToWishlist = async (
 		entry: CollectionEntry,
 		isStarwish: boolean,
@@ -921,6 +964,21 @@ function CollectionPage() {
 		try {
 			await removeFromWishlistMutation.mutateAsync(wishlistEntryId);
 			toast.success("Removed from wishlist");
+		} catch (error) {
+			if (error instanceof Error) {
+				toast.error(error.message);
+			}
+		}
+	};
+
+	const handleToggleFavorite = async (entry: CollectionEntry) => {
+		try {
+			const result = await toggleFavoriteMutation.mutateAsync(entry.id);
+			toast.success(
+				result.isFavorite
+					? `Added ${entry.character.name} to favorites`
+					: `Removed ${entry.character.name} from favorites`,
+			);
 		} catch (error) {
 			if (error instanceof Error) {
 				toast.error(error.message);
@@ -1113,6 +1171,20 @@ function CollectionPage() {
 								</button>
 							</>
 						)}
+						<div className="w-px h-5 bg-border mx-1" />
+						<button
+							onClick={() =>
+								setIsFavoriteFilter(isFavoriteFilter === true ? null : true)
+							}
+							className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+								isFavoriteFilter === true
+									? "bg-destructive/10 text-destructive ring-1 ring-destructive/20"
+									: "bg-muted/30 text-muted-foreground hover:bg-muted/50"
+							}`}
+						>
+							<HeartIcon size={12} weight="fill" />
+							<span>Favorites</span>
+						</button>
 					</div>
 				)}
 			</div>
@@ -1341,6 +1413,18 @@ function CollectionPage() {
 							</button>
 						</Badge>
 					)}
+					{isFavoriteFilter !== null && (
+						<Badge variant="secondary" className="gap-1 pr-1">
+							<HeartIcon size={10} weight="fill" className="text-destructive" />
+							Favorites
+							<button
+								onClick={() => setIsFavoriteFilter(null)}
+								className="ml-1 hover:bg-background/50 rounded-sm p-0.5"
+							>
+								<XIcon size={10} />
+							</button>
+						</Badge>
+					)}
 					<Button
 						variant="ghost"
 						size="sm"
@@ -1382,6 +1466,7 @@ function CollectionPage() {
 								onDelete={setDeletingEntry}
 								onAddToWishlist={handleAddToWishlist}
 								onRemoveFromWishlist={handleRemoveFromWishlist}
+								onToggleFavorite={handleToggleFavorite}
 								wishlistStatus={wishlistMap.get(entry.character.id) ?? null}
 							/>
 						))}

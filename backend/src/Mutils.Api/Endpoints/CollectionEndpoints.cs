@@ -25,6 +25,7 @@ public static class CollectionEndpoints {
             bool? isDisabled,
             string? keyTypes,
             string? wishStatus,
+            bool? isFavorite,
             int page = 1,
             int pageSize = 50) => {
                 var userId = GetUserId(user);
@@ -76,6 +77,10 @@ public static class CollectionEndpoints {
                     };
                 }
 
+                if (isFavorite.HasValue) {
+                    query = query.Where(e => e.IsFavorite == isFavorite.Value);
+                }
+
                 sortBy ??= "rank";
                 sortOrder ??= "asc";
 
@@ -111,7 +116,8 @@ public static class CollectionEndpoints {
                         e.Id,
                         e.Character,
                         e.AcquiredAt,
-                        e.Notes
+                        e.Notes,
+                        e.IsFavorite
                     })
                     .ToListAsync();
 
@@ -157,7 +163,8 @@ public static class CollectionEndpoints {
                     ),
                     e.AcquiredAt,
                     e.Notes,
-                    e.Character.Disabled
+                    e.Character.Disabled,
+                    e.IsFavorite
                 )).ToList();
 
                 return Results.Ok(new PaginatedResponse<CollectionEntryDto>(
@@ -643,6 +650,24 @@ public static class CollectionEndpoints {
                 await db.SaveChangesAsync();
 
                 return Results.NoContent();
+            });
+
+        group.MapPost("/{id}/toggle-favorite", async (
+            Guid id,
+            ClaimsPrincipal user,
+            MutilsDbContext db) => {
+                var userId = GetUserId(user);
+                if (userId is null) return Results.Unauthorized();
+
+                var entry = await db.CollectionEntries
+                    .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
+
+                if (entry is null) return Results.NotFound();
+
+                entry.IsFavorite = !entry.IsFavorite;
+                await db.SaveChangesAsync();
+
+                return Results.Ok(new { isFavorite = entry.IsFavorite });
             });
 
         group.MapGet("/images/{id}", async (

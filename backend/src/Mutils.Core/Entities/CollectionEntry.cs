@@ -7,4 +7,5 @@ public sealed class CollectionEntry : BaseEntity {
     public Character Character { get; set; } = null!;
     public DateTime? AcquiredAt { get; set; }
     public string? Notes { get; set; }
+    public bool IsFavorite { get; set; } = false;
 }
