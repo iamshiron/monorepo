@@ -300,6 +300,112 @@ public static class CollectionEndpoints {
                 return Results.Ok(new CollectionExportResponse(totalCount, exportedCount, items));
             });
 
+        group.MapPost("/add", async (
+            ClaimsPrincipal user,
+            AddCharacterRequest request,
+            MutilsDbContext db) => {
+                var userId = GetUserId(user);
+                if (userId is null) return Results.Unauthorized();
+
+                if (string.IsNullOrWhiteSpace(request.Name))
+                    return Results.BadRequest(new { error = "Character name is required" });
+
+                var existingCharacter = await db.Characters
+                    .FirstOrDefaultAsync(c => c.Name == request.Name);
+
+                Series? series = null;
+                if (!string.IsNullOrWhiteSpace(request.SeriesName)) {
+                    series = await db.Series.FirstOrDefaultAsync(s => s.Name == request.SeriesName);
+                    if (series is null) {
+                        series = new Series { Name = request.SeriesName };
+                        db.Series.Add(series);
+                    }
+                }
+
+                Character character;
+                var isNewCharacter = false;
+
+                if (existingCharacter is not null) {
+                    character = existingCharacter;
+
+                    if (request.Rank.HasValue && character.Rank != request.Rank)
+                        character.Rank = request.Rank;
+                    if (request.Claims.HasValue && character.Claims != request.Claims)
+                        character.Claims = request.Claims;
+                    if (request.Images.HasValue && character.Images != request.Images)
+                        character.Images = request.Images;
+                    if (request.Gifs.HasValue && character.Gifs != request.Gifs)
+                        character.Gifs = request.Gifs;
+                    if (request.SeriesCount.HasValue && character.SeriesCount != request.SeriesCount)
+                        character.SeriesCount = request.SeriesCount;
+                    if (request.KeyCount.HasValue && character.KeyCount != request.KeyCount) {
+                        character.KeyCount = request.KeyCount;
+                        character.KeyType = KeyHelper.GetKeyTypeFromCount(request.KeyCount);
+                    }
+                    if (request.Kakera.HasValue && character.Kakera != request.Kakera)
+                        character.Kakera = request.Kakera;
+                    if (request.Sp.HasValue && character.Sp != request.Sp)
+                        character.Sp = request.Sp;
+                    if (!string.IsNullOrEmpty(request.ImageUrl) && character.OriginalImageUrl != request.ImageUrl) {
+                        character.OriginalImageUrl = request.ImageUrl;
+                        character.StoredImageId = null;
+                    }
+                    if (series is not null && character.SeriesId != series.Id)
+                        character.Series = series;
+                } else {
+                    isNewCharacter = true;
+                    character = new Character {
+                        Name = request.Name,
+                        Rank = request.Rank,
+                        Claims = request.Claims,
+                        Images = request.Images,
+                        Gifs = request.Gifs,
+                        SeriesCount = request.SeriesCount,
+                        KeyCount = request.KeyCount,
+                        KeyType = request.KeyCount.HasValue ? KeyHelper.GetKeyTypeFromCount(request.KeyCount) : null,
+                        Kakera = request.Kakera,
+                        Sp = request.Sp,
+                        OriginalImageUrl = request.ImageUrl,
+                        Series = series,
+                        Source = "manual"
+                    };
+                    db.Characters.Add(character);
+                }
+
+                var existingEntry = await db.CollectionEntries
+                    .FirstOrDefaultAsync(e => e.UserId == userId && e.Character.Name == request.Name);
+
+                if (existingEntry is not null)
+                    return Results.BadRequest(new { error = "Character already in collection" });
+
+                var entry = new CollectionEntry {
+                    UserId = userId.Value,
+                    Character = character,
+                    AcquiredAt = DateTime.UtcNow
+                };
+                db.CollectionEntries.Add(entry);
+
+                var imagesQueued = 0;
+                if (!string.IsNullOrEmpty(request.ImageUrl) && character.StoredImageId is null) {
+                    var existingStoredImage = await db.StoredImages
+                        .AnyAsync(s => s.OriginalUrl == request.ImageUrl);
+                    var pendingJob = await db.ImageJobs
+                        .AnyAsync(j => j.OriginalUrl == request.ImageUrl && j.Status == ImageJobStatus.Pending);
+
+                    if (!existingStoredImage && !pendingJob) {
+                        db.ImageJobs.Add(new ImageJob {
+                            Character = character,
+                            OriginalUrl = request.ImageUrl
+                        });
+                        imagesQueued = 1;
+                    }
+                }
+
+                await db.SaveChangesAsync();
+
+                return Results.Ok(new AddCharacterResponse(entry.Id, character.Id, isNewCharacter, imagesQueued));
+            });
+
         group.MapPost("/import", async (
             ClaimsPrincipal user,
             ImportRequest request,

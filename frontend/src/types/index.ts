@@ -404,3 +404,24 @@ export interface SeriesWithCount {
 	name: string;
 	characterCount: number;
 }
+
+export interface AddCharacterRequest {
+	name: string;
+	rank?: number;
+	claims?: number;
+	images?: number;
+	gifs?: number;
+	seriesCount?: number;
+	keyCount?: number;
+	kakera?: number;
+	sp?: number;
+	imageUrl?: string;
+	seriesName?: string;
+}
+
+export interface AddCharacterResponse {
+	id: string;
+	characterId: string;
+	isNewCharacter: boolean;
+	imagesQueued: number;
+}

@@ -5,6 +5,7 @@ import {
 	ImagesIcon,
 	ListBulletsIcon,
 	MagnifyingGlassIcon,
+	PlusIcon,
 	SignInIcon,
 	SortAscendingIcon,
 	UploadIcon,
@@ -19,6 +20,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ActiveFilters } from "@/components/collection/ActiveFilters";
+import { AddCharacterModal } from "@/components/collection/AddCharacterModal";
 import { CharacterCard } from "@/components/collection/CharacterCard";
 import { DeleteConfirmModal } from "@/components/collection/DeleteConfirmModal";
 import { EditModal } from "@/components/collection/EditModal";
@@ -42,7 +44,11 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/hooks/useAuth";
 import { collectionApi, listsApi } from "@/lib/api";
-import type { CollectionEntry, CollectionExportRequest } from "@/types";
+import type {
+	AddCharacterRequest,
+	CollectionEntry,
+	CollectionExportRequest,
+} from "@/types";
 
 export const Route = createFileRoute("/collection")({
 	component: CollectionPage,
@@ -90,6 +96,7 @@ function CollectionPage() {
 	const [showImport, setShowImport] = useState(false);
 	const [showExport, setShowExport] = useState(false);
 	const [showSeriesImport, setShowSeriesImport] = useState(false);
+	const [showAddCharacter, setShowAddCharacter] = useState(false);
 	const [editingEntry, setEditingEntry] = useState<CollectionEntry | null>(
 		null,
 	);
@@ -291,6 +298,16 @@ function CollectionPage() {
 		},
 	});
 
+	const addCharacterMutation = useMutation({
+		mutationFn: (request: AddCharacterRequest) =>
+			collectionApi.addCharacter(request),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["collection"] });
+			queryClient.invalidateQueries({ queryKey: ["collection-stats"] });
+			refetchImageStatus();
+		},
+	});
+
 	const addToWishlistMutation = useMutation({
 		mutationFn: ({
 			characterId,
@@ -480,6 +497,14 @@ function CollectionPage() {
 						>
 							<ListBulletsIcon size={16} />
 							Series
+						</Button>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setShowAddCharacter(true)}
+						>
+							<PlusIcon size={16} />
+							Add Character
 						</Button>
 						<Button size="sm" onClick={() => setShowImport(true)}>
 							<UploadIcon size={16} />
@@ -682,6 +707,19 @@ function CollectionPage() {
 				onClose={() => setDeletingEntry(null)}
 				onConfirm={async (id) => {
 					await deleteMutation.mutateAsync(id);
+				}}
+			/>
+
+			<AddCharacterModal
+				isOpen={showAddCharacter}
+				onClose={() => setShowAddCharacter(false)}
+				seriesList={seriesList}
+				onAdd={async (data) => {
+					const result = await addCharacterMutation.mutateAsync(data);
+					toast.success(`Added ${data.name} to collection`);
+					if (result.imagesQueued > 0) {
+						toast.info(`${result.imagesQueued} image(s) queued for download`);
+					}
 				}}
 			/>
 		</div>

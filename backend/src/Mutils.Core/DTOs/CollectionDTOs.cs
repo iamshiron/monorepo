@@ -94,3 +94,24 @@ public sealed record SeriesWithCountDto(
     string Name,
     int CharacterCount
 );
+
+public sealed record AddCharacterRequest(
+    string Name,
+    int? Rank = null,
+    int? Claims = null,
+    int? Images = null,
+    int? Gifs = null,
+    int? SeriesCount = null,
+    int? KeyCount = null,
+    int? Kakera = null,
+    int? Sp = null,
+    string? ImageUrl = null,
+    string? SeriesName = null
+);
+
+public sealed record AddCharacterResponse(
+    Guid Id,
+    Guid CharacterId,
+    bool IsNewCharacter,
+    int ImagesQueued
+);

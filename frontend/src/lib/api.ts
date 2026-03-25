@@ -1,5 +1,7 @@
 import axios from "axios";
 import type {
+	AddCharacterRequest,
+	AddCharacterResponse,
 	ApiError,
 	AuthResponse,
 	BulkKakeraImportRequest,
@@ -179,6 +181,14 @@ export const collectionApi = {
 	toggleFavorite: async (id: string) => {
 		const { data } = await api.post<{ isFavorite: boolean }>(
 			`/collection/${id}/toggle-favorite`,
+		);
+		return data;
+	},
+
+	addCharacter: async (request: AddCharacterRequest) => {
+		const { data } = await api.post<AddCharacterResponse>(
+			"/collection/add",
+			request,
 		);
 		return data;
 	},
