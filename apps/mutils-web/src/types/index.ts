@@ -1,0 +1,427 @@
+export interface User {
+	id: string;
+	discordId: string;
+	username: string;
+	avatarUrl: string | null;
+	createdAt?: string;
+	updatedAt?: string;
+}
+
+export interface Character {
+	id: string;
+	name: string;
+	rank: number | null;
+	claims: number | null;
+	images: number | null;
+	gifs: number | null;
+	seriesCount: number | null;
+	keyType: string | null;
+	keyCount: number | null;
+	kakera: number | null;
+	sp: number | null;
+	imageUrl: string | null;
+	storedImageId: string | null;
+	seriesName: string | null;
+	kakeraStats?: CharacterKakeraStats;
+}
+
+export interface CharacterKakeraStats {
+	totalValue: number;
+	totalCount: number;
+	byType: Record<string, number>;
+}
+
+export interface CollectionEntry {
+	id: string;
+	character: Character;
+	acquiredAt: string | null;
+	notes: string | null;
+	createdAt: string;
+	updatedAt: string;
+	isDisabled?: boolean;
+	isFavorite?: boolean;
+}
+
+export interface PaginatedResponse<T> {
+	items: T[];
+	total: number;
+	page: number;
+	pageSize: number;
+	totalPages: number;
+}
+
+export type ListType = "enable" | "disable";
+
+export interface EnableList {
+	id: string;
+	name: string;
+	content: string;
+	isActive: boolean;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface DisableList {
+	id: string;
+	name: string;
+	content: string;
+	isActive: boolean;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface ListPreset {
+	id: string;
+	name: string;
+	type: ListType;
+	content: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface AuthResponse {
+	accessToken: string;
+	refreshToken: string;
+	expiresIn: number;
+	user: User;
+}
+
+export interface ImportResponse {
+	imported: number;
+	skipped: number;
+	updated: number;
+	errors: string[];
+	imagesQueued: number;
+	disabledImported?: number;
+}
+
+export interface CollectionStats {
+	totalCharacters: number;
+	totalKakera: number;
+	keyDistribution: Record<string, number>;
+	disabledCount?: number;
+}
+
+export interface OptimizerAnalysis {
+	totalCharacters: number;
+	totalKakera: number;
+	keyDistribution: Record<string, number>;
+	recommendations: OptimizerRecommendation[];
+}
+
+export interface OptimizerRecommendation {
+	type: string;
+	series: string;
+	reason: string;
+	impact: "high" | "medium" | "low";
+}
+
+export interface OptimizerSuggestion {
+	id: string;
+	type: string;
+	characters: string[];
+	reason: string;
+	priority: number;
+}
+
+export interface OptimizerSuggestionsResponse {
+	suggestions: OptimizerSuggestion[];
+}
+
+export interface ApiError {
+	error: {
+		code: string;
+		message: string;
+		details?: Record<string, unknown>;
+	};
+}
+
+export type KakeraType =
+	| "purple"
+	| "blue"
+	| "green"
+	| "yellow"
+	| "orange"
+	| "red"
+	| "rainbow"
+	| "light"
+	| "chaos"
+	| "dark"
+	| "teal"
+	| "bku";
+
+export interface KakeraClaim {
+	id: string;
+	userId: string;
+	characterId: string | null;
+	characterName: string | null;
+	type: KakeraType;
+	value: number;
+	isClaimed: boolean;
+	claimedAt: string;
+}
+
+export interface KakeraStats {
+	totalValue: number;
+	totalCount: number;
+	byType: Record<
+		string,
+		{
+			count: number;
+			totalValue: number;
+		}
+	>;
+}
+
+export interface CreateKakeraClaimRequest {
+	characterId?: string;
+	characterName?: string;
+	type: KakeraType;
+	value: number;
+	isClaimed: boolean;
+	claimedAt?: string;
+}
+
+export interface UpdateKakeraClaimRequest {
+	characterName?: string;
+	type: KakeraType;
+	value: number;
+	isClaimed: boolean;
+	claimedAt?: string;
+}
+
+export interface KakeraClaimExportItem {
+	id: string;
+	characterName: string | null;
+	type: KakeraType;
+	value: number;
+	isClaimed: boolean;
+	claimedAt: string;
+}
+
+export interface CalculatorConfig {
+	id: string;
+	name: string;
+	totalPool: number;
+	disabledLimit: number;
+	antiDisabled: number;
+	silverBadge: number;
+	rubyBadge: number;
+	perk2: number;
+	perk3: number;
+	perk4: number;
+	ownedTotal: number;
+	ownedDisabled: number;
+	totalRolls?: number;
+	bwRollsInvested?: number;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface CreateCalculatorConfigRequest {
+	name: string;
+	totalPool: number;
+	disabledLimit: number;
+	antiDisabled: number;
+	silverBadge: number;
+	rubyBadge: number;
+	perk2: number;
+	perk3: number;
+	perk4: number;
+	ownedTotal: number;
+	ownedDisabled: number;
+	totalRolls: number;
+	bwRollsInvested: number;
+}
+
+export interface UpdateCalculatorConfigRequest {
+	name?: string;
+	totalPool?: number;
+	disabledLimit?: number;
+	antiDisabled?: number;
+	silverBadge?: number;
+	rubyBadge?: number;
+	perk2?: number;
+	perk3?: number;
+	perk4?: number;
+	ownedTotal?: number;
+	ownedDisabled?: number;
+	totalRolls?: number;
+	bwRollsInvested?: number;
+}
+
+export interface UserProfile {
+	id: string;
+	bronzeBadge: number;
+	silverBadge: number;
+	goldBadge: number;
+	sapphireBadge: number;
+	rubyBadge: number;
+	emeraldBadge: number;
+	diamondBadge: number;
+	towerPerk1: number;
+	towerPerk2: number;
+	towerPerk3: number;
+	towerPerk4: number;
+	towerPerk5: number;
+	towerPerk6: number;
+	towerPerk7: number;
+	towerPerk8: number;
+	towerPerk9: number;
+	towerPerk10: number;
+	towerPerk11: number;
+	towerPerk12: number;
+	totalPool: number;
+	disabledLimit: number;
+	antiDisabled: number;
+	totalRolls: number;
+	bwRollsInvested: number;
+	kakeraPerFloor: number;
+	bronzeBadgePrice: number;
+	silverBadgePrice: number;
+	goldBadgePrice: number;
+	sapphireBadgePrice: number;
+	rubyBadgePrice: number;
+	emeraldBadgePrice: number;
+	diamondBadgePrice: number;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface UpdateProfileRequest {
+	bronzeBadge?: number;
+	silverBadge?: number;
+	goldBadge?: number;
+	sapphireBadge?: number;
+	rubyBadge?: number;
+	emeraldBadge?: number;
+	diamondBadge?: number;
+	towerPerk1?: number;
+	towerPerk2?: number;
+	towerPerk3?: number;
+	towerPerk4?: number;
+	towerPerk5?: number;
+	towerPerk6?: number;
+	towerPerk7?: number;
+	towerPerk8?: number;
+	towerPerk9?: number;
+	towerPerk10?: number;
+	towerPerk11?: number;
+	towerPerk12?: number;
+	totalPool?: number;
+	disabledLimit?: number;
+	antiDisabled?: number;
+	totalRolls?: number;
+	bwRollsInvested?: number;
+	kakeraPerFloor?: number;
+	bronzeBadgePrice?: number;
+	silverBadgePrice?: number;
+	goldBadgePrice?: number;
+	sapphireBadgePrice?: number;
+	rubyBadgePrice?: number;
+	emeraldBadgePrice?: number;
+	diamondBadgePrice?: number;
+}
+
+export interface BulkKakeraImportRequest {
+	data: string;
+	characterName?: string;
+}
+
+export interface BulkKakeraImportResponse {
+	imported: number;
+	skipped: number;
+	errors: string[];
+}
+
+export interface ImportSeriesResponse {
+	updated: number;
+	notFound: number;
+	notFoundNames: string[];
+}
+
+export interface CollectionExportItem {
+	name: string;
+	kakera: number | null;
+	keyCount: number | null;
+	sp: number | null;
+	isDisabled: boolean;
+}
+
+export interface CollectionExportResponse {
+	totalCount: number;
+	exportedCount: number;
+	items: CollectionExportItem[];
+}
+
+export interface CollectionExportRequest {
+	minKeys?: number;
+	sortBy?: "kakera" | "keyCount" | "sp" | "name";
+	sortOrder?: "asc" | "desc";
+	limit?: number;
+	excludeDisabled?: boolean;
+}
+
+export interface WishlistEntry {
+	id: string;
+	characterId: string;
+	characterName: string;
+	rank: number | null;
+	kakera: number | null;
+	keyCount: number | null;
+	keyType: string | null;
+	seriesName: string | null;
+	imageUrl: string | null;
+	storedImageId: string | null;
+	isStarwish: boolean;
+	priority: number;
+	notes: string | null;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface WishlistStats {
+	totalCount: number;
+	starwishCount: number;
+	regularCount: number;
+}
+
+export interface CreateWishlistEntryRequest {
+	characterId: string;
+	isStarwish?: boolean;
+	priority?: number;
+	notes?: string;
+}
+
+export interface UpdateWishlistEntryRequest {
+	isStarwish?: boolean;
+	priority?: number;
+	notes?: string;
+}
+
+export interface SeriesWithCount {
+	id: string;
+	name: string;
+	characterCount: number;
+}
+
+export interface AddCharacterRequest {
+	name: string;
+	rank?: number;
+	claims?: number;
+	images?: number;
+	gifs?: number;
+	seriesCount?: number;
+	keyCount?: number;
+	kakera?: number;
+	sp?: number;
+	imageUrl?: string;
+	seriesName?: string;
+}
+
+export interface AddCharacterResponse {
+	id: string;
+	characterId: string;
+	isNewCharacter: boolean;
+	imagesQueued: number;
+}
