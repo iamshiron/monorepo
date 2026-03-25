@@ -1,5 +1,6 @@
 import {
 	CaretDownIcon,
+	CheckIcon,
 	DownloadIcon,
 	FolderOpenIcon,
 	FunnelIcon,
@@ -70,6 +71,12 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import {
+	Sheet,
+	SheetContent,
+	SheetHeader,
+	SheetTitle,
+} from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
@@ -95,6 +102,53 @@ function useDebouncedValue<T>(value: T, delay: number): T {
 	}, [value, delay]);
 
 	return debouncedValue;
+}
+
+interface CollectionFilters {
+	minKeys: number;
+	minKakera: number;
+	disabledFilter: "all" | "disabled" | "enabled";
+	selectedKeyTypes: string[];
+	wishStatus: "wish" | "starwish" | "inwishlist" | null;
+	isFavoriteFilter: boolean | null;
+	selectedSeries: string[];
+}
+
+const FILTERS_STORAGE_KEY = "mutils-collection-filters";
+
+const DEFAULT_FILTERS: CollectionFilters = {
+	minKeys: 0,
+	minKakera: 0,
+	disabledFilter: "all",
+	selectedKeyTypes: [],
+	wishStatus: null,
+	isFavoriteFilter: null,
+	selectedSeries: [],
+};
+
+function usePersistedFilters(): [
+	CollectionFilters,
+	(filters: CollectionFilters) => void,
+] {
+	const [filters, setFilters] = useState<CollectionFilters>(() => {
+		try {
+			const stored = localStorage.getItem(FILTERS_STORAGE_KEY);
+			if (stored) {
+				const parsed = JSON.parse(stored);
+				return { ...DEFAULT_FILTERS, ...parsed };
+			}
+		} catch (e) {
+			console.error("Failed to parse stored filters:", e);
+		}
+		return DEFAULT_FILTERS;
+	});
+
+	const setPersistedFilters = (newFilters: CollectionFilters) => {
+		localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(newFilters));
+		setFilters(newFilters);
+	};
+
+	return [filters, setPersistedFilters];
 }
 
 const CharacterCard = memo(function CharacterCard({
@@ -713,18 +767,18 @@ function CollectionPage() {
 	const [sortBy, setSortBy] = useState("rank");
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 	const [page, setPage] = useState(1);
-	const [minKeys, setMinKeys] = useState(0);
-	const [minKakera, setMinKakera] = useState(0);
-	const [disabledFilter, setDisabledFilter] = useState<
-		"all" | "disabled" | "enabled"
-	>("all");
-	const [selectedKeyTypes, setSelectedKeyTypes] = useState<string[]>([]);
-	const [wishStatus, setWishStatus] = useState<
-		"wish" | "starwish" | "inwishlist" | null
-	>(null);
-	const [isFavoriteFilter, setIsFavoriteFilter] = useState<boolean | null>(
-		null,
-	);
+	const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+	const [seriesSearch, setSeriesSearch] = useState("");
+	const [filters, setFilters] = usePersistedFilters();
+	const {
+		minKeys,
+		minKakera,
+		disabledFilter,
+		selectedKeyTypes,
+		wishStatus,
+		isFavoriteFilter,
+		selectedSeries,
+	} = filters;
 	const queryClient = useQueryClient();
 	const { isAuthenticated, isLoading: authLoading } = useAuth();
 	const navigate = useNavigate();
@@ -737,23 +791,29 @@ function CollectionPage() {
 		disabledFilter !== "all" ||
 		selectedKeyTypes.length > 0 ||
 		wishStatus !== null ||
-		isFavoriteFilter !== null;
+		isFavoriteFilter !== null ||
+		selectedSeries.length > 0;
 
 	const clearAllFilters = () => {
-		setMinKeys(0);
-		setMinKakera(0);
-		setDisabledFilter("all");
-		setSelectedKeyTypes([]);
-		setWishStatus(null);
-		setIsFavoriteFilter(null);
+		setFilters(DEFAULT_FILTERS);
 	};
 
 	const toggleKeyType = (keyType: string) => {
-		setSelectedKeyTypes((prev) =>
-			prev.includes(keyType)
-				? prev.filter((k) => k !== keyType)
-				: [...prev, keyType],
-		);
+		setFilters({
+			...filters,
+			selectedKeyTypes: selectedKeyTypes.includes(keyType)
+				? selectedKeyTypes.filter((k) => k !== keyType)
+				: [...selectedKeyTypes, keyType],
+		});
+	};
+
+	const toggleSeries = (seriesName: string) => {
+		setFilters({
+			...filters,
+			selectedSeries: selectedSeries.includes(seriesName)
+				? selectedSeries.filter((s) => s !== seriesName)
+				: [...selectedSeries, seriesName],
+		});
 	};
 
 	useEffect(() => {
@@ -766,6 +826,7 @@ function CollectionPage() {
 		selectedKeyTypes,
 		wishStatus,
 		isFavoriteFilter,
+		selectedSeries,
 	]);
 
 	const { data, isLoading, error } = useQuery({
@@ -784,6 +845,8 @@ function CollectionPage() {
 					selectedKeyTypes.length > 0 ? selectedKeyTypes.join(",") : undefined,
 				wishStatus: wishStatus ?? undefined,
 				isFavorite: isFavoriteFilter ?? undefined,
+				series:
+					selectedSeries.length > 0 ? selectedSeries.join(",") : undefined,
 			},
 		],
 		queryFn: () =>
@@ -801,6 +864,8 @@ function CollectionPage() {
 					selectedKeyTypes.length > 0 ? selectedKeyTypes.join(",") : undefined,
 				wishStatus: wishStatus ?? undefined,
 				isFavorite: isFavoriteFilter ?? undefined,
+				series:
+					selectedSeries.length > 0 ? selectedSeries.join(",") : undefined,
 			}),
 		enabled: isAuthenticated,
 		placeholderData: keepPreviousData,
@@ -811,6 +876,17 @@ function CollectionPage() {
 		queryFn: () => collectionApi.getStats(),
 		enabled: isAuthenticated,
 	});
+
+	const { data: seriesList } = useQuery({
+		queryKey: ["collection-series"],
+		queryFn: () => collectionApi.getSeries(),
+		enabled: isAuthenticated,
+	});
+
+	const filteredSeriesList =
+		seriesList?.filter((series) =>
+			series.name.toLowerCase().includes(seriesSearch.toLowerCase()),
+		) ?? [];
 
 	const { data: imageStatus, refetch: refetchImageStatus } = useQuery({
 		queryKey: ["image-status"],
@@ -1102,91 +1178,6 @@ function CollectionPage() {
 						</Button>
 					</div>
 				</div>
-
-				{stats && Object.keys(stats.keyDistribution).length > 0 && (
-					<div className="flex gap-2 flex-wrap items-center">
-						{Object.entries(stats.keyDistribution)
-							.sort(([a], [b]) => {
-								const order = ["bronzekey", "silverkey", "goldkey", "chaoskey"];
-								return order.indexOf(a) - order.indexOf(b);
-							})
-							.map(([key, count]) => {
-								const config = KEY_TYPE_CONFIG[key] || {
-									label: key.replace("key", ""),
-									color: "text-muted-foreground",
-									bgColor: "bg-muted/50",
-								};
-								const isSelected = selectedKeyTypes.includes(key);
-								return (
-									<button
-										key={key}
-										onClick={() => toggleKeyType(key)}
-										className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-											isSelected
-												? `${config.bgColor} ${config.color} ring-1 ring-current/20`
-												: "bg-muted/30 text-muted-foreground hover:bg-muted/50"
-										}`}
-									>
-										<KeyIcon size={12} weight="fill" className={config.color} />
-										<span>{config.label}</span>
-										<span className="opacity-60">{count}</span>
-									</button>
-								);
-							})}
-
-						{wishlistStats && wishlistStats.totalCount > 0 && (
-							<>
-								<div className="w-px h-5 bg-border mx-1" />
-								<button
-									onClick={() =>
-										setWishStatus(wishStatus === "starwish" ? null : "starwish")
-									}
-									className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-										wishStatus === "starwish"
-											? "bg-warning/10 text-warning ring-1 ring-warning/20"
-											: "bg-muted/30 text-muted-foreground hover:bg-muted/50"
-									}`}
-								>
-									<StarIcon size={12} weight="fill" className="text-warning" />
-									<span>Starwish</span>
-									<span className="opacity-60">
-										{wishlistStats.starwishCount}
-									</span>
-								</button>
-								<button
-									onClick={() =>
-										setWishStatus(wishStatus === "wish" ? null : "wish")
-									}
-									className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-										wishStatus === "wish"
-											? "bg-muted-foreground/10 text-muted-foreground ring-1 ring-muted-foreground/20"
-											: "bg-muted/30 text-muted-foreground hover:bg-muted/50"
-									}`}
-								>
-									<StarIcon size={12} />
-									<span>Wish</span>
-									<span className="opacity-60">
-										{wishlistStats.regularCount}
-									</span>
-								</button>
-							</>
-						)}
-						<div className="w-px h-5 bg-border mx-1" />
-						<button
-							onClick={() =>
-								setIsFavoriteFilter(isFavoriteFilter === true ? null : true)
-							}
-							className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-								isFavoriteFilter === true
-									? "bg-destructive/10 text-destructive ring-1 ring-destructive/20"
-									: "bg-muted/30 text-muted-foreground hover:bg-muted/50"
-							}`}
-						>
-							<HeartIcon size={12} weight="fill" />
-							<span>Favorites</span>
-						</button>
-					</div>
-				)}
 			</div>
 
 			{imageStatus &&
@@ -1221,103 +1212,17 @@ function CollectionPage() {
 					/>
 				</div>
 
-				<Popover>
-					<PopoverTrigger asChild>
-						<Button
-							variant="outline"
-							size="icon"
-							className="h-10 w-10 relative"
-						>
-							<FunnelIcon size={18} />
-							{hasActiveFilters && (
-								<span className="absolute -top-1 -right-1 size-3 bg-primary rounded-full" />
-							)}
-						</Button>
-					</PopoverTrigger>
-					<PopoverContent className="w-80" align="end">
-						<div className="space-y-5">
-							<div>
-								<h4 className="text-sm font-medium mb-3">Filters</h4>
-								<div className="space-y-4">
-									<div className="space-y-2">
-										<div className="flex items-center justify-between">
-											<Label className="text-xs text-muted-foreground">
-												Minimum Keys
-											</Label>
-											<span className="text-xs font-mono text-primary">
-												{minKeys}+
-											</span>
-										</div>
-										<Slider
-											value={[minKeys]}
-											onValueChange={([v]) => setMinKeys(v)}
-											min={0}
-											max={20}
-											step={1}
-											className="py-2"
-										/>
-									</div>
-
-									<div className="space-y-2">
-										<div className="flex items-center justify-between">
-											<Label className="text-xs text-muted-foreground">
-												Minimum Kakera
-											</Label>
-											<span className="text-xs font-mono text-primary">
-												{minKakera.toLocaleString()}+
-											</span>
-										</div>
-										<Slider
-											value={[minKakera]}
-											onValueChange={([v]) => setMinKakera(v)}
-											min={0}
-											max={10000}
-											step={100}
-											className="py-2"
-										/>
-									</div>
-
-									<Separator />
-
-									<div className="space-y-2">
-										<Label className="text-xs text-muted-foreground">
-											Status
-										</Label>
-										<div className="flex gap-1.5">
-											{(["all", "enabled", "disabled"] as const).map(
-												(status) => (
-													<Button
-														key={status}
-														variant={
-															disabledFilter === status ? "default" : "outline"
-														}
-														size="sm"
-														onClick={() => setDisabledFilter(status)}
-														className="flex-1 text-xs capitalize"
-													>
-														{status}
-													</Button>
-												),
-											)}
-										</div>
-									</div>
-								</div>
-							</div>
-
-							{hasActiveFilters && (
-								<Button
-									variant="ghost"
-									size="sm"
-									onClick={clearAllFilters}
-									className="w-full text-destructive hover:text-destructive"
-								>
-									<XIcon size={14} />
-									Clear all filters
-								</Button>
-							)}
-						</div>
-					</PopoverContent>
-				</Popover>
+				<Button
+					variant="outline"
+					size="icon"
+					className="h-10 w-10 relative"
+					onClick={() => setFilterSheetOpen(true)}
+				>
+					<FunnelIcon size={18} />
+					{hasActiveFilters && (
+						<span className="absolute -top-1 -right-1 size-3 bg-primary rounded-full" />
+					)}
+				</Button>
 
 				<Select value={sortBy} onValueChange={setSortBy}>
 					<SelectTrigger className="h-10! w-[160px]">
@@ -1346,25 +1251,359 @@ function CollectionPage() {
 				</Button>
 			</div>
 
+			<Sheet open={filterSheetOpen} onOpenChange={setFilterSheetOpen}>
+				<SheetContent
+					side="right"
+					className="w-[360px] sm:max-w-[400px] overflow-y-auto p-0"
+				>
+					<SheetHeader className="px-6 pt-6 pb-2">
+						<SheetTitle className="text-lg">Filters</SheetTitle>
+					</SheetHeader>
+					<div className="space-y-6 px-6 pb-6">
+						<div className="space-y-4">
+							<h4 className="text-sm font-medium flex items-center gap-2">
+								<KeyIcon size={16} />
+								Keys
+							</h4>
+							<div className="space-y-3">
+								{stats && Object.keys(stats.keyDistribution).length > 0 && (
+									<div className="flex gap-1.5 flex-wrap">
+										{Object.entries(stats.keyDistribution)
+											.sort(([a], [b]) => {
+												const order = [
+													"bronzekey",
+													"silverkey",
+													"goldkey",
+													"chaoskey",
+												];
+												return order.indexOf(a) - order.indexOf(b);
+											})
+											.map(([key, count]) => {
+												const config = KEY_TYPE_CONFIG[key] || {
+													label: key.replace("key", ""),
+													color: "text-muted-foreground",
+													bgColor: "bg-muted/50",
+												};
+												const isSelected = selectedKeyTypes.includes(key);
+												return (
+													<button
+														key={key}
+														onClick={() => toggleKeyType(key)}
+														className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+															isSelected
+																? `${config.bgColor} ${config.color} ring-1 ring-current/20`
+																: "bg-muted/30 text-muted-foreground hover:bg-muted/50"
+														}`}
+													>
+														<KeyIcon
+															size={12}
+															weight="fill"
+															className={config.color}
+														/>
+														<span>{config.label}</span>
+														<span className="opacity-60">{count}</span>
+													</button>
+												);
+											})}
+									</div>
+								)}
+								<div className="space-y-2">
+									<div className="flex items-center justify-between">
+										<Label className="text-xs text-muted-foreground">
+											Minimum Keys
+										</Label>
+										<span className="text-xs font-mono text-primary">
+											{minKeys}+
+										</span>
+									</div>
+									<Slider
+										value={[minKeys]}
+										onValueChange={([v]) =>
+											setFilters({ ...filters, minKeys: v })
+										}
+										min={0}
+										max={20}
+										step={1}
+										className="py-2"
+									/>
+								</div>
+							</div>
+						</div>
+
+						<Separator />
+
+						<div className="space-y-4">
+							<h4 className="text-sm font-medium flex items-center gap-2">
+								<StarIcon size={16} />
+								Kakera
+							</h4>
+							<div className="space-y-3">
+								<div className="space-y-2">
+									<div className="flex items-center justify-between">
+										<Label className="text-xs text-muted-foreground">
+											Minimum Kakera
+										</Label>
+										<span className="text-xs font-mono text-primary">
+											{minKakera.toLocaleString()}+
+										</span>
+									</div>
+									<Slider
+										value={[minKakera]}
+										onValueChange={([v]) =>
+											setFilters({ ...filters, minKakera: v })
+										}
+										min={0}
+										max={10000}
+										step={100}
+										className="py-2"
+									/>
+								</div>
+							</div>
+						</div>
+
+						<Separator />
+
+						<div className="space-y-4">
+							<h4 className="text-sm font-medium">Status</h4>
+							<div className="flex gap-1.5">
+								{(["all", "enabled", "disabled"] as const).map((status) => (
+									<Button
+										key={status}
+										variant={disabledFilter === status ? "default" : "outline"}
+										size="sm"
+										onClick={() =>
+											setFilters({ ...filters, disabledFilter: status })
+										}
+										className="flex-1 text-xs capitalize"
+									>
+										{status}
+									</Button>
+								))}
+							</div>
+						</div>
+
+						<Separator />
+
+						{(wishlistStats?.totalCount ?? 0) > 0 && (
+							<>
+								<div className="space-y-4">
+									<h4 className="text-sm font-medium flex items-center gap-2">
+										<StarIcon size={16} />
+										Wishlist
+									</h4>
+									<div className="flex gap-1.5 flex-wrap">
+										<button
+											onClick={() =>
+												setFilters({
+													...filters,
+													wishStatus:
+														wishStatus === "starwish" ? null : "starwish",
+												})
+											}
+											className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+												wishStatus === "starwish"
+													? "bg-warning/10 text-warning ring-1 ring-warning/20"
+													: "bg-muted/30 text-muted-foreground hover:bg-muted/50"
+											}`}
+										>
+											<StarIcon
+												size={12}
+												weight="fill"
+												className="text-warning"
+											/>
+											<span>Starwish</span>
+											<span className="opacity-60">
+												{wishlistStats?.starwishCount ?? 0}
+											</span>
+										</button>
+										<button
+											onClick={() =>
+												setFilters({
+													...filters,
+													wishStatus: wishStatus === "wish" ? null : "wish",
+												})
+											}
+											className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+												wishStatus === "wish"
+													? "bg-muted-foreground/10 text-muted-foreground ring-1 ring-muted-foreground/20"
+													: "bg-muted/30 text-muted-foreground hover:bg-muted/50"
+											}`}
+										>
+											<StarIcon size={12} />
+											<span>Wish</span>
+											<span className="opacity-60">
+												{wishlistStats?.regularCount ?? 0}
+											</span>
+										</button>
+									</div>
+								</div>
+
+								<Separator />
+							</>
+						)}
+
+						<div className="space-y-4">
+							<h4 className="text-sm font-medium flex items-center gap-2">
+								<HeartIcon size={16} />
+								Other
+							</h4>
+							<div className="flex gap-1.5 flex-wrap">
+								<button
+									onClick={() =>
+										setFilters({
+											...filters,
+											isFavoriteFilter: isFavoriteFilter === true ? null : true,
+										})
+									}
+									className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+										isFavoriteFilter === true
+											? "bg-destructive/10 text-destructive ring-1 ring-destructive/20"
+											: "bg-muted/30 text-muted-foreground hover:bg-muted/50"
+									}`}
+								>
+									<HeartIcon size={12} weight="fill" />
+									<span>Favorites</span>
+								</button>
+							</div>
+						</div>
+
+						<Separator />
+
+						<div className="space-y-4">
+							<h4 className="text-sm font-medium flex items-center gap-2">
+								<FolderOpenIcon size={16} />
+								Series
+							</h4>
+							{seriesList && seriesList.length > 0 ? (
+								<Popover>
+									<PopoverTrigger asChild>
+										<Button
+											variant="outline"
+											role="combobox"
+											className="w-full justify-between"
+										>
+											{selectedSeries.length > 0 ? (
+												<span className="truncate">
+													{selectedSeries.length} series selected
+												</span>
+											) : (
+												<span className="text-muted-foreground">
+													Select series...
+												</span>
+											)}
+											<CaretDownIcon
+												size={16}
+												className="ml-2 shrink-0 opacity-50"
+											/>
+										</Button>
+									</PopoverTrigger>
+									<PopoverContent
+										className="p-0"
+										align="start"
+										style={{ width: "var(--radix-popover-trigger-width)" }}
+									>
+										<div className="p-1">
+											<Input
+												placeholder="Search series..."
+												value={seriesSearch}
+												onChange={(e) => setSeriesSearch(e.target.value)}
+												className="h-8"
+											/>
+										</div>
+										<div
+											className="max-h-64 overflow-y-auto border-t"
+											onWheel={(e) => e.stopPropagation()}
+										>
+											{filteredSeriesList.length === 0 ? (
+												<div className="py-6 text-center text-xs text-muted-foreground">
+													No series found.
+												</div>
+											) : (
+												filteredSeriesList.map((series) => (
+													<div
+														key={series.id}
+														onClick={() => toggleSeries(series.name)}
+														className="flex items-center justify-between px-2 py-1.5 text-xs cursor-pointer hover:bg-accent rounded-sm mx-1"
+													>
+														<span className="truncate flex-1">
+															{series.name}
+														</span>
+														<span className="text-muted-foreground shrink-0 ml-2">
+															{series.characterCount}
+														</span>
+														{selectedSeries.includes(series.name) && (
+															<CheckIcon size={14} className="ml-2 shrink-0" />
+														)}
+													</div>
+												))
+											)}
+										</div>
+									</PopoverContent>
+								</Popover>
+							) : (
+								<p className="text-sm text-muted-foreground">
+									No series in your collection. Import series data to filter by
+									series.
+								</p>
+							)}
+							{selectedSeries.length > 0 && (
+								<div className="flex flex-wrap gap-1.5">
+									{selectedSeries.map((seriesName) => (
+										<Badge
+											key={seriesName}
+											variant="secondary"
+											className="gap-1 pr-1"
+										>
+											<span className="max-w-[120px] truncate">
+												{seriesName}
+											</span>
+											<button
+												onClick={() => toggleSeries(seriesName)}
+												className="ml-1 hover:bg-background/50 rounded-sm p-0.5"
+											>
+												<XIcon size={10} />
+											</button>
+										</Badge>
+									))}
+								</div>
+							)}
+						</div>
+
+						<Separator />
+
+						{hasActiveFilters && (
+							<Button
+								variant="destructive"
+								onClick={clearAllFilters}
+								className="w-full"
+							>
+								<XIcon size={16} />
+								Clear All Filters
+							</Button>
+						)}
+					</div>
+				</SheetContent>
+			</Sheet>
+
 			{hasActiveFilters && (
 				<div className="flex items-center gap-2 flex-wrap">
 					<span className="text-xs text-muted-foreground">Active filters:</span>
 					{minKeys > 0 && (
 						<Badge variant="secondary" className="gap-1 pr-1">
 							{minKeys}+ keys
-							<Button
-								onClick={() => setMinKeys(0)}
+							<button
+								onClick={() => setFilters({ ...filters, minKeys: 0 })}
 								className="ml-1 hover:bg-background/50 rounded-sm p-0.5"
 							>
 								<XIcon size={10} />
-							</Button>
+							</button>
 						</Badge>
 					)}
 					{minKakera > 0 && (
 						<Badge variant="secondary" className="gap-1 pr-1">
 							{minKakera.toLocaleString()}+ ka
 							<button
-								onClick={() => setMinKakera(0)}
+								onClick={() => setFilters({ ...filters, minKakera: 0 })}
 								className="ml-1 hover:bg-background/50 rounded-sm p-0.5"
 							>
 								<XIcon size={10} />
@@ -1375,7 +1614,9 @@ function CollectionPage() {
 						<Badge variant="secondary" className="gap-1 pr-1 capitalize">
 							{disabledFilter}
 							<button
-								onClick={() => setDisabledFilter("all")}
+								onClick={() =>
+									setFilters({ ...filters, disabledFilter: "all" })
+								}
 								className="ml-1 hover:bg-background/50 rounded-sm p-0.5"
 							>
 								<XIcon size={10} />
@@ -1406,7 +1647,7 @@ function CollectionPage() {
 							/>
 							{wishStatus === "starwish" ? "Starwish" : "Wish"}
 							<button
-								onClick={() => setWishStatus(null)}
+								onClick={() => setFilters({ ...filters, wishStatus: null })}
 								className="ml-1 hover:bg-background/50 rounded-sm p-0.5"
 							>
 								<XIcon size={10} />
@@ -1418,13 +1659,26 @@ function CollectionPage() {
 							<HeartIcon size={10} weight="fill" className="text-destructive" />
 							Favorites
 							<button
-								onClick={() => setIsFavoriteFilter(null)}
+								onClick={() =>
+									setFilters({ ...filters, isFavoriteFilter: null })
+								}
 								className="ml-1 hover:bg-background/50 rounded-sm p-0.5"
 							>
 								<XIcon size={10} />
 							</button>
 						</Badge>
 					)}
+					{selectedSeries.map((seriesName) => (
+						<Badge key={seriesName} variant="secondary" className="gap-1 pr-1">
+							<span className="max-w-[100px] truncate">{seriesName}</span>
+							<button
+								onClick={() => toggleSeries(seriesName)}
+								className="ml-1 hover:bg-background/50 rounded-sm p-0.5"
+							>
+								<XIcon size={10} />
+							</button>
+						</Badge>
+					))}
 					<Button
 						variant="ghost"
 						size="sm"

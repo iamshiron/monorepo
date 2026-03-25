@@ -88,3 +88,9 @@ public sealed record CollectionExportRequest(
     int? Limit = null,
     bool? ExcludeDisabled = null
 );
+
+public sealed record SeriesWithCountDto(
+    Guid Id,
+    string Name,
+    int CharacterCount
+);

@@ -26,6 +26,7 @@ public static class CollectionEndpoints {
             string? keyTypes,
             string? wishStatus,
             bool? isFavorite,
+            string? series,
             int page = 1,
             int pageSize = 50) => {
                 var userId = GetUserId(user);
@@ -79,6 +80,11 @@ public static class CollectionEndpoints {
 
                 if (isFavorite.HasValue) {
                     query = query.Where(e => e.IsFavorite == isFavorite.Value);
+                }
+
+                if (!string.IsNullOrEmpty(series)) {
+                    var seriesList = series.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+                    query = query.Where(e => e.Character.Series != null && seriesList.Contains(e.Character.Series.Name));
                 }
 
                 sortBy ??= "rank";
@@ -207,6 +213,32 @@ public static class CollectionEndpoints {
                     keyDistribution,
                     disabledCount
                 ));
+            });
+
+        group.MapGet("/series", async (
+            ClaimsPrincipal user,
+            MutilsDbContext db) => {
+                var userId = GetUserId(user);
+                if (userId is null) return Results.Unauthorized();
+
+                var entriesWithSeries = await db.CollectionEntries
+                    .Include(e => e.Character)
+                        .ThenInclude(c => c.Series)
+                    .Where(e => e.UserId == userId && e.Character.Series != null)
+                    .Select(e => new { e.Character.SeriesId, e.Character.Series!.Name, e.CharacterId })
+                    .ToListAsync();
+
+                var seriesWithCounts = entriesWithSeries
+                    .GroupBy(e => new { e.SeriesId, e.Name })
+                    .Select(g => new SeriesWithCountDto(
+                        g.Key.SeriesId!.Value,
+                        g.Key.Name,
+                        g.Select(e => e.CharacterId).Distinct().Count()
+                    ))
+                    .OrderBy(s => s.Name)
+                    .ToList();
+
+                return Results.Ok(seriesWithCounts);
             });
 
         group.MapPost("/export", async (

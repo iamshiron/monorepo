@@ -398,3 +398,9 @@ export interface UpdateWishlistEntryRequest {
 	priority?: number;
 	notes?: string;
 }
+
+export interface SeriesWithCount {
+	id: string;
+	name: string;
+	characterCount: number;
+}

@@ -21,6 +21,7 @@ import type {
 	KakeraStats,
 	ListPreset,
 	PaginatedResponse,
+	SeriesWithCount,
 	UpdateCalculatorConfigRequest,
 	UpdateKakeraClaimRequest,
 	UpdateProfileRequest,
@@ -113,11 +114,17 @@ export const collectionApi = {
 		keyTypes?: string;
 		wishStatus?: "wish" | "starwish" | "inwishlist";
 		isFavorite?: boolean;
+		series?: string;
 	}) => {
 		const { data } = await api.get<PaginatedResponse<CollectionEntry>>(
 			"/collection",
 			{ params },
 		);
+		return data;
+	},
+
+	getSeries: async () => {
+		const { data } = await api.get<SeriesWithCount[]>("/collection/series");
 		return data;
 	},
 
