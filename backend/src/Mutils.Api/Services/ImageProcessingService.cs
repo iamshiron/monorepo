@@ -40,7 +40,7 @@ public class ImageProcessingService : BackgroundService {
         var storageService = scope.ServiceProvider.GetRequiredService<IStorageService>();
         var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-        var bucketName = configuration["MINIO_BUCKET_ASSETS"] ?? "mutils-assets";
+        var bucketName = configuration["MUTILS_BUCKET_ASSETS"] ?? "mutils-assets";
 
         var pendingJobs = await dbContext.ImageJobs
             .Include(j => j.Character)
