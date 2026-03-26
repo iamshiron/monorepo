@@ -19,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MutilsDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("Default")
-        ?? builder.Configuration["ConnectionStrings__Default"]
+        ?? builder.Configuration["MUTILS_ConnectionStrings__Default"]
         ?? throw new InvalidOperationException("Database connection string not configured")
     ));
 
@@ -31,10 +31,10 @@ builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<IStorageService, MinioStorageService>();
 builder.Services.AddHostedService<ImageProcessingService>();
 
-var minioEndpoint = builder.Configuration["MINIO_ENDPOINT"] ?? "localhost:9000";
-var minioAccessKey = builder.Configuration["MINIO_ACCESS_KEY"] ?? "minioadmin";
-var minioSecretKey = builder.Configuration["MINIO_SECRET_KEY"] ?? "minioadmin";
-var minioUseSsl = bool.TryParse(builder.Configuration["MINIO_USE_SSL"], out var ssl) && ssl;
+var minioEndpoint = builder.Configuration["MUTILS_MINIO_ENDPOINT"] ?? "localhost:9000";
+var minioAccessKey = builder.Configuration["MUTILS_MINIO_ACCESS_KEY"] ?? "minioadmin";
+var minioSecretKey = builder.Configuration["MUTILS_MINIO_SECRET_KEY"] ?? "minioadmin";
+var minioUseSsl = bool.TryParse(builder.Configuration["MUTILS_MINIO_USE_SSL"], out var ssl) && ssl;
 
 builder.Services.AddSingleton<IMinioClient>(sp => {
     return new MinioClient()
@@ -44,10 +44,10 @@ builder.Services.AddSingleton<IMinioClient>(sp => {
         .Build();
 });
 
-var jwtSecret = builder.Configuration["JWT_SECRET"]
-    ?? throw new InvalidOperationException("JWT_SECRET not configured");
-var jwtIssuer = builder.Configuration["JWT_ISSUER"] ?? "mutils";
-var jwtAudience = builder.Configuration["JWT_AUDIENCE"] ?? "mutils-users";
+var jwtSecret = builder.Configuration["MUTILS_JWT_SECRET"]
+    ?? throw new InvalidOperationException("MUTILS_JWT_SECRET not configured");
+var jwtIssuer = builder.Configuration["MUTILS_JWT_ISSUER"] ?? "mutils";
+var jwtAudience = builder.Configuration["MUTILS_JWT_AUDIENCE"] ?? "mutils-users";
 
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

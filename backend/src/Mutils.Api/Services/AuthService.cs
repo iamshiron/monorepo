@@ -33,11 +33,11 @@ public class AuthService : IAuthService {
     }
 
     public string GenerateAccessToken(User user) {
-        var jwtSecret = _configuration["JWT_SECRET"]
-            ?? throw new InvalidOperationException("JWT_SECRET not configured");
-        var issuer = _configuration["JWT_ISSUER"] ?? "mutils";
-        var audience = _configuration["JWT_AUDIENCE"] ?? "mutils-users";
-        var expiryHours = int.Parse(_configuration["JWT_EXPIRY_HOURS"] ?? "24");
+        var jwtSecret = _configuration["MUTILS_JWT_SECRET"]
+            ?? throw new InvalidOperationException("MUTILS_JWT_SECRET not configured");
+        var issuer = _configuration["MUTILS_JWT_ISSUER"] ?? "mutils";
+        var audience = _configuration["MUTILS_JWT_AUDIENCE"] ?? "mutils-users";
+        var expiryHours = int.Parse(_configuration["MUTILS_JWT_EXPIRY_HOURS"] ?? "24");
 
         var key = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(jwtSecret));
@@ -71,8 +71,8 @@ public class AuthService : IAuthService {
     }
 
     public string GetDiscordOAuthUrl(string redirectUri) {
-        var clientId = _configuration["DISCORD_CLIENT_ID"]
-            ?? throw new InvalidOperationException("DISCORD_CLIENT_ID not configured");
+        var clientId = _configuration["MUTILS_DISCORD_CLIENT_ID"]
+            ?? throw new InvalidOperationException("MUTILS_DISCORD_CLIENT_ID not configured");
 
         return $"https://discord.com/oauth2/authorize?client_id={clientId}" +
                $"&redirect_uri={Uri.EscapeDataString(redirectUri)}" +
@@ -80,8 +80,8 @@ public class AuthService : IAuthService {
     }
 
     public async Task<(User? User, string? Error)> ExchangeCodeForUserAsync(string code, string redirectUri) {
-        var clientId = _configuration["DISCORD_CLIENT_ID"];
-        var clientSecret = _configuration["DISCORD_CLIENT_SECRET"];
+        var clientId = _configuration["MUTILS_DISCORD_CLIENT_ID"];
+        var clientSecret = _configuration["MUTILS_DISCORD_CLIENT_SECRET"];
 
         if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret)) {
             _logger.LogError("Discord OAuth not configured. ClientId: {HasClientId}, ClientSecret: {HasClientSecret}",
@@ -154,16 +154,16 @@ public class AuthService : IAuthService {
     }
 
     public ClaimsPrincipal? GetPrincipalFromToken(string token) {
-        var jwtSecret = _configuration["JWT_SECRET"]
-            ?? throw new InvalidOperationException("JWT_SECRET not configured");
+        var jwtSecret = _configuration["MUTILS_JWT_SECRET"]
+            ?? throw new InvalidOperationException("MUTILS_JWT_SECRET not configured");
 
         var tokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = _configuration["JWT_ISSUER"] ?? "mutils",
-            ValidAudience = _configuration["JWT_AUDIENCE"] ?? "mutils-users",
+            ValidIssuer = _configuration["MUTILS_JWT_ISSUER"] ?? "mutils",
+            ValidAudience = _configuration["MUTILS_JWT_AUDIENCE"] ?? "mutils-users",
             IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(jwtSecret))
         };
