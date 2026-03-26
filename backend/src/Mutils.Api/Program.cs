@@ -15,11 +15,10 @@ using Scalar.AspNetCore;
 Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services.AddDbContext<MutilsDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("Default")
-        ?? builder.Configuration["MUTILS_ConnectionStrings__Default"]
+        ?? builder.Configuration.GetSection("MUTILS_ConnectionStrings")["Default"]
         ?? throw new InvalidOperationException("Database connection string not configured")
     ));
 
