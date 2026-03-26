@@ -1,10 +1,10 @@
 using Minio;
 using Minio.DataModel.Args;
 using Microsoft.Extensions.Logging;
-using Mutils.Core.Entities;
-using Mutils.Core.Services;
+using Shiron.Mutils.Core.Entities;
+using Shiron.Mutils.Core.Services;
 
-namespace Mutils.Infrastructure.Services;
+namespace Shiron.Mutils.Infrastructure.Services;
 
 public class MinioStorageService : IStorageService {
     private readonly IMinioClient _minioClient;

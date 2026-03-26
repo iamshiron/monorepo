@@ -1,6 +1,6 @@
-using Mutils.Core.Entities;
+using Shiron.Mutils.Core.Entities;
 
-namespace Mutils.Core.DTOs;
+namespace Shiron.Mutils.Core.DTOs;
 
 public record KakeraClaimDto(
     Guid Id,

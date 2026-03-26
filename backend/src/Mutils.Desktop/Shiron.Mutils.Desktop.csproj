@@ -9,8 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Mutils.Core\Mutils.Core.csproj" />
-        <ProjectReference Include="..\Mutils.Infrastructure\Mutils.Infrastructure.csproj" />
+        <ProjectReference Include="..\Mutils.Core\Shiron.Mutils.Core.csproj" />
+        <ProjectReference Include="..\Mutils.Infrastructure\Shiron.Mutils.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

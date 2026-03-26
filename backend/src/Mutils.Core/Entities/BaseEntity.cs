@@ -1,4 +1,4 @@
-namespace Mutils.Core.Entities;
+namespace Shiron.Mutils.Core.Entities;
 
 public abstract class BaseEntity {
     public Guid Id { get; set; } = Guid.CreateVersion7();

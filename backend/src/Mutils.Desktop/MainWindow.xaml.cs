@@ -13,10 +13,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Mutils.Core.DTOs;
-using Mutils.Core.Entities;
+using Shiron.Mutils.Core.DTOs;
+using Shiron.Mutils.Core.Entities;
 
-namespace Mutils.Desktop;
+namespace Shiron.Mutils.Desktop;
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml

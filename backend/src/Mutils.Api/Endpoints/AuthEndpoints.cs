@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using Microsoft.Extensions.Logging;
-using Mutils.Api.Services;
-using Mutils.Core.DTOs;
+using Shiron.Mutils.Api.Services;
+using Shiron.Mutils.Core.DTOs;
 
-namespace Mutils.Api.Endpoints;
+namespace Shiron.Mutils.Api.Endpoints;
 
 public static class AuthEndpoints {
     private static readonly ILogger Logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger("AuthEndpoints");

@@ -1,4 +1,4 @@
-namespace Mutils.Core.DTOs;
+namespace Shiron.Mutils.Core.DTOs;
 
 public sealed record OptimizerAnalysisRequest(
     bool IncludeWishlist = false

@@ -1,8 +1,8 @@
 using System.IO;
 using System.Text.Json;
-using Mutils.Core.DTOs;
+using Shiron.Mutils.Core.DTOs;
 
-namespace Mutils.Desktop;
+namespace Shiron.Mutils.Desktop;
 
 public class AppSettings {
     public string ApiBaseUrl { get; set; } = "http://localhost:5000";

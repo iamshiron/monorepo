@@ -1,4 +1,4 @@
-namespace Mutils.Core.Services;
+namespace Shiron.Mutils.Core.Services;
 
 public interface IMinioService {
     Task UploadUserFileAsync(Guid userId, string fileName, Stream content, string contentType, CancellationToken cancellationToken = default);

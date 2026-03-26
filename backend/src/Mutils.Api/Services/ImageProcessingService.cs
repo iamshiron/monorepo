@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Mutils.Core.Entities;
-using Mutils.Core.Services;
-using Mutils.Infrastructure.Data;
+using Shiron.Mutils.Core.Entities;
+using Shiron.Mutils.Core.Services;
+using Shiron.Mutils.Infrastructure.Data;
 
-namespace Mutils.Api.Services;
+namespace Shiron.Mutils.Api.Services;
 
 public class ImageProcessingService : BackgroundService {
     private readonly IServiceProvider _serviceProvider;

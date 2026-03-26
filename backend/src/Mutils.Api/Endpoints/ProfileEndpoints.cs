@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using Mutils.Core.DTOs;
-using Mutils.Core.Entities;
-using Mutils.Infrastructure.Data;
+using Shiron.Mutils.Core.DTOs;
+using Shiron.Mutils.Core.Entities;
+using Shiron.Mutils.Infrastructure.Data;
 
-namespace Mutils.Api.Endpoints;
+namespace Shiron.Mutils.Api.Endpoints;
 
 public static class ProfileEndpoints {
     public static void MapProfileEndpoints(this IEndpointRouteBuilder app) {

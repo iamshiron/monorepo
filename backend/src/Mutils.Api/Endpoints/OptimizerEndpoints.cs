@@ -1,8 +1,8 @@
 using System.Security.Claims;
-using Mutils.Core.DTOs;
-using Mutils.Core.Services;
+using Shiron.Mutils.Core.DTOs;
+using Shiron.Mutils.Core.Services;
 
-namespace Mutils.Api.Endpoints;
+namespace Shiron.Mutils.Api.Endpoints;
 
 public static class OptimizerEndpoints {
     public static void MapOptimizerEndpoints(this IEndpointRouteBuilder app) {

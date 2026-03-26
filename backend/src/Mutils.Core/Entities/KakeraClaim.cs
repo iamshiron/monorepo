@@ -1,4 +1,4 @@
-namespace Mutils.Core.Entities;
+namespace Shiron.Mutils.Core.Entities;
 
 public enum KakeraType {
     Purple,

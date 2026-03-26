@@ -1,9 +1,9 @@
 using FluentAssertions;
-using Mutils.Core.Entities;
-using Mutils.Infrastructure.Services;
+using Shiron.Mutils.Core.Entities;
+using Shiron.Mutils.Infrastructure.Services;
 using Xunit;
 
-namespace Mutils.Tests.Unit;
+namespace Shiron.Mutils.Tests.Unit;
 
 public class KakeraLogParserTests {
     private readonly KakeraLogParser _parser = new();

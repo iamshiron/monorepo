@@ -1,4 +1,4 @@
-namespace Mutils.Core.Entities;
+namespace Shiron.Mutils.Core.Entities;
 
 public sealed class User : BaseEntity {
     public required string DiscordId { get; set; }

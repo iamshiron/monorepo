@@ -1,4 +1,4 @@
-namespace Mutils.Core.DTOs;
+namespace Shiron.Mutils.Core.DTOs;
 
 public record CalculatorConfigDto(
     Guid Id,

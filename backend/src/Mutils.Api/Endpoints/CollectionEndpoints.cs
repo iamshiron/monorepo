@@ -1,12 +1,12 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using Mutils.Core.DTOs;
-using Mutils.Core.Services;
-using Mutils.Core.Helpers;
-using Mutils.Infrastructure.Data;
-using Mutils.Core.Entities;
+using Shiron.Mutils.Core.DTOs;
+using Shiron.Mutils.Core.Services;
+using Shiron.Mutils.Core.Helpers;
+using Shiron.Mutils.Infrastructure.Data;
+using Shiron.Mutils.Core.Entities;
 
-namespace Mutils.Api.Endpoints;
+namespace Shiron.Mutils.Api.Endpoints;
 
 public static class CollectionEndpoints {
     private static readonly ILogger Logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger("CollectionEndpoints");

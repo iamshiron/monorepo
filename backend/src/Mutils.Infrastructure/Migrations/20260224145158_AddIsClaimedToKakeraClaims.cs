@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Mutils.Infrastructure.Migrations {
+namespace Shiron.Mutils.Infrastructure.Migrations {
     /// <inheritdoc />
     public partial class AddIsClaimedToKakeraClaims : Migration {
         /// <inheritdoc />

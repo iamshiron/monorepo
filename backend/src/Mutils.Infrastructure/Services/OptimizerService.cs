@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using Mutils.Core.DTOs;
-using Mutils.Core.Services;
-using Mutils.Core.Helpers;
-using Mutils.Infrastructure.Data;
+using Shiron.Mutils.Core.DTOs;
+using Shiron.Mutils.Core.Services;
+using Shiron.Mutils.Core.Helpers;
+using Shiron.Mutils.Infrastructure.Data;
 
-namespace Mutils.Infrastructure.Services;
+namespace Shiron.Mutils.Infrastructure.Services;
 
 public class OptimizerService(MutilsDbContext dbContext) : IOptimizerService {
     public async Task<OptimizerAnalysisResponse> AnalyzeAsync(

@@ -1,11 +1,11 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using Mutils.Core.DTOs;
-using Mutils.Core.Entities;
-using Mutils.Core.Services;
-using Mutils.Infrastructure.Data;
+using Shiron.Mutils.Core.DTOs;
+using Shiron.Mutils.Core.Entities;
+using Shiron.Mutils.Core.Services;
+using Shiron.Mutils.Infrastructure.Data;
 
-namespace Mutils.Api.Endpoints;
+namespace Shiron.Mutils.Api.Endpoints;
 
 public static class KakeraEndpoints {
     public static void MapKakeraEndpoints(this IEndpointRouteBuilder app) {

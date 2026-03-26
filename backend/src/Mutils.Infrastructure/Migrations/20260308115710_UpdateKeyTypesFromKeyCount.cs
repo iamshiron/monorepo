@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Mutils.Infrastructure.Migrations {
+namespace Shiron.Mutils.Infrastructure.Migrations {
     public partial class UpdateKeyTypesFromKeyCount : Migration {
         protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.Sql(@"

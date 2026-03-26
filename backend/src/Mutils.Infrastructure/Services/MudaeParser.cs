@@ -1,8 +1,8 @@
 using System.Text.RegularExpressions;
-using Mutils.Core.Services;
-using Mutils.Core.Helpers;
+using Shiron.Mutils.Core.Services;
+using Shiron.Mutils.Core.Helpers;
 
-namespace Mutils.Infrastructure.Services;
+namespace Shiron.Mutils.Infrastructure.Services;
 
 public partial class MudaeParser : IMudaeParser {
     public IEnumerable<ParsedCharacter> ParseCollection(string data) {

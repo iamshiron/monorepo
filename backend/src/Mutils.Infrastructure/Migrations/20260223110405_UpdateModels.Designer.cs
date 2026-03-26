@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Mutils.Infrastructure.Data;
+using Shiron.Mutils.Infrastructure.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Mutils.Infrastructure.Migrations
+namespace Shiron.Mutils.Infrastructure.Migrations
 {
     [DbContext(typeof(MutilsDbContext))]
     [Migration("20260223110405_UpdateModels")]

@@ -1,6 +1,6 @@
-using Mutils.Core.Entities;
+using Shiron.Mutils.Core.Entities;
 
-namespace Mutils.Core.Services;
+namespace Shiron.Mutils.Core.Services;
 
 public interface IStorageService {
     Task<StoredImage?> StoreImageAsync(string url, string bucketName, CancellationToken cancellationToken = default);

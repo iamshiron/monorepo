@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Mutils.Infrastructure.Migrations
+namespace Shiron.Mutils.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class AddServerSettingsToProfile : Migration

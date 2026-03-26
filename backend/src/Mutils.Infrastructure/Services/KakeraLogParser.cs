@@ -1,10 +1,10 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Mutils.Core.DTOs;
-using Mutils.Core.Entities;
-using Mutils.Core.Services;
+using Shiron.Mutils.Core.DTOs;
+using Shiron.Mutils.Core.Entities;
+using Shiron.Mutils.Core.Services;
 
-namespace Mutils.Infrastructure.Services;
+namespace Shiron.Mutils.Infrastructure.Services;
 
 public partial class KakeraLogParser : IKakeraLogParser {
     private static readonly Dictionary<string, KakeraType> KakeraTypeMap = new() {

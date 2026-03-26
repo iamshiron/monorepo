@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Minio;
-using Mutils.Api.Endpoints;
-using Mutils.Api.Services;
-using Mutils.Core.Services;
-using Mutils.Infrastructure.Data;
-using Mutils.Infrastructure.Services;
+using Shiron.Mutils.Api.Endpoints;
+using Shiron.Mutils.Api.Services;
+using Shiron.Mutils.Core.Services;
+using Shiron.Mutils.Infrastructure.Data;
+using Shiron.Mutils.Infrastructure.Services;
 using Scalar.AspNetCore;
 
 Env.TraversePath().Load();

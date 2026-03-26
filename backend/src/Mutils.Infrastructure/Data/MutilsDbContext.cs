@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Mutils.Core.Entities;
+using Shiron.Mutils.Core.Entities;
 
-namespace Mutils.Infrastructure.Data;
+namespace Shiron.Mutils.Infrastructure.Data;
 
 public class MutilsDbContext : DbContext {
     public MutilsDbContext(DbContextOptions<MutilsDbContext> options) : base(options) { }

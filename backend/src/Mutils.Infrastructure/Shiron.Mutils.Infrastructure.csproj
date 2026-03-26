@@ -17,6 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mutils.Core\Mutils.Core.csproj" />
+    <ProjectReference Include="..\Mutils.Core\Shiron.Mutils.Core.csproj" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-namespace Mutils.Core.Helpers;
+namespace Shiron.Mutils.Core.Helpers;
 
 public static class KeyHelper {
     public static string? GetKeyTypeFromCount(int? keyCount) {

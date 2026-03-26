@@ -3,9 +3,9 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Windows;
-using Mutils.Core.DTOs;
+using Shiron.Mutils.Core.DTOs;
 
-namespace Mutils.Desktop;
+namespace Shiron.Mutils.Desktop;
 
 public class DesktopAuthService {
     private readonly SettingsService _settingsService;

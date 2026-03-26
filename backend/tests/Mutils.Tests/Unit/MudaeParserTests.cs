@@ -1,8 +1,8 @@
 using FluentAssertions;
-using Mutils.Infrastructure.Services;
+using Shiron.Mutils.Infrastructure.Services;
 using Xunit;
 
-namespace Mutils.Tests.Unit;
+namespace Shiron.Mutils.Tests.Unit;
 
 public class MudaeParserTests {
     private readonly MudaeParser _parser = new();

@@ -1,4 +1,4 @@
-namespace Mutils.Core.Entities;
+namespace Shiron.Mutils.Core.Entities;
 
 public sealed class ImageJob : BaseEntity {
     public Guid CharacterId { get; set; }

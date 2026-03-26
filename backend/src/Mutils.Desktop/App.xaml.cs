@@ -2,7 +2,7 @@ using System.Configuration;
 using System.Data;
 using System.Windows;
 
-namespace Mutils.Desktop;
+namespace Shiron.Mutils.Desktop;
 
 /// <summary>
 /// Interaction logic for App.xaml

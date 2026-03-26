@@ -1,4 +1,4 @@
-namespace Mutils.Core.Entities;
+namespace Shiron.Mutils.Core.Entities;
 
 public sealed class StoredImage : BaseEntity {
     public required string ObjectKey { get; set; }
