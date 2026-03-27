@@ -1,6 +1,6 @@
 import { SignInIcon } from '@phosphor-icons/react';
 import { createFileRoute } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
+import { Button } from '@shiron/ui/components/ui/button';
 import { authApi } from '@/lib/api';
 
 export const Route = createFileRoute('/')({

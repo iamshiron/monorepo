@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Minio;
+using Scalar.AspNetCore;
 using Shiron.Mutils.Api.Endpoints;
 using Shiron.Mutils.Api.Services;
 using Shiron.Mutils.Core.Services;
 using Shiron.Mutils.Infrastructure.Data;
 using Shiron.Mutils.Infrastructure.Services;
-using Scalar.AspNetCore;
 
 Env.TraversePath().Load();
 
@@ -73,7 +73,7 @@ builder.Services.ConfigureHttpJsonOptions(options => {
 
 builder.Services.AddCors(options => {
     options.AddDefaultPolicy(policy => {
-        policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173")
+        policy.WithOrigins("http://localhost:1910", "http://127.0.0.1:1910")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
