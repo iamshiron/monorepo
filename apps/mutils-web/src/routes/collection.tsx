@@ -13,12 +13,36 @@ import {
 import {
 	keepPreviousData,
 	useMutation,
-	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import {
+	useGetApiCollection,
+	useGetApiCollectionStats,
+	useGetApiCollectionSeries,
+	useGetImageStatus,
+	getGetApiCollectionQueryKey,
+	getGetApiCollectionStatsQueryKey,
+	postApiCollectionImport,
+	deleteApiCollectionClear,
+	postApiCollectionProcessImages,
+	putApiCollectionId,
+	deleteApiCollectionId,
+	postApiCollectionImportSeries,
+	postApiCollectionAdd,
+	postApiCollectionExport,
+	postApiCollectionIdToggleFavorite,
+} from "@/api/collection/collection";
+import {
+	useGetApiListsWishlist,
+	useGetApiListsWishlistStats,
+	getGetApiListsWishlistQueryKey,
+	getGetApiListsWishlistStatsQueryKey,
+	postApiListsWishlist,
+	deleteApiListsWishlistId,
+} from "@/api/lists-wishlist/lists-wishlist";
 import { ActiveFilters } from "@/components/collection/ActiveFilters";
 import { AddCharacterModal } from "@/components/collection/AddCharacterModal";
 import { CharacterCard } from "@/components/collection/CharacterCard";
@@ -44,12 +68,7 @@ import {
 } from "@shiron/ui/components/ui/select";
 import { Spinner } from "@shiron/ui/components/ui/spinner";
 import { useAuth } from "@/hooks/useAuth";
-import { collectionApi, listsApi } from "@/lib/api";
-import type {
-	AddCharacterRequest,
-	CollectionEntry,
-	CollectionExportRequest,
-} from "@/types";
+import type { CollectionEntry } from "@/types";
 
 export const Route = createFileRoute("/collection")({
 	component: CollectionPage,
@@ -153,80 +172,56 @@ function CollectionPage() {
 		selectedSeries,
 	]);
 
-	const { data, isLoading, error } = useQuery({
-		queryKey: [
-			"collection",
-			{
-				search: debouncedSearch,
-				sortBy,
-				sortOrder,
-				page,
-				minKeys: minKeys || undefined,
-				minKakera: minKakera || undefined,
-				isDisabled:
-					disabledFilter === "all" ? undefined : disabledFilter === "disabled",
-				keyTypes:
-					selectedKeyTypes.length > 0 ? selectedKeyTypes.join(",") : undefined,
-				wishStatus: wishStatus ?? undefined,
-				isFavorite: isFavoriteFilter ?? undefined,
-				series:
-					selectedSeries.length > 0 ? selectedSeries.join(",") : undefined,
+	const { data, isLoading, error } = useGetApiCollection(
+		{
+			search: debouncedSearch,
+			sortBy,
+			sortOrder,
+			page,
+			pageSize: 60,
+			minKeys: minKeys || undefined,
+			minKakera: minKakera || undefined,
+			isDisabled:
+				disabledFilter === "all" ? undefined : disabledFilter === "disabled",
+			keyTypes:
+				selectedKeyTypes.length > 0 ? selectedKeyTypes.join(",") : undefined,
+			wishStatus: wishStatus ?? undefined,
+			isFavorite: isFavoriteFilter ?? undefined,
+			series: selectedSeries.length > 0 ? selectedSeries.join(",") : undefined,
+		},
+		{
+			query: {
+				enabled: isAuthenticated,
+				placeholderData: keepPreviousData,
 			},
-		],
-		queryFn: () =>
-			collectionApi.get({
-				search: debouncedSearch,
-				sortBy,
-				sortOrder,
-				page,
-				pageSize: 60,
-				minKeys: minKeys || undefined,
-				minKakera: minKakera || undefined,
-				isDisabled:
-					disabledFilter === "all" ? undefined : disabledFilter === "disabled",
-				keyTypes:
-					selectedKeyTypes.length > 0 ? selectedKeyTypes.join(",") : undefined,
-				wishStatus: wishStatus ?? undefined,
-				isFavorite: isFavoriteFilter ?? undefined,
-				series:
-					selectedSeries.length > 0 ? selectedSeries.join(",") : undefined,
-			}),
-		enabled: isAuthenticated,
-		placeholderData: keepPreviousData,
+		},
+	);
+
+	const { data: stats } = useGetApiCollectionStats({
+		query: { enabled: isAuthenticated },
 	});
 
-	const { data: stats } = useQuery({
-		queryKey: ["collection-stats"],
-		queryFn: () => collectionApi.getStats(),
-		enabled: isAuthenticated,
+	const { data: seriesList } = useGetApiCollectionSeries({
+		query: { enabled: isAuthenticated },
 	});
 
-	const { data: seriesList } = useQuery({
-		queryKey: ["collection-series"],
-		queryFn: () => collectionApi.getSeries(),
-		enabled: isAuthenticated,
-	});
-
-	const { data: imageStatus, refetch: refetchImageStatus } = useQuery({
-		queryKey: ["image-status"],
-		queryFn: () => collectionApi.getImageStatus(),
-		enabled: isAuthenticated,
-		refetchInterval: (query) => {
-			const d = query.state.data;
-			return d && d.pending > 0 ? 5000 : false;
+	const { data: imageStatus, refetch: refetchImageStatus } = useGetImageStatus({
+		query: {
+			enabled: isAuthenticated,
+			refetchInterval: (query) => {
+				const d = query.state.data;
+				return d && Number(d.pending) > 0 ? 5000 : false;
+			},
 		},
 	});
 
-	const { data: wishlistData } = useQuery({
-		queryKey: ["wishlist-all"],
-		queryFn: () => listsApi.getWishlist({ pageSize: 1000 }),
-		enabled: isAuthenticated,
-	});
+	const { data: wishlistData } = useGetApiListsWishlist(
+		{ pageSize: 1000 },
+		{ query: { enabled: isAuthenticated } },
+	);
 
-	const { data: wishlistStats } = useQuery({
-		queryKey: ["wishlist-stats"],
-		queryFn: () => listsApi.getWishlistStats(),
-		enabled: isAuthenticated,
+	const { data: wishlistStats } = useGetApiListsWishlistStats({
+		query: { enabled: isAuthenticated },
 	});
 
 	const wishlistMap = new Map<
@@ -249,24 +244,32 @@ function CollectionPage() {
 		}: {
 			data: string;
 			disabledCharacters?: string;
-		}) => collectionApi.import(data, disabledCharacters),
+		}) => postApiCollectionImport({ data, disabledCharacters }),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["collection"] });
-			queryClient.invalidateQueries({ queryKey: ["collection-stats"] });
+			queryClient.invalidateQueries({
+				queryKey: getGetApiCollectionQueryKey(),
+			});
+			queryClient.invalidateQueries({
+				queryKey: getGetApiCollectionStatsQueryKey(),
+			});
 			refetchImageStatus();
 		},
 	});
 
 	const clearMutation = useMutation({
-		mutationFn: collectionApi.clear,
+		mutationFn: () => deleteApiCollectionClear(),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["collection"] });
-			queryClient.invalidateQueries({ queryKey: ["collection-stats"] });
+			queryClient.invalidateQueries({
+				queryKey: getGetApiCollectionQueryKey(),
+			});
+			queryClient.invalidateQueries({
+				queryKey: getGetApiCollectionStatsQueryKey(),
+			});
 		},
 	});
 
 	const processImagesMutation = useMutation({
-		mutationFn: collectionApi.processImages,
+		mutationFn: () => postApiCollectionProcessImages(),
 		onSuccess: () => {
 			refetchImageStatus();
 		},
@@ -280,33 +283,49 @@ function CollectionPage() {
 			id: string;
 			notes?: string;
 			keyCount?: number;
-		}) => collectionApi.update(id, data),
+		}) =>
+			putApiCollectionId(id, {
+				notes: data.notes ?? null,
+				keyCount: data.keyCount,
+			}),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["collection"] });
+			queryClient.invalidateQueries({
+				queryKey: getGetApiCollectionQueryKey(),
+			});
 		},
 	});
 
 	const deleteMutation = useMutation({
-		mutationFn: (id: string) => collectionApi.delete(id),
+		mutationFn: (id: string) => deleteApiCollectionId(id),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["collection"] });
-			queryClient.invalidateQueries({ queryKey: ["collection-stats"] });
+			queryClient.invalidateQueries({
+				queryKey: getGetApiCollectionQueryKey(),
+			});
+			queryClient.invalidateQueries({
+				queryKey: getGetApiCollectionStatsQueryKey(),
+			});
 		},
 	});
 
 	const importSeriesMutation = useMutation({
-		mutationFn: (data: string) => collectionApi.importSeries(data),
+		mutationFn: (data: string) => postApiCollectionImportSeries({ data }),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["collection"] });
+			queryClient.invalidateQueries({
+				queryKey: getGetApiCollectionQueryKey(),
+			});
 		},
 	});
 
 	const addCharacterMutation = useMutation({
-		mutationFn: (request: AddCharacterRequest) =>
-			collectionApi.addCharacter(request),
+		mutationFn: (request: Parameters<typeof postApiCollectionAdd>[0]) =>
+			postApiCollectionAdd(request),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["collection"] });
-			queryClient.invalidateQueries({ queryKey: ["collection-stats"] });
+			queryClient.invalidateQueries({
+				queryKey: getGetApiCollectionQueryKey(),
+			});
+			queryClient.invalidateQueries({
+				queryKey: getGetApiCollectionStatsQueryKey(),
+			});
 			refetchImageStatus();
 		},
 	});
@@ -318,31 +337,35 @@ function CollectionPage() {
 		}: {
 			characterId: string;
 			isStarwish: boolean;
-		}) =>
-			listsApi.addToWishlist({
-				characterId,
-				isStarwish,
-			}),
+		}) => postApiListsWishlist({ characterId, isStarwish }),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["wishlist"] });
-			queryClient.invalidateQueries({ queryKey: ["wishlist-all"] });
-			queryClient.invalidateQueries({ queryKey: ["wishlist-stats"] });
+			queryClient.invalidateQueries({
+				queryKey: getGetApiListsWishlistQueryKey(),
+			});
+			queryClient.invalidateQueries({
+				queryKey: getGetApiListsWishlistStatsQueryKey(),
+			});
 		},
 	});
 
 	const removeFromWishlistMutation = useMutation({
-		mutationFn: (id: string) => listsApi.removeFromWishlist(id),
+		mutationFn: (id: string) => deleteApiListsWishlistId(id),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["wishlist"] });
-			queryClient.invalidateQueries({ queryKey: ["wishlist-all"] });
-			queryClient.invalidateQueries({ queryKey: ["wishlist-stats"] });
+			queryClient.invalidateQueries({
+				queryKey: getGetApiListsWishlistQueryKey(),
+			});
+			queryClient.invalidateQueries({
+				queryKey: getGetApiListsWishlistStatsQueryKey(),
+			});
 		},
 	});
 
 	const toggleFavoriteMutation = useMutation({
-		mutationFn: (id: string) => collectionApi.toggleFavorite(id),
+		mutationFn: (id: string) => postApiCollectionIdToggleFavorite(id),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["collection"] });
+			queryClient.invalidateQueries({
+				queryKey: getGetApiCollectionQueryKey(),
+			});
 		},
 	});
 
@@ -391,20 +414,6 @@ function CollectionPage() {
 				toast.error(error.message);
 			}
 		}
-	};
-
-	const handleExport = async (request: CollectionExportRequest) => {
-		const data = await collectionApi.export(request);
-		const json = JSON.stringify(data, null, 2);
-		const blob = new Blob([json], { type: "application/json" });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement("a");
-		a.href = url;
-		a.download = "collection-export.json";
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(url);
 	};
 
 	if (authLoading) {
@@ -520,17 +529,19 @@ function CollectionPage() {
 			</div>
 
 			{imageStatus &&
-				(imageStatus.pending > 0 || imageStatus.processing > 0) && (
+				(Number(imageStatus.pending) > 0 ||
+					Number(imageStatus.processing) > 0) && (
 					<div className="glass rounded-lg px-4 py-3 flex items-center gap-3">
 						<Spinner className="size-4 text-primary" />
 						<span className="text-sm">
 							Processing images: {imageStatus.stored}/{imageStatus.total} cached
-							{imageStatus.pending > 0 && ` · ${imageStatus.pending} pending`}
+							{Number(imageStatus.pending) > 0 &&
+								` · ${imageStatus.pending} pending`}
 						</span>
 					</div>
 				)}
 
-			{imageStatus && imageStatus.failed > 0 && (
+			{imageStatus && Number(imageStatus.failed) > 0 && (
 				<div className="bg-destructive/10 border border-destructive/30 rounded-lg px-4 py-3 text-sm text-destructive">
 					{imageStatus.failed} images failed to download
 				</div>
@@ -597,9 +608,9 @@ function CollectionPage() {
 				onOpenChange={setFilterSheetOpen}
 				filters={filters}
 				onFiltersChange={setFilters}
-				stats={stats}
-				wishlistStats={wishlistStats}
-				seriesList={seriesList}
+				stats={stats as never}
+				wishlistStats={wishlistStats as never}
+				seriesList={seriesList as never}
 			/>
 
 			<ActiveFilters
@@ -633,7 +644,7 @@ function CollectionPage() {
 						{data.items.map((entry) => (
 							<CharacterCard
 								key={entry.id}
-								entry={entry}
+								entry={entry as unknown as CollectionEntry}
 								onEdit={setEditingEntry}
 								onDelete={setDeletingEntry}
 								onAddToWishlist={handleAddToWishlist}
@@ -645,7 +656,7 @@ function CollectionPage() {
 						))}
 					</div>
 
-					{data.totalPages > 1 && (
+					{Number(data.totalPages) > 1 && (
 						<div className="flex items-center justify-center gap-2 pt-4">
 							<Button
 								variant="outline"
@@ -665,7 +676,9 @@ function CollectionPage() {
 							<Button
 								variant="outline"
 								size="sm"
-								onClick={() => setPage((p) => Math.min(data.totalPages, p + 1))}
+								onClick={() =>
+									setPage((p) => Math.min(Number(data.totalPages), p + 1))
+								}
 								disabled={page === data.totalPages}
 							>
 								Next
@@ -682,7 +695,7 @@ function CollectionPage() {
 					return importMutation.mutateAsync({
 						data,
 						disabledCharacters,
-					});
+					}) as never;
 				}}
 				onClear={async () => {
 					await clearMutation.mutateAsync();
@@ -692,14 +705,26 @@ function CollectionPage() {
 			<ExportModal
 				isOpen={showExport}
 				onClose={() => setShowExport(false)}
-				onExport={handleExport}
+				onExport={async (request) => {
+					const data = await postApiCollectionExport(request);
+					const json = JSON.stringify(data, null, 2);
+					const blob = new Blob([json], { type: "application/json" });
+					const url = URL.createObjectURL(blob);
+					const a = document.createElement("a");
+					a.href = url;
+					a.download = "collection-export.json";
+					document.body.appendChild(a);
+					a.click();
+					document.body.removeChild(a);
+					URL.revokeObjectURL(url);
+				}}
 			/>
 
 			<SeriesImportModal
 				isOpen={showSeriesImport}
 				onClose={() => setShowSeriesImport(false)}
 				onImport={async (data) => {
-					return importSeriesMutation.mutateAsync(data);
+					return importSeriesMutation.mutateAsync(data) as never;
 				}}
 			/>
 
@@ -724,11 +749,11 @@ function CollectionPage() {
 			<AddCharacterModal
 				isOpen={showAddCharacter}
 				onClose={() => setShowAddCharacter(false)}
-				seriesList={seriesList}
+				seriesList={seriesList as never}
 				onAdd={async (data) => {
 					const result = await addCharacterMutation.mutateAsync(data);
 					toast.success(`Added ${data.name} to collection`);
-					if (result.imagesQueued > 0) {
+					if (Number(result.imagesQueued) > 0) {
 						toast.info(`${result.imagesQueued} image(s) queued for download`);
 					}
 				}}

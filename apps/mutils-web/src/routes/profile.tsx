@@ -6,7 +6,7 @@ import {
 	MedalIcon,
 	WarningIcon,
 } from "@phosphor-icons/react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -28,8 +28,8 @@ import {
 	SelectValue,
 } from "@shiron/ui/components/ui/select";
 import { Spinner } from "@shiron/ui/components/ui/spinner";
-import { profileApi } from "@/lib/api";
-import type { UpdateProfileRequest, UserProfile } from "@/types";
+import { useGetApiProfile, usePutApiProfile } from "@/api/profile/profile";
+import type { UpdateProfileRequest, UserProfileDto } from "@/api/model";
 
 export const Route = createFileRoute("/profile")({
 	component: ProfilePage,
@@ -216,10 +216,7 @@ function LevelSelect({
 function ProfilePage() {
 	const queryClient = useQueryClient();
 
-	const { data: serverProfile, isLoading } = useQuery({
-		queryKey: ["profile"],
-		queryFn: profileApi.get,
-	});
+	const { data: serverProfile, isLoading } = useGetApiProfile();
 
 	const [localEdits, setLocalEdits] = useState<
 		Partial<Record<ProfileFieldKey, number>>
@@ -233,14 +230,19 @@ function ProfilePage() {
 	const getValue = useCallback(
 		(key: ProfileFieldKey): number => {
 			if (key in localEdits) return localEdits[key]!;
-			const serverValue = serverProfile?.[key as keyof UserProfile] as
+			const serverValue = serverProfile?.[key as keyof UserProfileDto] as
 				| number
+				| string
 				| undefined;
-			if (serverValue !== undefined && serverValue !== 0) return serverValue;
+			const numericValue =
+				typeof serverValue === "string"
+					? parseInt(serverValue, 10)
+					: serverValue;
+			if (numericValue !== undefined && numericValue !== 0) return numericValue;
 			if (key === "kakeraPerFloor") return DEFAULT_KAKERA_PER_FLOOR;
 			const badgePrice = BADGE_PRICES.find((b) => b.key === key);
 			if (badgePrice) return badgePrice.default;
-			return serverValue ?? 0;
+			return numericValue ?? 0;
 		},
 		[localEdits, serverProfile],
 	);
@@ -249,20 +251,23 @@ function ProfilePage() {
 		setLocalEdits((prev) => ({ ...prev, [key]: value }));
 	}, []);
 
-	const saveMutation = useMutation({
-		mutationFn: (request: UpdateProfileRequest) => profileApi.update(request),
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: ["profile"] });
-			toast.success("Profile saved");
-		},
-		onError: () => {
-			toast.error("Failed to save profile");
+	const saveMutation = usePutApiProfile({
+		mutation: {
+			onSuccess: async () => {
+				await queryClient.invalidateQueries({
+					queryKey: ["/api/profile"],
+				});
+				toast.success("Profile saved");
+			},
+			onError: () => {
+				toast.error("Failed to save profile");
+			},
 		},
 	});
 
 	const handleSave = useCallback(() => {
 		if (!hasChanges) return;
-		saveMutation.mutate(localEdits as UpdateProfileRequest);
+		saveMutation.mutate({ data: localEdits as UpdateProfileRequest });
 	}, [localEdits, hasChanges, saveMutation]);
 
 	if (isLoading) {

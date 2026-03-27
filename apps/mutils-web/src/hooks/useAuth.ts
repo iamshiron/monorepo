@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { authApi } from "@/lib/api";
+import {
+	getApiAuthCallback,
+	postApiAuthLogout,
+} from "@/api/authentication/authentication";
 import type { User } from "@/types";
 
 export function useAuth() {
@@ -15,18 +18,22 @@ export function useAuth() {
 	}, []);
 
 	const login = useCallback(async (code: string) => {
-		const response = await authApi.callback(code);
+		const redirectUri = `${window.location.origin}/auth/callback`;
+		const response = await getApiAuthCallback({
+			code,
+			redirect_uri: redirectUri,
+		});
 		console.log("Auth response:", response);
 		localStorage.setItem("accessToken", response.accessToken);
 		localStorage.setItem("refreshToken", response.refreshToken);
 		localStorage.setItem("user", JSON.stringify(response.user));
-		setUser(response.user);
-		return response.user;
+		setUser(response.user as User);
+		return response.user as User;
 	}, []);
 
 	const logout = useCallback(async () => {
 		try {
-			await authApi.logout();
+			await postApiAuthLogout();
 		} catch {
 			// Ignore logout errors
 		} finally {

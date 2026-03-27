@@ -20,17 +20,17 @@ import {
 import { KAKERA_COLORS } from "@/lib/constants";
 import type {
 	CreateKakeraClaimRequest,
-	KakeraClaim,
+	KakeraClaimDto,
 	KakeraType,
 	UpdateKakeraClaimRequest,
-} from "@/types";
+} from "@/api/model";
 
 interface KakeraClaimModalProps {
 	isOpen: boolean;
 	onClose: () => void;
 	onSubmit?: (request: CreateKakeraClaimRequest) => Promise<void>;
 	onUpdate?: (id: string, request: UpdateKakeraClaimRequest) => Promise<void>;
-	editClaim?: KakeraClaim | null;
+	editClaim?: KakeraClaimDto | null;
 }
 
 const KAKERA_TYPES: {
@@ -38,18 +38,18 @@ const KAKERA_TYPES: {
 	label: string;
 	defaultValue: number;
 }[] = [
-	{ value: "purple", label: "Purple", defaultValue: 120 },
-	{ value: "blue", label: "Blue", defaultValue: 100 },
-	{ value: "green", label: "Green", defaultValue: 75 },
-	{ value: "yellow", label: "Yellow", defaultValue: 60 },
-	{ value: "orange", label: "Orange", defaultValue: 50 },
-	{ value: "red", label: "Red", defaultValue: 40 },
-	{ value: "rainbow", label: "Rainbow", defaultValue: 150 },
-	{ value: "light", label: "Light", defaultValue: 30 },
-	{ value: "chaos", label: "Chaos", defaultValue: 25 },
-	{ value: "dark", label: "Dark", defaultValue: 20 },
-	{ value: "teal", label: "Teal", defaultValue: 15 },
-	{ value: "bku", label: "Bku", defaultValue: 10 },
+	{ value: "Purple", label: "Purple", defaultValue: 120 },
+	{ value: "Blue", label: "Blue", defaultValue: 100 },
+	{ value: "Green", label: "Green", defaultValue: 75 },
+	{ value: "Yellow", label: "Yellow", defaultValue: 60 },
+	{ value: "Orange", label: "Orange", defaultValue: 50 },
+	{ value: "Red", label: "Red", defaultValue: 40 },
+	{ value: "Rainbow", label: "Rainbow", defaultValue: 150 },
+	{ value: "Light", label: "Light", defaultValue: 30 },
+	{ value: "Chaos", label: "Chaos", defaultValue: 25 },
+	{ value: "Dark", label: "Dark", defaultValue: 20 },
+	{ value: "Teal", label: "Teal", defaultValue: 15 },
+	{ value: "Bku", label: "Bku", defaultValue: 10 },
 ];
 
 export function KakeraClaimModal({
@@ -60,7 +60,7 @@ export function KakeraClaimModal({
 	editClaim,
 }: KakeraClaimModalProps) {
 	const [characterName, setCharacterName] = useState("");
-	const [type, setType] = useState<KakeraType>("purple");
+	const [type, setType] = useState<KakeraType>("Purple");
 	const [value, setValue] = useState(120);
 	const [isClaimed, setIsClaimed] = useState(true);
 	const [claimedAt, setClaimedAt] = useState(
@@ -74,12 +74,12 @@ export function KakeraClaimModal({
 		if (editClaim) {
 			setCharacterName(editClaim.characterName || "");
 			setType(editClaim.type);
-			setValue(editClaim.value);
+			setValue(Number(editClaim.value));
 			setIsClaimed(editClaim.isClaimed);
 			setClaimedAt(editClaim.claimedAt.slice(0, 10));
 		} else {
 			setCharacterName("");
-			setType("purple");
+			setType("Purple");
 			setValue(120);
 			setIsClaimed(true);
 			setClaimedAt(new Date().toISOString().slice(0, 10));
@@ -98,7 +98,7 @@ export function KakeraClaimModal({
 		setIsLoading(true);
 		try {
 			const request = {
-				characterName: characterName.trim() || undefined,
+				characterName: characterName.trim() || null,
 				type,
 				value,
 				isClaimed,
@@ -120,7 +120,7 @@ export function KakeraClaimModal({
 
 	const handleClose = () => {
 		setCharacterName("");
-		setType("purple");
+		setType("Purple");
 		setValue(120);
 		setIsClaimed(true);
 		setClaimedAt(new Date().toISOString().slice(0, 10));

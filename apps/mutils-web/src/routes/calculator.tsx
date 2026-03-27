@@ -7,7 +7,7 @@ import {
 	TrashIcon,
 	UploadIcon,
 } from "@phosphor-icons/react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { Alert, AlertDescription } from "@shiron/ui/components/ui/alert";
@@ -36,8 +36,15 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@shiron/ui/components/ui/tooltip";
-import { calculatorApi } from "@/lib/api";
-import type { CalculatorConfig, CreateCalculatorConfigRequest } from "@/types";
+import {
+	useDeleteApiCalculatorId,
+	useGetApiCalculator,
+	usePostApiCalculator,
+} from "@/api/calculator/calculator";
+import type {
+	CalculatorConfigDto,
+	CreateCalculatorConfigRequest,
+} from "@/api/model";
 
 export const Route = createFileRoute("/calculator")({
 	component: CalculatorPage,
@@ -233,27 +240,30 @@ function formatPercent(value: number, decimals = 4): string {
 
 function CalculatorPage() {
 	const queryClient = useQueryClient();
-	const [inputs, setInputs] = useState<CalculatorIconInputs>(defaultInputs);
+	const [inputs, setInputs] = useState<CalculatorInputs>(defaultInputs);
 	const [configName, setConfigName] = useState("");
 	const [importError, setImportError] = useState<string | null>(null);
 
-	const { data: configs = [], isLoading } = useQuery({
-		queryKey: ["calculator-configs"],
-		queryFn: calculatorApi.getAll,
-	});
+	const { data: configs = [], isLoading } = useGetApiCalculator();
 
-	const createMutation = useMutation({
-		mutationFn: calculatorApi.create,
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["calculator-configs"] });
-			setConfigName("");
+	const createMutation = usePostApiCalculator({
+		mutation: {
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: ["/api/calculator"],
+				});
+				setConfigName("");
+			},
 		},
 	});
 
-	const deleteMutation = useMutation({
-		mutationFn: calculatorApi.delete,
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["calculator-configs"] });
+	const deleteMutation = useDeleteApiCalculatorId({
+		mutation: {
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: ["/api/calculator"],
+				});
+			},
 		},
 	});
 
@@ -266,35 +276,48 @@ function CalculatorPage() {
 	const handleSaveConfig = () => {
 		let name = configName.trim();
 		if (!name) {
-			name = `Setup ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+			name = `Setup ${new Date().toLocaleTimeString([], {
+				hour: "2-digit",
+				minute: "2-digit",
+			})}`;
 		}
 
 		const request: CreateCalculatorConfigRequest = {
 			name,
-			...inputs,
+			totalPool: inputs.totalPool,
+			disabledLimit: inputs.disabledLimit,
+			antiDisabled: inputs.antiDisabled,
+			silverBadge: inputs.silverBadge,
+			rubyBadge: inputs.rubyBadge,
+			bwLevel: inputs.bwRollsInvested,
+			perk2: inputs.perk2,
+			perk3: inputs.perk3,
+			perk4: inputs.perk4,
+			ownedTotal: inputs.ownedTotal,
+			ownedDisabled: inputs.ownedDisabled,
 		};
-		createMutation.mutate(request);
+		createMutation.mutate({ data: request });
 	};
 
-	const handleLoadConfig = (config: CalculatorConfig) => {
+	const handleLoadConfig = (config: CalculatorConfigDto) => {
 		setInputs({
-			totalPool: config.totalPool,
-			disabledLimit: config.disabledLimit,
-			antiDisabled: config.antiDisabled,
-			silverBadge: config.silverBadge,
-			rubyBadge: config.rubyBadge,
-			perk2: config.perk2,
-			perk3: config.perk3,
-			perk4: config.perk4,
-			ownedTotal: config.ownedTotal,
-			ownedDisabled: config.ownedDisabled,
-			totalRolls: config.totalRolls ?? 0,
-			bwRollsInvested: config.bwRollsInvested ?? 0,
+			totalPool: Number(config.totalPool),
+			disabledLimit: Number(config.disabledLimit),
+			antiDisabled: Number(config.antiDisabled),
+			silverBadge: Number(config.silverBadge),
+			rubyBadge: Number(config.rubyBadge),
+			perk2: Number(config.perk2),
+			perk3: Number(config.perk3),
+			perk4: Number(config.perk4),
+			ownedTotal: Number(config.ownedTotal),
+			ownedDisabled: Number(config.ownedDisabled),
+			totalRolls: 10,
+			bwRollsInvested: Number(config.bwLevel) ?? 0,
 		});
 	};
 
 	const handleDeleteConfig = (id: string) => {
-		deleteMutation.mutate(id);
+		deleteMutation.mutate({ id });
 	};
 
 	const handleExport = () => {
@@ -304,7 +327,9 @@ function CalculatorPage() {
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement("a");
 		a.href = url;
-		a.download = `mudae-calculator-configs-${new Date().toISOString().split("T")[0]}.json`;
+		a.download = `mudae-calculator-configs-${
+			new Date().toISOString().split("T")[0]
+		}.json`;
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
@@ -333,15 +358,14 @@ function CalculatorPage() {
 									antiDisabled: config.antiDisabled ?? 0,
 									silverBadge: config.silverBadge ?? 0,
 									rubyBadge: config.rubyBadge ?? 0,
+									bwLevel: config.bwRollsInvested ?? config.bwLevel ?? 0,
 									perk2: config.perk2 ?? 0,
 									perk3: config.perk3 ?? 0,
 									perk4: config.perk4 ?? 0,
 									ownedTotal: config.ownedTotal ?? 0,
 									ownedDisabled: config.ownedDisabled ?? 0,
-									totalRolls: config.totalRolls ?? 0,
-									bwRollsInvested: config.bwRollsInvested ?? 0,
 								};
-								createMutation.mutate(request);
+								createMutation.mutate({ data: request });
 							});
 							setImportError(null);
 						} else {

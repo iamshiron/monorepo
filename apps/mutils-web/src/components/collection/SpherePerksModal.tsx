@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@shiron/ui/components/ui/button";
@@ -19,8 +19,12 @@ import {
 } from "@shiron/ui/components/ui/select";
 import { Spinner } from "@shiron/ui/components/ui/spinner";
 import { Switch } from "@shiron/ui/components/ui/switch";
-import { collectionApi } from "@/lib/api";
-import type { CollectionEntry, CollectionEntrySpherePerks } from "@/types";
+import {
+	useGetApiCollectionIdSpheres,
+	usePostApiCollectionIdSpheres,
+} from "@/api/collection/collection";
+import type { CollectionEntrySpherePerks } from "@/api/model";
+import type { CollectionEntry } from "@/types";
 
 const SPHERE_PERKS = [
 	{
@@ -166,11 +170,12 @@ export function SpherePerksModal({
 }) {
 	const queryClient = useQueryClient();
 
-	const { data: serverPerks, isLoading } = useQuery({
-		queryKey: ["sphere-perks", entry?.id],
-		queryFn: () => collectionApi.getSpherePerks(entry!.id),
-		enabled: isOpen && entry !== null,
-	});
+	const { data: serverPerks, isLoading } = useGetApiCollectionIdSpheres(
+		entry?.id ?? "",
+		{
+			query: { enabled: isOpen && entry !== null },
+		},
+	);
 
 	const [localPerks, setLocalPerks] =
 		useState<CollectionEntrySpherePerks>(EMPTY_PERKS);
@@ -194,24 +199,24 @@ export function SpherePerksModal({
 		setLocalPerks((prev) => ({ ...prev, [key]: value }));
 	};
 
-	const saveMutation = useMutation({
-		mutationFn: (perks: CollectionEntrySpherePerks) =>
-			collectionApi.updateSpherePerks(entry!.id, perks),
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({
-				queryKey: ["sphere-perks", entry?.id],
-			});
-			toast.success("Sphere perks saved");
-			onClose();
-		},
-		onError: () => {
-			toast.error("Failed to save sphere perks");
+	const saveMutation = usePostApiCollectionIdSpheres({
+		mutation: {
+			onSuccess: async () => {
+				await queryClient.invalidateQueries({
+					queryKey: ["/api/collection", entry?.id, "spheres"],
+				});
+				toast.success("Sphere perks saved");
+				onClose();
+			},
+			onError: () => {
+				toast.error("Failed to save sphere perks");
+			},
 		},
 	});
 
 	const handleSave = () => {
 		if (!entry) return;
-		saveMutation.mutate(localPerks);
+		saveMutation.mutate({ id: entry.id, data: localPerks as any });
 	};
 
 	const hasChanges =

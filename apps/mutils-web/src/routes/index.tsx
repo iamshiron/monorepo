@@ -1,11 +1,18 @@
 import { SignInIcon } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@shiron/ui/components/ui/button";
-import { authApi } from "@/lib/api";
 
 export const Route = createFileRoute("/")({
 	component: HomePage,
 });
+
+function getDiscordUrl(): string {
+	const clientId = import.meta.env.VITE_MUTILS_DISCORD_CLIENT_ID;
+	const redirectUri = `${window.location.origin}/auth/callback`;
+	return `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
+		redirectUri,
+	)}&response_type=code&scope=identify`;
+}
 
 function HomePage() {
 	const clientId = import.meta.env.VITE_MUTILS_DISCORD_CLIENT_ID;
@@ -28,7 +35,7 @@ function HomePage() {
 					asChild
 					className="h-10 px-6 text-sm shadow-lg hover:shadow-glow-sakura"
 				>
-					<a href={authApi.getDiscordUrl()}>
+					<a href={getDiscordUrl()}>
 						<SignInIcon size={20} weight="bold" />
 						Login with Discord
 					</a>

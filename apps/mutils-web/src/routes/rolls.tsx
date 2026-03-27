@@ -6,7 +6,6 @@ import {
 	SparkleIcon,
 	StarIcon,
 } from "@phosphor-icons/react";
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { isAfter, parseISO, subDays } from "date-fns";
 import { useState } from "react";
@@ -22,10 +21,12 @@ import {
 	TableHeader,
 	TableRow,
 } from "@shiron/ui/components/ui/table";
+import { useGetApiCollectionStats } from "@/api/collection/collection";
+import { useGetApiKakeraClaims } from "@/api/kakera/kakera";
+import { useGetApiProfile } from "@/api/profile/profile";
+import type { KakeraClaimDto, KakeraType } from "@/api/model";
 import { useAuth } from "@/hooks/useAuth";
-import { collectionApi, kakeraApi, profileApi } from "@/lib/api";
 import { KAKERA_COLORS } from "@/lib/constants";
-import type { KakeraClaim, KakeraType } from "@/types";
 
 export const Route = createFileRoute("/rolls")({
 	component: RollsPage,
@@ -41,18 +42,18 @@ const TIMEFRAME_CONFIG: Record<TimeframeKey, { label: string; days: number }> =
 	};
 
 const KAKERA_TYPE_ORDER: KakeraType[] = [
-	"chaos",
-	"dark",
-	"light",
-	"rainbow",
-	"red",
-	"orange",
-	"yellow",
-	"green",
-	"teal",
-	"blue",
-	"purple",
-	"bku",
+	"Chaos",
+	"Dark",
+	"Light",
+	"Rainbow",
+	"Red",
+	"Orange",
+	"Yellow",
+	"Green",
+	"Teal",
+	"Blue",
+	"Purple",
+	"Bku",
 ];
 
 interface KakeraTypeStats {
@@ -65,9 +66,9 @@ interface KakeraTypeStats {
 }
 
 function filterClaimsByTimeframe(
-	claims: KakeraClaim[],
+	claims: KakeraClaimDto[],
 	timeframe: TimeframeKey,
-): KakeraClaim[] {
+): KakeraClaimDto[] {
 	const days = TIMEFRAME_CONFIG[timeframe].days;
 	const cutoff = subDays(new Date(), days);
 	return claims.filter((claim) => {
@@ -76,7 +77,7 @@ function filterClaimsByTimeframe(
 	});
 }
 
-function calculateKakeraStats(claims: KakeraClaim[]): KakeraTypeStats[] {
+function calculateKakeraStats(claims: KakeraClaimDto[]): KakeraTypeStats[] {
 	const totalClaims = claims.length;
 	if (totalClaims === 0) return [];
 
@@ -88,7 +89,7 @@ function calculateKakeraStats(claims: KakeraClaim[]): KakeraTypeStats[] {
 			byType[type] = { count: 0, totalValue: 0 };
 		}
 		byType[type].count++;
-		byType[type].totalValue += claim.value;
+		byType[type].totalValue += Number(claim.value);
 	}
 
 	const orderedTypes = KAKERA_TYPE_ORDER.filter((type) => byType[type]);
@@ -250,20 +251,13 @@ function RollsPage() {
 	const { isAuthenticated } = useAuth();
 	const [timeframe, setTimeframe] = useState<TimeframeKey>("month");
 
-	const { data: profile, isLoading: profileLoading } = useQuery({
-		queryKey: ["profile"],
-		queryFn: profileApi.get,
-	});
+	const { data: profile, isLoading: profileLoading } = useGetApiProfile();
 
-	const { data: collectionStats, isLoading: statsLoading } = useQuery({
-		queryKey: ["collection-stats"],
-		queryFn: collectionApi.getStats,
-	});
+	const { data: collectionStats, isLoading: statsLoading } =
+		useGetApiCollectionStats();
 
-	const { data: kakeraClaims } = useQuery({
-		queryKey: ["kakera-claims"],
-		queryFn: () => kakeraApi.getClaims(),
-		enabled: isAuthenticated,
+	const { data: kakeraClaims } = useGetApiKakeraClaims(undefined, {
+		query: { enabled: isAuthenticated },
 	});
 
 	if (profileLoading || statsLoading) {
@@ -283,18 +277,18 @@ function RollsPage() {
 	}
 
 	const inputs = {
-		totalPool: profile.totalPool || 33927,
-		disabledLimit: profile.disabledLimit || 28927,
-		antiDisabled: profile.antiDisabled || 0,
-		silverBadge: profile.silverBadge || 0,
-		rubyBadge: profile.rubyBadge || 0,
-		perk2: profile.towerPerk2 || 0,
-		perk3: profile.towerPerk3 || 0,
-		perk4: profile.towerPerk4 || 0,
-		ownedTotal: collectionStats?.totalCharacters || 0,
-		ownedDisabled: collectionStats?.disabledCount || 0,
-		totalRolls: profile.totalRolls || 10,
-		bwRollsInvested: profile.bwRollsInvested || 0,
+		totalPool: Number(profile.totalPool) || 33927,
+		disabledLimit: Number(profile.disabledLimit) || 28927,
+		antiDisabled: Number(profile.antiDisabled) || 0,
+		silverBadge: Number(profile.silverBadge) || 0,
+		rubyBadge: Number(profile.rubyBadge) || 0,
+		perk2: Number(profile.towerPerk2) || 0,
+		perk3: Number(profile.towerPerk3) || 0,
+		perk4: Number(profile.towerPerk4) || 0,
+		ownedTotal: Number(collectionStats?.totalCharacters) || 0,
+		ownedDisabled: Number(collectionStats?.disabledCount) || 0,
+		totalRolls: Number(profile.totalRolls) || 10,
+		bwRollsInvested: Number(profile.bwRollsInvested) || 0,
 	};
 
 	const results = calculate(inputs);
@@ -394,7 +388,9 @@ function RollsPage() {
 					items={[
 						{
 							label: "Silver Badge",
-							value: `Level ${inputs.silverBadge} (+${inputs.silverBadge * 25}%)`,
+							value: `Level ${inputs.silverBadge} (+${
+								inputs.silverBadge * 25
+							}%)`,
 						},
 						{
 							label: "Ruby Badge",
@@ -588,7 +584,9 @@ function RollsPage() {
 							title="Est. Hourly Kakera"
 							icon={<ClockIcon size={16} className="text-info" />}
 							value={`~${Math.round(estimatedHourlyKakera).toLocaleString()}`}
-							subtext={`${effectiveRolls} rolls × ${(totalHitChance * 100).toFixed(2)}% hit rate × ${avgKakeraPerClaim.toFixed(0)} avg`}
+							subtext={`${effectiveRolls} rolls × ${(
+								totalHitChance * 100
+							).toFixed(2)}% hit rate × ${avgKakeraPerClaim.toFixed(0)} avg`}
 							variant="info"
 						/>
 

@@ -18,8 +18,21 @@ import {
 	UploadIcon,
 	WarningIcon,
 } from "@phosphor-icons/react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import {
+	useDeleteApiKakeraClaims,
+	useDeleteApiKakeraClaimsId,
+	useGetApiKakeraClaims,
+	useGetApiKakeraStats,
+	usePostApiKakeraBulkImport,
+	usePostApiKakeraClaims,
+	usePostApiKakeraImport,
+	usePutApiKakeraClaimsId,
+	getApiKakeraExport,
+	getGetApiKakeraClaimsQueryKey,
+	getGetApiKakeraStatsQueryKey,
+} from "@/api/kakera/kakera";
 import { format, isAfter, parseISO, startOfDay, subDays } from "date-fns";
 import { useState } from "react";
 import {
@@ -98,16 +111,13 @@ import {
 } from "@shiron/ui/components/ui/table";
 import { Textarea } from "@shiron/ui/components/ui/textarea";
 import { useAuth } from "@/hooks/useAuth";
-import { kakeraApi } from "@/lib/api";
 import { KAKERA_COLORS } from "@/lib/constants";
 import type {
 	BulkKakeraImportResponse,
-	CreateKakeraClaimRequest,
-	KakeraClaim,
-	KakeraClaimExportItem,
+	KakeraClaimDto,
+	KakeraExportItemDto,
 	KakeraType,
-	UpdateKakeraClaimRequest,
-} from "@/types";
+} from "@/api/model";
 
 export const Route = createFileRoute("/statistics")({
 	component: StatisticsPage,
@@ -155,7 +165,7 @@ function StatisticsPage() {
 	const [sortBy, setSortBy] = useState<SortField>("claimedAt");
 	const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 	const [showAddModal, setShowAddModal] = useState(false);
-	const [editClaim, setEditClaim] = useState<KakeraClaim | null>(null);
+	const [editClaim, setEditClaim] = useState<KakeraClaimDto | null>(null);
 	const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 	const [showImportConfirm, setShowImportConfirm] = useState(false);
 	const [showWipeConfirm, setShowWipeConfirm] = useState(false);
@@ -163,7 +173,7 @@ function StatisticsPage() {
 	const [bulkImportData, setBulkImportData] = useState("");
 	const [bulkImportCharacterName, setBulkImportCharacterName] = useState("");
 	const [pendingImportData, setPendingImportData] = useState<
-		KakeraClaimExportItem[] | null
+		KakeraExportItemDto[] | null
 	>(null);
 	const [showAdvancedStats, setShowAdvancedStats] = useState(false);
 	const [thresholdTarget, setThresholdTarget] = useState<string>("0");
@@ -181,64 +191,73 @@ function StatisticsPage() {
 	>("default");
 	const queryClient = useQueryClient();
 
-	const { data: claims, isLoading: claimsLoading } = useQuery({
-		queryKey: ["kakera-claims"],
-		queryFn: () => kakeraApi.getClaims(),
-		enabled: isAuthenticated,
+	const { data: claims, isLoading: claimsLoading } = useGetApiKakeraClaims(
+		undefined,
+		{ query: { enabled: isAuthenticated } },
+	);
+
+	const { data: stats, isLoading: statsLoading } = useGetApiKakeraStats({
+		query: { enabled: isAuthenticated },
 	});
 
-	const { data: stats, isLoading: statsLoading } = useQuery({
-		queryKey: ["kakera-stats"],
-		queryFn: () => kakeraApi.getStats(),
-		enabled: isAuthenticated,
-	});
-
-	const createClaimMutation = useMutation({
-		mutationFn: (request: CreateKakeraClaimRequest) =>
-			kakeraApi.createClaim(request),
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["kakera-claims"] });
-			queryClient.invalidateQueries({ queryKey: ["kakera-stats"] });
+	const createClaimMutation = usePostApiKakeraClaims({
+		mutation: {
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: getGetApiKakeraClaimsQueryKey(),
+				});
+				queryClient.invalidateQueries({
+					queryKey: getGetApiKakeraStatsQueryKey(),
+				});
+			},
 		},
 	});
 
-	const updateClaimMutation = useMutation({
-		mutationFn: ({
-			id,
-			request,
-		}: {
-			id: string;
-			request: UpdateKakeraClaimRequest;
-		}) => kakeraApi.updateClaim(id, request),
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["kakera-claims"] });
-			queryClient.invalidateQueries({ queryKey: ["kakera-stats"] });
-			setEditClaim(null);
+	const updateClaimMutation = usePutApiKakeraClaimsId({
+		mutation: {
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: getGetApiKakeraClaimsQueryKey(),
+				});
+				queryClient.invalidateQueries({
+					queryKey: getGetApiKakeraStatsQueryKey(),
+				});
+				setEditClaim(null);
+			},
 		},
 	});
 
-	const deleteClaimMutation = useMutation({
-		mutationFn: (id: string) => kakeraApi.deleteClaim(id),
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["kakera-claims"] });
-			queryClient.invalidateQueries({ queryKey: ["kakera-stats"] });
-			setDeleteConfirmId(null);
+	const deleteClaimMutation = useDeleteApiKakeraClaimsId({
+		mutation: {
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: getGetApiKakeraClaimsQueryKey(),
+				});
+				queryClient.invalidateQueries({
+					queryKey: getGetApiKakeraStatsQueryKey(),
+				});
+				setDeleteConfirmId(null);
+			},
 		},
 	});
 
-	const importClaimsMutation = useMutation({
-		mutationFn: (claims: KakeraClaimExportItem[]) =>
-			kakeraApi.importClaims(claims),
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["kakera-claims"] });
-			queryClient.invalidateQueries({ queryKey: ["kakera-stats"] });
-			setShowImportConfirm(false);
-			setPendingImportData(null);
+	const importClaimsMutation = usePostApiKakeraImport({
+		mutation: {
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: getGetApiKakeraClaimsQueryKey(),
+				});
+				queryClient.invalidateQueries({
+					queryKey: getGetApiKakeraStatsQueryKey(),
+				});
+				setShowImportConfirm(false);
+				setPendingImportData(null);
+			},
 		},
 	});
 
 	const handleExport = async () => {
-		const data = await kakeraApi.exportClaims();
+		const data = await getApiKakeraExport();
 		const blob = new Blob([JSON.stringify(data, null, 2)], {
 			type: "application/json",
 		});
@@ -276,13 +295,16 @@ function StatisticsPage() {
 				totalKakera: stats.totalValue,
 				totalClaims: stats.totalCount,
 				averagePerClaim: Math.round(avgPerClaim),
-				bestClaim: Math.max(...claims.map((c) => c.value), 0),
+				bestClaim: Math.max(...claims.map((c) => Number(c.value)), 0),
 				last7DaysTotal,
 				dailyAverage: Math.round(dailyAvg),
 				monthlyEstimate: Math.round(dailyAvg * 30),
 				successRate:
 					claims.length > 0
-						? `${Math.round((claims.filter((c) => c.isClaimed).length / claims.length) * 100)}%`
+						? `${Math.round(
+								(claims.filter((c) => c.isClaimed).length / claims.length) *
+									100,
+							)}%`
 						: "0%",
 			},
 			distributionByType: typeStats,
@@ -373,41 +395,44 @@ function StatisticsPage() {
 		e.target.value = "";
 	};
 
-	const wipeClaimsMutation = useMutation({
-		mutationFn: () => kakeraApi.wipeClaims(),
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["kakera-claims"] });
-			queryClient.invalidateQueries({ queryKey: ["kakera-stats"] });
-			setShowWipeConfirm(false);
+	const wipeClaimsMutation = useDeleteApiKakeraClaims({
+		mutation: {
+			onSuccess: () => {
+				queryClient.invalidateQueries({
+					queryKey: getGetApiKakeraClaimsQueryKey(),
+				});
+				queryClient.invalidateQueries({
+					queryKey: getGetApiKakeraStatsQueryKey(),
+				});
+				setShowWipeConfirm(false);
+			},
 		},
 	});
 
-	const bulkImportMutation = useMutation({
-		mutationFn: async () => {
-			console.log("Sending bulk import:", {
-				data: bulkImportData,
-				characterName: bulkImportCharacterName,
-			});
-			const result = await kakeraApi.bulkImport({
-				data: bulkImportData,
-				characterName: bulkImportCharacterName || undefined,
-			});
-			console.log("Bulk import result:", result);
-			return result;
-		},
-		onSuccess: (result: BulkKakeraImportResponse) => {
-			queryClient.invalidateQueries({ queryKey: ["kakera-claims"] });
-			queryClient.invalidateQueries({ queryKey: ["kakera-stats"] });
-			setShowBulkImportModal(false);
-			setBulkImportData("");
-			setBulkImportCharacterName("");
-			if (result.errors.length > 0) {
-				alert(
-					`Imported ${result.imported}, Skipped ${result.skipped}\n\nErrors:\n${result.errors.join("\n")}`,
-				);
-			} else {
-				alert(`Imported ${result.imported} claims, skipped ${result.skipped}`);
-			}
+	const bulkImportMutation = usePostApiKakeraBulkImport({
+		mutation: {
+			onSuccess: (result: BulkKakeraImportResponse) => {
+				queryClient.invalidateQueries({
+					queryKey: getGetApiKakeraClaimsQueryKey(),
+				});
+				queryClient.invalidateQueries({
+					queryKey: getGetApiKakeraStatsQueryKey(),
+				});
+				setShowBulkImportModal(false);
+				setBulkImportData("");
+				setBulkImportCharacterName("");
+				if (result.errors.length > 0) {
+					alert(
+						`Imported ${result.imported}, Skipped ${
+							result.skipped
+						}\n\nErrors:\n${result.errors.join("\n")}`,
+					);
+				} else {
+					alert(
+						`Imported ${result.imported} claims, skipped ${result.skipped}`,
+					);
+				}
+			},
 		},
 	});
 
@@ -443,7 +468,7 @@ function StatisticsPage() {
 		);
 		return {
 			date: format(parseISO(date), "MMM dd"),
-			value: dayClaims.reduce((sum, c) => sum + c.value, 0),
+			value: dayClaims.reduce((sum, c) => sum + Number(c.value), 0),
 			count: dayClaims.length,
 		};
 	});
@@ -457,11 +482,14 @@ function StatisticsPage() {
 	const last7DaysClaims = claims.filter((c) =>
 		isAfter(parseISO(c.claimedAt), sevenDaysAgo),
 	);
-	const last7DaysTotal = last7DaysClaims.reduce((sum, c) => sum + c.value, 0);
+	const last7DaysTotal = last7DaysClaims.reduce(
+		(sum, c) => sum + Number(c.value),
+		0,
+	);
 
 	const avgPerClaim =
 		filteredClaims.length > 0
-			? filteredClaims.reduce((sum, c) => sum + c.value, 0) /
+			? filteredClaims.reduce((sum, c) => sum + Number(c.value), 0) /
 				filteredClaims.length
 			: 0;
 	const daysWithData = dailyData.filter((d) => d.value > 0).length || 1;
@@ -469,7 +497,7 @@ function StatisticsPage() {
 		dailyData.reduce((sum, d) => sum + d.value, 0) / daysWithData;
 
 	const getKakeraColor = (type: string | number) => {
-		const typeStr = String(type).toLowerCase();
+		const typeStr = String(type);
 		return KAKERA_COLORS[typeStr as KakeraType] || "var(--foreground)";
 	};
 
@@ -480,7 +508,7 @@ function StatisticsPage() {
 				if (!acc[type]) {
 					acc[type] = { totalValue: 0, count: 0 };
 				}
-				acc[type].totalValue += claim.value;
+				acc[type].totalValue += Number(claim.value);
 				acc[type].count += 1;
 				return acc;
 			},
@@ -513,7 +541,7 @@ function StatisticsPage() {
 		return {
 			name,
 			count: dayClaims.length,
-			value: dayClaims.reduce((sum, c) => sum + c.value, 0),
+			value: dayClaims.reduce((sum, c) => sum + Number(c.value), 0),
 		};
 	});
 
@@ -654,7 +682,7 @@ function StatisticsPage() {
 				}, 0);
 				const rSquared = Math.max(0, 1 - ssResidual / ssTotal);
 
-				const currentBaseline = stats.totalValue;
+				const currentBaseline = Number(stats.totalValue);
 				const lastDayInData = Math.max(...dataPoints.map((p) => p.x));
 
 				const futureDays = [7, 14, 30, 60, 90];
@@ -715,7 +743,7 @@ function StatisticsPage() {
 				comparison = String(a.type).localeCompare(String(b.type));
 				break;
 			case "value":
-				comparison = a.value - b.value;
+				comparison = Number(a.value) - Number(b.value);
 				break;
 			case "claimedAt":
 				comparison =
@@ -877,7 +905,10 @@ function StatisticsPage() {
 							<span className="text-muted-foreground text-sm">Best Claim</span>
 						</div>
 						<p className="text-3xl font-bold text-primary">
-							{Math.max(...claims.map((c) => c.value), 0).toLocaleString()}
+							{Math.max(
+								...claims.map((c) => Number(c.value)),
+								0,
+							).toLocaleString()}
 						</p>
 					</CardContent>
 				</Card>
@@ -928,7 +959,10 @@ function StatisticsPage() {
 						</div>
 						<p className="text-3xl font-bold text-destructive">
 							{claims.length > 0
-								? `${Math.round((claims.filter((c) => c.isClaimed).length / claims.length) * 100)}%`
+								? `${Math.round(
+										(claims.filter((c) => c.isClaimed).length / claims.length) *
+											100,
+									)}%`
 								: "0%"}
 						</p>
 					</CardContent>
@@ -1114,17 +1148,17 @@ function StatisticsPage() {
 								<TableBody>
 									{(() => {
 										const typeOrder = [
-											"chaos",
-											"dark",
-											"light",
-											"rainbow",
-											"red",
-											"orange",
-											"yellow",
-											"green",
-											"teal",
-											"blue",
-											"purple",
+											"Chaos",
+											"Dark",
+											"Light",
+											"Rainbow",
+											"Red",
+											"Orange",
+											"Yellow",
+											"Green",
+											"Teal",
+											"Blue",
+											"Purple",
 										] as const;
 										const totalClaims = filteredClaims.length;
 										const orderedData = typeOrder
@@ -1406,7 +1440,9 @@ function StatisticsPage() {
 										Momentum
 									</div>
 									<p
-										className={`text-2xl font-bold flex items-center gap-2 ${momentum >= 0 ? "text-success" : "text-destructive"}`}
+										className={`text-2xl font-bold flex items-center gap-2 ${
+											momentum >= 0 ? "text-success" : "text-destructive"
+										}`}
 									>
 										{momentum >= 0 ? (
 											<TrendUpIcon size={20} />
@@ -1560,7 +1596,9 @@ function StatisticsPage() {
 												Using recent trend:
 											</span>
 											<span
-												className={`font-semibold ${momentum >= 0 ? "text-success" : "text-destructive"}`}
+												className={`font-semibold ${
+													momentum >= 0 ? "text-success" : "text-destructive"
+												}`}
 											>
 												{daysToTargetTrend === Infinity
 													? "\u221E"
@@ -1600,7 +1638,23 @@ function StatisticsPage() {
 													tickLine={false}
 													axisLine={false}
 												/>
-												<Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+												<Tooltip
+													contentStyle={CHART_TOOLTIP_STYLE}
+													formatter={(value: unknown, _name, props) => {
+														const numValue =
+															typeof value === "number" ? value : Number(value);
+														if (isNaN(numValue)) {
+															return "";
+														}
+														const isFuture = props.payload?.isFuture;
+														return (
+															<span className={isFuture ? "text-info" : ""}>
+																{numValue.toLocaleString()}
+																{isFuture ? " (projected)" : ""}
+															</span>
+														);
+													}}
+												/>
 												<Line
 													type="monotone"
 													dataKey="rollingAvg"
@@ -1658,7 +1712,11 @@ function StatisticsPage() {
 														Slope ={" "}
 													</span>
 													<span
-														className={`font-semibold ${linearResult.slope >= 0 ? "text-success" : "text-destructive"}`}
+														className={`font-semibold ${
+															linearResult.slope >= 0
+																? "text-success"
+																: "text-destructive"
+														}`}
 													>
 														{linearResult.slope >= 0 ? "+" : ""}
 														{linearResult.slope.toFixed(2)} kakera/day²
@@ -1681,8 +1739,12 @@ function StatisticsPage() {
 											</p>
 											<p className="text-xs text-muted-foreground mt-2">
 												{linearResult.slope >= 0
-													? `Your daily income is growing by ~${linearResult.slope.toFixed(1)} kakera each day`
-													: `Your daily income is declining by ~${Math.abs(linearResult.slope).toFixed(1)} kakera each day`}
+													? `Your daily income is growing by ~${linearResult.slope.toFixed(
+															1,
+														)} kakera each day`
+													: `Your daily income is declining by ~${Math.abs(
+															linearResult.slope,
+														).toFixed(1)} kakera each day`}
 											</p>
 										</div>
 
@@ -1798,12 +1860,12 @@ function StatisticsPage() {
 														/>
 														<Tooltip
 															contentStyle={CHART_TOOLTIP_STYLE}
-															formatter={(
-																value: number | undefined,
-																_name,
-																props,
-															) => {
-																if (value === undefined) return "";
+															formatter={(value, _name, props) => {
+																const numValue =
+																	typeof value === "number"
+																		? value
+																		: Number(value);
+																if (isNaN(numValue)) return "";
 																const isFuture = props.payload?.isFuture;
 																return (
 																	<span className={isFuture ? "text-info" : ""}>
@@ -1968,9 +2030,13 @@ function StatisticsPage() {
 												variant="outline"
 												className="capitalize"
 												style={{
-													backgroundColor: `color-mix(in srgb, ${getKakeraColor(claim.type)} 12%, transparent)`,
+													backgroundColor: `color-mix(in srgb, ${getKakeraColor(
+														claim.type,
+													)} 12%, transparent)`,
 													color: getKakeraColor(claim.type),
-													borderColor: `color-mix(in srgb, ${getKakeraColor(claim.type)} 25%, transparent)`,
+													borderColor: `color-mix(in srgb, ${getKakeraColor(
+														claim.type,
+													)} 25%, transparent)`,
 												}}
 											>
 												{String(claim.type).toLowerCase()}
@@ -1998,7 +2064,11 @@ function StatisticsPage() {
 														variant="ghost"
 														size="sm"
 														className="text-destructive hover:text-destructive h-auto py-0.5 px-1.5 text-xs"
-														onClick={() => deleteClaimMutation.mutate(claim.id)}
+														onClick={() =>
+															deleteClaimMutation.mutate({
+																id: claim.id,
+															})
+														}
 													>
 														Confirm
 													</Button>
@@ -2101,7 +2171,7 @@ function StatisticsPage() {
 				isOpen={showAddModal}
 				onClose={() => setShowAddModal(false)}
 				onSubmit={async (request) => {
-					await createClaimMutation.mutateAsync(request);
+					await createClaimMutation.mutateAsync({ data: request });
 				}}
 			/>
 
@@ -2110,7 +2180,10 @@ function StatisticsPage() {
 				onClose={() => setEditClaim(null)}
 				editClaim={editClaim}
 				onUpdate={async (id, request) => {
-					await updateClaimMutation.mutateAsync({ id, request });
+					await updateClaimMutation.mutateAsync({
+						id,
+						data: request,
+					});
 				}}
 			/>
 
@@ -2142,7 +2215,9 @@ function StatisticsPage() {
 							variant="destructive"
 							onClick={() => {
 								if (pendingImportData) {
-									importClaimsMutation.mutate(pendingImportData);
+									importClaimsMutation.mutate({
+										data: pendingImportData,
+									});
 								}
 							}}
 							disabled={importClaimsMutation.isPending}
@@ -2245,7 +2320,14 @@ APP
 							Cancel
 						</Button>
 						<Button
-							onClick={() => bulkImportMutation.mutate()}
+							onClick={() =>
+								bulkImportMutation.mutate({
+									data: {
+										data: bulkImportData,
+										characterName: bulkImportCharacterName || null,
+									},
+								})
+							}
 							disabled={bulkImportMutation.isPending || !bulkImportData.trim()}
 						>
 							{bulkImportMutation.isPending ? "Importing..." : "Import"}
