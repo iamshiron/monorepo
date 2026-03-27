@@ -22,6 +22,7 @@ public class MutilsDbContext : DbContext {
     public DbSet<CalculatorConfig> CalculatorConfigs => Set<CalculatorConfig>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<WishlistEntry> WishlistEntries => Set<WishlistEntry>();
+    public DbSet<SpherePerks> SpherePerks => Set<SpherePerks>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         modelBuilder.Entity<User>(entity => {
@@ -196,6 +197,14 @@ public class MutilsDbContext : DbContext {
                 .WithMany(c => c.WishlistEntries)
                 .HasForeignKey(e => e.CharacterId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<SpherePerks>(entity => {
+            entity.HasKey(e => e.CollectionEntryId);
+            entity.HasIndex(e => e.CollectionEntryId);
+            entity.HasOne(e => e.CollectionEntry)
+                .WithOne(e => e.SpherePerks)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 

@@ -8,4 +8,6 @@ public sealed class CollectionEntry : BaseEntity {
     public DateTime? AcquiredAt { get; set; }
     public string? Notes { get; set; }
     public bool IsFavorite { get; set; } = false;
+
+    public SpherePerks? SpherePerks { get; set; }
 }
