@@ -95,6 +95,7 @@ app.UseAuthorization();
 
 app.MapAuthEndpoints();
 app.MapCollectionEndpoints();
+app.MapSphereEndpoints();
 app.MapListEndpoints();
 app.MapOptimizerEndpoints();
 app.MapUserEndpoints();
