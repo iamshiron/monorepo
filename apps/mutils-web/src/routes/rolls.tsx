@@ -117,8 +117,8 @@ function calculateWeightedAverage(stats: KakeraTypeStats[]): number {
 }
 
 function getKakeraColor(type: KakeraType | string): string {
-    const typeStr = String(type).toLowerCase();
-    return KAKERA_COLORS[typeStr as KakeraType] || "var(--foreground)";
+	const typeStr = String(type).toLowerCase();
+	return KAKERA_COLORS[typeStr as KakeraType] || "var(--foreground)";
 }
 
 interface CalculationResults {
