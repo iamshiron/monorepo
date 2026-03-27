@@ -1,7 +1,7 @@
-import { SignInIcon } from "@phosphor-icons/react";
-import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
-import { authApi } from "@/lib/api";
+import { SignInIcon } from '@phosphor-icons/react';
+import { createFileRoute } from '@tanstack/react-router';
+import { Button } from '@shiron/ui/components/ui/button';
+import { authApi } from '@/lib/api';
 
 export const Route = createFileRoute("/")({
 	component: HomePage,
@@ -42,7 +42,7 @@ function HomePage() {
 					</p>
 					<pre className="bg-muted p-4 rounded-lg text-sm text-muted-foreground">
 						{`VITE_MUTILS_DISCORD_CLIENT_ID=your_discord_application_id
-VITE_MUTILS_API_URL=http://localhost:5000/api`}
+VITE_MUTILS_API_URL=http://localhost:1810/api`}
 					</pre>
 					<p className="text-foreground-subtle text-sm mt-4">
 						See{" "}
