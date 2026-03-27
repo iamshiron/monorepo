@@ -115,3 +115,18 @@ public sealed record AddCharacterResponse(
     bool IsNewCharacter,
     int ImagesQueued
 );
+
+public sealed record CollectionEntrySpherePerks(
+    int Perk1,
+    int Perk2,
+    int Perk3,
+    int Perk4,
+    int Perk5,
+    bool Perk6,
+    bool Perk7,
+    bool Perk8,
+    bool Perk9,
+    bool Perk10
+) {
+    public static CollectionEntrySpherePerks Empty = new(0, 0, 0, 0, 0, false, false, false, false, false);
+}
