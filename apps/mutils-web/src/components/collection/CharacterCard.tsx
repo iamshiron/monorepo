@@ -6,6 +6,7 @@ import {
 	StarIcon,
 	TrashIcon,
 	XIcon,
+	SphereIcon,
 } from "@phosphor-icons/react";
 import { memo } from "react";
 import { Badge } from "@shiron/ui/components/ui/badge";
@@ -40,6 +41,7 @@ export const CharacterCard = memo(function CharacterCard({
 	onAddToWishlist,
 	onRemoveFromWishlist,
 	onToggleFavorite,
+	onEditSpherePerks,
 	wishlistStatus,
 }: {
 	entry: CollectionEntry;
@@ -48,6 +50,7 @@ export const CharacterCard = memo(function CharacterCard({
 	onAddToWishlist: (entry: CollectionEntry, isStarwish: boolean) => void;
 	onRemoveFromWishlist: (wishlistEntryId: string) => void;
 	onToggleFavorite: (entry: CollectionEntry) => void;
+	onEditSpherePerks: (entry: CollectionEntry) => void;
 	wishlistStatus?: { id: string; type: "wish" | "starwish" } | null;
 }) {
 	const character = entry.character;
@@ -62,7 +65,9 @@ export const CharacterCard = memo(function CharacterCard({
 		<ContextMenu>
 			<ContextMenuTrigger asChild>
 				<div
-					className={`glass rounded-lg p-2.5 lantern-top hover:shadow-lg transition-all group relative ${isDisabled ? "ring-2 ring-destructive/50 bg-destructive/5" : ""}`}
+					className={`glass rounded-lg p-2.5 lantern-top hover:shadow-lg transition-all group relative ${
+						isDisabled ? "ring-2 ring-destructive/50 bg-destructive/5" : ""
+					}`}
 				>
 					{isDisabled && (
 						<Badge
@@ -90,7 +95,9 @@ export const CharacterCard = memo(function CharacterCard({
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<div
-									className={`absolute z-10 ${entry.isFavorite ? "top-5 left-1.5" : "top-1.5 left-1.5"}`}
+									className={`absolute z-10 ${
+										entry.isFavorite ? "top-5 left-1.5" : "top-1.5 left-1.5"
+									}`}
 								>
 									<StarIcon
 										size={14}
@@ -115,7 +122,9 @@ export const CharacterCard = memo(function CharacterCard({
 							<img
 								src={imageSrc}
 								alt={character.name}
-								className={`w-full h-full object-cover rounded-md group-hover:scale-105 transition-transform ${isDisabled ? "opacity-60" : ""}`}
+								className={`w-full h-full object-cover rounded-md group-hover:scale-105 transition-transform ${
+									isDisabled ? "opacity-60" : ""
+								}`}
 								loading="lazy"
 							/>
 						) : (
@@ -124,7 +133,9 @@ export const CharacterCard = memo(function CharacterCard({
 					</div>
 					<div className="flex items-start justify-between gap-1.5">
 						<h3
-							className={`font-medium text-sm truncate ${isDisabled ? "text-destructive" : ""}`}
+							className={`font-medium text-sm truncate ${
+								isDisabled ? "text-destructive" : ""
+							}`}
 							title={character.name}
 						>
 							{character.name}
@@ -140,7 +151,10 @@ export const CharacterCard = memo(function CharacterCard({
 								/>
 								{character.keyCount && (
 									<span
-										className={`text-[10px] ${KEY_COLORS[character.keyType] || "text-muted-foreground/70"}`}
+										className={`text-[10px] ${
+											KEY_COLORS[character.keyType] ||
+											"text-muted-foreground/70"
+										}`}
 									>
 										×{character.keyCount}
 									</span>
@@ -258,6 +272,11 @@ export const CharacterCard = memo(function CharacterCard({
 						</ContextMenuItem>
 					</>
 				)}
+				<ContextMenuSeparator />
+				<ContextMenuItem onClick={() => onEditSpherePerks(entry)}>
+					<SphereIcon size={14} className="mr-2" />
+					Edit Sphere Perks
+				</ContextMenuItem>
 				<ContextMenuSeparator />
 				<ContextMenuItem onClick={() => onEdit(entry)}>
 					<PencilIcon size={14} className="mr-2" />

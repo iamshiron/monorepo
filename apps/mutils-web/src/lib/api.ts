@@ -8,6 +8,7 @@ import type {
 	BulkKakeraImportResponse,
 	CalculatorConfig,
 	CollectionEntry,
+	CollectionEntrySpherePerks,
 	CollectionExportRequest,
 	CollectionExportResponse,
 	CollectionStats,
@@ -211,6 +212,17 @@ export const collectionApi = {
 			{ data },
 		);
 		return response;
+	},
+
+	getSpherePerks: async (id: string) => {
+		const { data } = await api.get<CollectionEntrySpherePerks>(
+			`/collection/${id}/speheres`,
+		);
+		return data;
+	},
+
+	updateSpherePerks: async (id: string, perks: CollectionEntrySpherePerks) => {
+		await api.post(`/collection/${id}/spheres`, perks);
 	},
 };
 

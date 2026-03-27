@@ -425,3 +425,16 @@ export interface AddCharacterResponse {
 	isNewCharacter: boolean;
 	imagesQueued: number;
 }
+
+export interface CollectionEntrySpherePerks {
+	perk1: number;
+	perk2: number;
+	perk3: number;
+	perk4: number;
+	perk5: number;
+	perk6: boolean;
+	perk7: boolean;
+	perk8: boolean;
+	perk9: boolean;
+	perk10: boolean;
+}

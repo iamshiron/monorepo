@@ -32,6 +32,7 @@ import {
 } from "@/components/collection/FilterSheet";
 import { ImportModal } from "@/components/collection/ImportModal";
 import { SeriesImportModal } from "@/components/collection/SeriesImportModal";
+import { SpherePerksModal } from "@/components/collection/SpherePerksModal";
 import { Button } from "@shiron/ui/components/ui/button";
 import { Input } from "@shiron/ui/components/ui/input";
 import {
@@ -103,6 +104,8 @@ function CollectionPage() {
 	const [deletingEntry, setDeletingEntry] = useState<CollectionEntry | null>(
 		null,
 	);
+	const [editingSpherePerks, setEditingSpherePerks] =
+		useState<CollectionEntry | null>(null);
 	const [search, setSearch] = useState("");
 	const [sortBy, setSortBy] = useState("rank");
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -353,7 +356,9 @@ function CollectionPage() {
 				isStarwish,
 			});
 			toast.success(
-				`Added ${entry.character.name} to ${isStarwish ? "starwish" : "wishlist"}`,
+				`Added ${entry.character.name} to ${
+					isStarwish ? "starwish" : "wishlist"
+				}`,
 			);
 		} catch (error) {
 			if (error instanceof Error) {
@@ -580,7 +585,9 @@ function CollectionPage() {
 				>
 					<SortAscendingIcon
 						size={18}
-						className={`transition-transform ${sortOrder === "desc" ? "rotate-180" : ""}`}
+						className={`transition-transform ${
+							sortOrder === "desc" ? "rotate-180" : ""
+						}`}
 					/>
 				</Button>
 			</div>
@@ -632,6 +639,7 @@ function CollectionPage() {
 								onAddToWishlist={handleAddToWishlist}
 								onRemoveFromWishlist={handleRemoveFromWishlist}
 								onToggleFavorite={handleToggleFavorite}
+								onEditSpherePerks={setEditingSpherePerks}
 								wishlistStatus={wishlistMap.get(entry.character.id) ?? null}
 							/>
 						))}
@@ -724,6 +732,12 @@ function CollectionPage() {
 						toast.info(`${result.imagesQueued} image(s) queued for download`);
 					}
 				}}
+			/>
+
+			<SpherePerksModal
+				isOpen={editingSpherePerks !== null}
+				onClose={() => setEditingSpherePerks(null)}
+				entry={editingSpherePerks}
 			/>
 		</div>
 	);

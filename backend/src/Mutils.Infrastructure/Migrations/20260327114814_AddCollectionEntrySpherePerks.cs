@@ -1,20 +1,16 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Shiron.Mutils.Infrastructure.Migrations
-{
+namespace Shiron.Mutils.Infrastructure.Migrations {
     /// <inheritdoc />
-    public partial class AddCollectionEntrySpherePerks : Migration
-    {
+    public partial class AddCollectionEntrySpherePerks : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.CreateTable(
                 name: "SpherePerks",
-                columns: table => new
-                {
+                columns: table => new {
                     CollectionEntryId = table.Column<Guid>(type: "uuid", nullable: false),
                     Perk1 = table.Column<int>(type: "integer", nullable: false),
                     Perk2 = table.Column<int>(type: "integer", nullable: false),
@@ -30,8 +26,7 @@ namespace Shiron.Mutils.Infrastructure.Migrations
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_SpherePerks", x => x.CollectionEntryId);
                     table.ForeignKey(
                         name: "FK_SpherePerks_CollectionEntries_CollectionEntryId",
@@ -48,8 +43,7 @@ namespace Shiron.Mutils.Infrastructure.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropTable(
                 name: "SpherePerks");
         }
