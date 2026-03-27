@@ -515,12 +515,10 @@ function StatisticsPage() {
 			{} as Record<string, { totalValue: number; count: number }>,
 		),
 	).map(([type, data]) => ({
-		name:
-			String(type).charAt(0).toUpperCase() +
-			String(type).slice(1).toLowerCase(),
+		name: String(type).charAt(0).toUpperCase() + String(type).slice(1),
 		value: data.totalValue,
 		count: data.count,
-		type: String(type).toLowerCase() as KakeraType,
+		type: String(type) as KakeraType,
 	}));
 
 	const cumulativeData = dailyData.reduce((acc: any[], day, i) => {
@@ -2039,7 +2037,7 @@ function StatisticsPage() {
 													)} 25%, transparent)`,
 												}}
 											>
-												{String(claim.type).toLowerCase()}
+												{String(claim.type)}
 											</Badge>
 										</TableCell>
 										<TableCell className="text-right font-mono text-primary">
