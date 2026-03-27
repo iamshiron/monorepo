@@ -1,54 +1,54 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
-@import '@fontsource-variable/ibm-plex-sans';
-@import '@shiron/ui/styles/globals.css';
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/ibm-plex-sans";
+@import "@shiron/ui/styles/globals.css";
 
-@source "@shiron/ui";
+@source "../../../../packages/ui/src/components";
 
 @theme inline {
-    --color-kakera-purple: var(--kakera-purple);
-    --color-kakera-blue: var(--kakera-blue);
-    --color-kakera-green: var(--kakera-green);
-    --color-kakera-yellow: var(--kakera-yellow);
-    --color-kakera-orange: var(--kakera-orange);
-    --color-kakera-red: var(--kakera-red);
-    --color-kakera-rainbow: var(--kakera-rainbow);
-    --color-kakera-light: var(--kakera-light);
-    --color-kakera-chaos: var(--kakera-chaos);
-    --color-kakera-dark: var(--kakera-dark);
-    --color-kakera-teal: var(--kakera-teal);
-    --color-kakera-bku: var(--kakera-bku);
+	--color-kakera-purple: var(--kakera-purple);
+	--color-kakera-blue: var(--kakera-blue);
+	--color-kakera-green: var(--kakera-green);
+	--color-kakera-yellow: var(--kakera-yellow);
+	--color-kakera-orange: var(--kakera-orange);
+	--color-kakera-red: var(--kakera-red);
+	--color-kakera-rainbow: var(--kakera-rainbow);
+	--color-kakera-light: var(--kakera-light);
+	--color-kakera-chaos: var(--kakera-chaos);
+	--color-kakera-dark: var(--kakera-dark);
+	--color-kakera-teal: var(--kakera-teal);
+	--color-kakera-bku: var(--kakera-bku);
 }
 
 :root {
-    /* Kakera type colors */
-    --kakera-purple: oklch(0.541 0.281 293.009);
-    --kakera-blue: oklch(0.546 0.245 262.881);
-    --kakera-green: oklch(0.627 0.194 149.214);
-    --kakera-yellow: oklch(0.795 0.184 86.047);
-    --kakera-orange: oklch(0.702 0.183 54.116);
-    --kakera-red: oklch(0.577 0.245 27.325);
-    --kakera-rainbow: oklch(0.667 0.295 322.15);
-    --kakera-light: oklch(0.818 0.024 286.375);
-    --kakera-chaos: oklch(0.6 0.24 0);
-    --kakera-dark: oklch(0.373 0.034 286.375);
-    --kakera-teal: oklch(0.6 0.155 192.776);
-    --kakera-bku: oklch(0.445 0.188 305.274);
+	/* Kakera type colors */
+	--kakera-purple: oklch(0.541 0.281 293.009);
+	--kakera-blue: oklch(0.546 0.245 262.881);
+	--kakera-green: oklch(0.627 0.194 149.214);
+	--kakera-yellow: oklch(0.795 0.184 86.047);
+	--kakera-orange: oklch(0.702 0.183 54.116);
+	--kakera-red: oklch(0.577 0.245 27.325);
+	--kakera-rainbow: oklch(0.667 0.295 322.15);
+	--kakera-light: oklch(0.818 0.024 286.375);
+	--kakera-chaos: oklch(0.6 0.24 0);
+	--kakera-dark: oklch(0.373 0.034 286.375);
+	--kakera-teal: oklch(0.6 0.155 192.776);
+	--kakera-bku: oklch(0.445 0.188 305.274);
 }
 
 .dark {
-    /* Kakera type colors (dark) */
-    --kakera-purple: oklch(0.627 0.265 293.009);
-    --kakera-blue: oklch(0.623 0.234 262.881);
-    --kakera-green: oklch(0.696 0.178 149.214);
-    --kakera-yellow: oklch(0.838 0.167 86.047);
-    --kakera-orange: oklch(0.752 0.171 54.116);
-    --kakera-red: oklch(0.704 0.191 22.216);
-    --kakera-rainbow: oklch(0.667 0.295 322.15);
-    --kakera-light: oklch(0.869 0.018 286.375);
-    --kakera-chaos: oklch(0.674 0.222 0);
-    --kakera-dark: oklch(0.501 0.029 286.375);
-    --kakera-teal: oklch(0.674 0.14 192.776);
-    --kakera-bku: oklch(0.541 0.178 305.274);
+	/* Kakera type colors (dark) */
+	--kakera-purple: oklch(0.627 0.265 293.009);
+	--kakera-blue: oklch(0.623 0.234 262.881);
+	--kakera-green: oklch(0.696 0.178 149.214);
+	--kakera-yellow: oklch(0.838 0.167 86.047);
+	--kakera-orange: oklch(0.752 0.171 54.116);
+	--kakera-red: oklch(0.704 0.191 22.216);
+	--kakera-rainbow: oklch(0.667 0.295 322.15);
+	--kakera-light: oklch(0.869 0.018 286.375);
+	--kakera-chaos: oklch(0.674 0.222 0);
+	--kakera-dark: oklch(0.501 0.029 286.375);
+	--kakera-teal: oklch(0.674 0.14 192.776);
+	--kakera-bku: oklch(0.541 0.178 305.274);
 }

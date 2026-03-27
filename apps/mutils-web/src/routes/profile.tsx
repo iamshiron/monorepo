@@ -1,532 +1,504 @@
 import {
-    CastleTurretIcon,
-    DiceFiveIcon,
-    FloppyDiskIcon,
-    GearIcon,
-    MedalIcon,
-    WarningIcon,
-} from '@phosphor-icons/react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
-import { useCallback, useEffect, useState } from 'react';
-import { toast } from 'sonner';
-import { Button } from '@shiron/ui/components/ui/button';
+	CastleTurretIcon,
+	DiceFiveIcon,
+	FloppyDiskIcon,
+	GearIcon,
+	MedalIcon,
+	WarningIcon,
+} from "@phosphor-icons/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Button } from "@shiron/ui/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@shiron/ui/components/ui/card';
-import { Input } from '@shiron/ui/components/ui/input';
-import { Label } from '@shiron/ui/components/ui/label';
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@shiron/ui/components/ui/card";
+import { Input } from "@shiron/ui/components/ui/input";
+import { Label } from "@shiron/ui/components/ui/label";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@shiron/ui/components/ui/select';
-import { Spinner } from '@shiron/ui/components/ui/spinner';
-import { profileApi } from '@/lib/api';
-import type { UpdateProfileRequest, UserProfile } from '@/types';
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@shiron/ui/components/ui/select";
+import { Spinner } from "@shiron/ui/components/ui/spinner";
+import { profileApi } from "@/lib/api";
+import type { UpdateProfileRequest, UserProfile } from "@/types";
 
-export const Route = createFileRoute('/profile')({
-    component: ProfilePage,
+export const Route = createFileRoute("/profile")({
+	component: ProfilePage,
 });
 
 const BADGES = [
-    { key: 'bronzeBadge', label: 'Bronze' },
-    { key: 'silverBadge', label: 'Silver' },
-    { key: 'goldBadge', label: 'Gold' },
-    { key: 'sapphireBadge', label: 'Sapphire' },
-    { key: 'rubyBadge', label: 'Ruby' },
-    { key: 'emeraldBadge', label: 'Emerald' },
-    { key: 'diamondBadge', label: 'Diamond' },
+	{ key: "bronzeBadge", label: "Bronze" },
+	{ key: "silverBadge", label: "Silver" },
+	{ key: "goldBadge", label: "Gold" },
+	{ key: "sapphireBadge", label: "Sapphire" },
+	{ key: "rubyBadge", label: "Ruby" },
+	{ key: "emeraldBadge", label: "Emerald" },
+	{ key: "diamondBadge", label: "Diamond" },
 ] as const;
 
 const TOWER_PERKS = [
-    { key: 'towerPerk1', id: 1, description: '+2 wishlist slots' },
-    {
-        key: 'towerPerk2',
-        id: 2,
-        description: 'Increased spawn chance for your $starwish: +50%',
-    },
-    {
-        key: 'towerPerk3',
-        id: 3,
-        description:
-            'Disablelist: +1 slot and limits lowered by 200 $wa, 200 $ha, 140 $wg, 140 $hg',
-    },
-    {
-        key: 'towerPerk4',
-        id: 4,
-        description:
-            '+10% chance to earn a second key if the character is wished',
-    },
-    {
-        key: 'towerPerk5',
-        id: 5,
-        description: 'Unveil 2 random buttons for the $oh command',
-    },
-    {
-        key: 'towerPerk6',
-        id: 6,
-        description: '+30 spheres when you claim a character',
-    },
-    {
-        key: 'towerPerk7',
-        id: 7,
-        description: 'Max kakera power increased to 110%',
-    },
-    {
-        key: 'towerPerk8',
-        id: 8,
-        description: 'Kakera buttons cost -4% kakera power',
-    },
-    {
-        key: 'towerPerk9',
-        id: 9,
-        description: 'Gold keys max bonus increased by +500 kakera/3h ($bku)',
-    },
-    {
-        key: 'towerPerk10',
-        id: 10,
-        description: 'Light kakera give +1 random kakera',
-    },
-    { key: 'towerPerk11', id: 11, description: '+1 roll per hour' },
-    {
-        key: 'towerPerk12',
-        id: 12,
-        description: '$colormm and $colorpr commands unlocked',
-    },
+	{ key: "towerPerk1", id: 1, description: "+2 wishlist slots" },
+	{
+		key: "towerPerk2",
+		id: 2,
+		description: "Increased spawn chance for your $starwish: +50%",
+	},
+	{
+		key: "towerPerk3",
+		id: 3,
+		description:
+			"Disablelist: +1 slot and limits lowered by 200 $wa, 200 $ha, 140 $wg, 140 $hg",
+	},
+	{
+		key: "towerPerk4",
+		id: 4,
+		description: "+10% chance to earn a second key if the character is wished",
+	},
+	{
+		key: "towerPerk5",
+		id: 5,
+		description: "Unveil 2 random buttons for the $oh command",
+	},
+	{
+		key: "towerPerk6",
+		id: 6,
+		description: "+30 spheres when you claim a character",
+	},
+	{
+		key: "towerPerk7",
+		id: 7,
+		description: "Max kakera power increased to 110%",
+	},
+	{
+		key: "towerPerk8",
+		id: 8,
+		description: "Kakera buttons cost -4% kakera power",
+	},
+	{
+		key: "towerPerk9",
+		id: 9,
+		description: "Gold keys max bonus increased by +500 kakera/3h ($bku)",
+	},
+	{
+		key: "towerPerk10",
+		id: 10,
+		description: "Light kakera give +1 random kakera",
+	},
+	{ key: "towerPerk11", id: 11, description: "+1 roll per hour" },
+	{
+		key: "towerPerk12",
+		id: 12,
+		description: "$colormm and $colorpr commands unlocked",
+	},
 ] as const;
 
 const ROLL_SETTINGS = [
-    {
-        key: 'totalPool',
-        label: 'Total Pool ($wg)',
-        description: 'Total characters in roulette from $wg',
-    },
-    {
-        key: 'disabledLimit',
-        label: 'Disabled Limit',
-        description: 'Base disabled limit before perk 3',
-    },
-    {
-        key: 'antiDisabled',
-        label: 'Antidisabled ($ad)',
-        description: 'Characters added back via $ad',
-    },
-    {
-        key: 'totalRolls',
-        label: 'Total Rolls/Hour',
-        description: 'Total rolls available per hour (base + perk 11 bonus)',
-    },
-    {
-        key: 'bwRollsInvested',
-        label: '$bw Rolls Invested',
-        description: 'Rolls invested in boostwish for bonus spawn',
-    },
+	{
+		key: "totalPool",
+		label: "Total Pool ($wg)",
+		description: "Total characters in roulette from $wg",
+	},
+	{
+		key: "disabledLimit",
+		label: "Disabled Limit",
+		description: "Base disabled limit before perk 3",
+	},
+	{
+		key: "antiDisabled",
+		label: "Antidisabled ($ad)",
+		description: "Characters added back via $ad",
+	},
+	{
+		key: "totalRolls",
+		label: "Total Rolls/Hour",
+		description: "Total rolls available per hour (base + perk 11 bonus)",
+	},
+	{
+		key: "bwRollsInvested",
+		label: "$bw Rolls Invested",
+		description: "Rolls invested in boostwish for bonus spawn",
+	},
 ] as const;
 
 const DEFAULT_KAKERA_PER_FLOOR = 5000;
 
 const BADGE_PRICES = [
-    { key: 'bronzeBadgePrice', label: 'Bronze', default: 1000 },
-    { key: 'silverBadgePrice', label: 'Silver', default: 2000 },
-    { key: 'goldBadgePrice', label: 'Gold', default: 3000 },
-    { key: 'sapphireBadgePrice', label: 'Sapphire', default: 5000 },
-    { key: 'rubyBadgePrice', label: 'Ruby', default: 7000 },
-    { key: 'emeraldBadgePrice', label: 'Emerald', default: 9000 },
-    { key: 'diamondBadgePrice', label: 'Diamond', default: 12000 },
+	{ key: "bronzeBadgePrice", label: "Bronze", default: 1000 },
+	{ key: "silverBadgePrice", label: "Silver", default: 2000 },
+	{ key: "goldBadgePrice", label: "Gold", default: 3000 },
+	{ key: "sapphireBadgePrice", label: "Sapphire", default: 5000 },
+	{ key: "rubyBadgePrice", label: "Ruby", default: 7000 },
+	{ key: "emeraldBadgePrice", label: "Emerald", default: 9000 },
+	{ key: "diamondBadgePrice", label: "Diamond", default: 12000 },
 ] as const;
 
 function calculateTowerInvestment(
-    totalFloors: number,
-    kakeraPerFloor: number,
+	totalFloors: number,
+	kakeraPerFloor: number,
 ): number {
-    return (kakeraPerFloor * totalFloors * (totalFloors + 1)) / 2;
+	return (kakeraPerFloor * totalFloors * (totalFloors + 1)) / 2;
 }
 
 function getTotalTowerFloors(
-    getValue: (key: ProfileFieldKey) => number,
+	getValue: (key: ProfileFieldKey) => number,
 ): number {
-    return TOWER_PERKS.reduce((sum, perk) => sum + getValue(perk.key), 0);
+	return TOWER_PERKS.reduce((sum, perk) => sum + getValue(perk.key), 0);
 }
 
 function validateTowerLevels(getValue: (key: ProfileFieldKey) => number): {
-    isValid: boolean;
-    issues: { perkId: number; current: number; required: number }[];
+	isValid: boolean;
+	issues: { perkId: number; current: number; required: number }[];
 } {
-    const levels = TOWER_PERKS.map((perk) => ({
-        id: perk.id,
-        level: getValue(perk.key),
-    }));
-    const maxLevel = Math.max(...levels.map((l) => l.level));
+	const levels = TOWER_PERKS.map((perk) => ({
+		id: perk.id,
+		level: getValue(perk.key),
+	}));
+	const maxLevel = Math.max(...levels.map((l) => l.level));
 
-    if (maxLevel === 0) return { isValid: true, issues: [] };
+	if (maxLevel === 0) return { isValid: true, issues: [] };
 
-    const issues: { perkId: number; current: number; required: number }[] = [];
+	const issues: { perkId: number; current: number; required: number }[] = [];
 
-    for (const perk of levels) {
-        if (perk.level < maxLevel - 1) {
-            issues.push({
-                perkId: perk.id,
-                current: perk.level,
-                required: maxLevel - 1,
-            });
-        }
-    }
+	for (const perk of levels) {
+		if (perk.level < maxLevel - 1) {
+			issues.push({
+				perkId: perk.id,
+				current: perk.level,
+				required: maxLevel - 1,
+			});
+		}
+	}
 
-    return { isValid: issues.length === 0, issues };
+	return { isValid: issues.length === 0, issues };
 }
 
 type ProfileFieldKey =
-    | (typeof BADGES)[number]['key']
-    | (typeof TOWER_PERKS)[number]['key']
-    | (typeof ROLL_SETTINGS)[number]['key']
-    | 'kakeraPerFloor'
-    | (typeof BADGE_PRICES)[number]['key'];
+	| (typeof BADGES)[number]["key"]
+	| (typeof TOWER_PERKS)[number]["key"]
+	| (typeof ROLL_SETTINGS)[number]["key"]
+	| "kakeraPerFloor"
+	| (typeof BADGE_PRICES)[number]["key"];
 
 function LevelSelect({
-    value,
-    onChange,
-    max,
+	value,
+	onChange,
+	max,
 }: {
-    value: number;
-    onChange: (v: number) => void;
-    max: number;
+	value: number;
+	onChange: (v: number) => void;
+	max: number;
 }) {
-    return (
-        <Select
-            value={String(value)}
-            onValueChange={(v) => onChange(Number(v))}
-        >
-            <SelectTrigger className="w-20">
-                <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-                {Array.from({ length: max + 1 }, (_, i) => (
-                    <SelectItem key={i} value={String(i)}>
-                        {i}
-                    </SelectItem>
-                ))}
-            </SelectContent>
-        </Select>
-    );
+	return (
+		<Select value={String(value)} onValueChange={(v) => onChange(Number(v))}>
+			<SelectTrigger className="w-20">
+				<SelectValue />
+			</SelectTrigger>
+			<SelectContent>
+				{Array.from({ length: max + 1 }, (_, i) => (
+					<SelectItem key={i} value={String(i)}>
+						{i}
+					</SelectItem>
+				))}
+			</SelectContent>
+		</Select>
+	);
 }
 
 function ProfilePage() {
-    const queryClient = useQueryClient();
+	const queryClient = useQueryClient();
 
-    const { data: serverProfile, isLoading } = useQuery({
-        queryKey: ['profile'],
-        queryFn: profileApi.get,
-    });
+	const { data: serverProfile, isLoading } = useQuery({
+		queryKey: ["profile"],
+		queryFn: profileApi.get,
+	});
 
-    const [localEdits, setLocalEdits] = useState<
-        Partial<Record<ProfileFieldKey, number>>
-    >({});
-    const hasChanges = Object.keys(localEdits).length > 0;
+	const [localEdits, setLocalEdits] = useState<
+		Partial<Record<ProfileFieldKey, number>>
+	>({});
+	const hasChanges = Object.keys(localEdits).length > 0;
 
-    useEffect(() => {
-        setLocalEdits({});
-    }, [serverProfile]);
+	useEffect(() => {
+		setLocalEdits({});
+	}, [serverProfile]);
 
-    const getValue = useCallback(
-        (key: ProfileFieldKey): number => {
-            if (key in localEdits) return localEdits[key]!;
-            const serverValue = serverProfile?.[key as keyof UserProfile] as
-                | number
-                | undefined;
-            if (serverValue !== undefined && serverValue !== 0)
-                return serverValue;
-            if (key === 'kakeraPerFloor') return DEFAULT_KAKERA_PER_FLOOR;
-            const badgePrice = BADGE_PRICES.find((b) => b.key === key);
-            if (badgePrice) return badgePrice.default;
-            return serverValue ?? 0;
-        },
-        [localEdits, serverProfile],
-    );
+	const getValue = useCallback(
+		(key: ProfileFieldKey): number => {
+			if (key in localEdits) return localEdits[key]!;
+			const serverValue = serverProfile?.[key as keyof UserProfile] as
+				| number
+				| undefined;
+			if (serverValue !== undefined && serverValue !== 0) return serverValue;
+			if (key === "kakeraPerFloor") return DEFAULT_KAKERA_PER_FLOOR;
+			const badgePrice = BADGE_PRICES.find((b) => b.key === key);
+			if (badgePrice) return badgePrice.default;
+			return serverValue ?? 0;
+		},
+		[localEdits, serverProfile],
+	);
 
-    const updateField = useCallback((key: ProfileFieldKey, value: number) => {
-        setLocalEdits((prev) => ({ ...prev, [key]: value }));
-    }, []);
+	const updateField = useCallback((key: ProfileFieldKey, value: number) => {
+		setLocalEdits((prev) => ({ ...prev, [key]: value }));
+	}, []);
 
-    const saveMutation = useMutation({
-        mutationFn: (request: UpdateProfileRequest) =>
-            profileApi.update(request),
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['profile'] });
-            toast.success('Profile saved');
-        },
-        onError: () => {
-            toast.error('Failed to save profile');
-        },
-    });
+	const saveMutation = useMutation({
+		mutationFn: (request: UpdateProfileRequest) => profileApi.update(request),
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ["profile"] });
+			toast.success("Profile saved");
+		},
+		onError: () => {
+			toast.error("Failed to save profile");
+		},
+	});
 
-    const handleSave = useCallback(() => {
-        if (!hasChanges) return;
-        saveMutation.mutate(localEdits as UpdateProfileRequest);
-    }, [localEdits, hasChanges, saveMutation]);
+	const handleSave = useCallback(() => {
+		if (!hasChanges) return;
+		saveMutation.mutate(localEdits as UpdateProfileRequest);
+	}, [localEdits, hasChanges, saveMutation]);
 
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center py-12">
-                <Spinner className="size-8" />
-            </div>
-        );
-    }
+	if (isLoading) {
+		return (
+			<div className="flex items-center justify-center py-12">
+				<Spinner className="size-8" />
+			</div>
+		);
+	}
 
-    return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold">Profile</h1>
-                    <p className="text-muted-foreground">
-                        Configure your badge levels and tower perks
-                    </p>
-                </div>
-                <Button
-                    onClick={handleSave}
-                    disabled={!hasChanges || saveMutation.isPending}
-                >
-                    <FloppyDiskIcon className="mr-2 h-4 w-4" />
-                    {saveMutation.isPending ? 'Saving...' : 'Save'}
-                </Button>
-            </div>
+	return (
+		<div className="space-y-6">
+			<div className="flex items-center justify-between">
+				<div>
+					<h1 className="text-2xl font-bold">Profile</h1>
+					<p className="text-muted-foreground">
+						Configure your badge levels and tower perks
+					</p>
+				</div>
+				<Button
+					onClick={handleSave}
+					disabled={!hasChanges || saveMutation.isPending}
+				>
+					<FloppyDiskIcon className="mr-2 h-4 w-4" />
+					{saveMutation.isPending ? "Saving..." : "Save"}
+				</Button>
+			</div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <MedalIcon className="h-5 w-5" />
-                        Kakera Badges
-                    </CardTitle>
-                    <CardDescription>
-                        Set your current badge levels (0–4)
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {BADGES.map((badge) => (
-                            <div
-                                key={badge.key}
-                                className="flex items-center justify-between gap-3 rounded-md border p-3"
-                            >
-                                <Label className="font-medium">
-                                    {badge.label}
-                                </Label>
-                                <LevelSelect
-                                    value={getValue(badge.key)}
-                                    onChange={(v) => updateField(badge.key, v)}
-                                    max={4}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
+			<Card>
+				<CardHeader>
+					<CardTitle className="flex items-center gap-2">
+						<MedalIcon className="h-5 w-5" />
+						Kakera Badges
+					</CardTitle>
+					<CardDescription>Set your current badge levels (0–4)</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+						{BADGES.map((badge) => (
+							<div
+								key={badge.key}
+								className="flex items-center justify-between gap-3 rounded-md border p-3"
+							>
+								<Label className="font-medium">{badge.label}</Label>
+								<LevelSelect
+									value={getValue(badge.key)}
+									onChange={(v) => updateField(badge.key, v)}
+									max={4}
+								/>
+							</div>
+						))}
+					</div>
+				</CardContent>
+			</Card>
 
-            <Card>
-                <CardHeader>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <CardTitle className="flex items-center gap-2">
-                                <CastleTurretIcon className="h-5 w-5" />
-                                Tower Perks
-                            </CardTitle>
-                            <CardDescription>
-                                Set your current tower perk levels (0–5)
-                            </CardDescription>
-                        </div>
-                        <div className="text-right">
-                            <span className="text-xs text-muted-foreground">
-                                Total Kakera Invested
-                            </span>
-                            <p className="text-lg font-semibold">
-                                {calculateTowerInvestment(
-                                    getTotalTowerFloors(getValue),
-                                    getValue('kakeraPerFloor'),
-                                ).toLocaleString()}
-                            </p>
-                        </div>
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    {(() => {
-                        const validation = validateTowerLevels(getValue);
-                        if (!validation.isValid) {
-                            const maxLevel = Math.max(
-                                ...TOWER_PERKS.map((p) => getValue(p.key)),
-                            );
-                            return (
-                                <div className="mb-4 rounded-md border border-yellow-500/50 bg-yellow-500/10 p-3">
-                                    <div className="flex items-start gap-2">
-                                        <WarningIcon className="h-5 w-5 text-yellow-500 shrink-0 mt-0.5" />
-                                        <div>
-                                            <p className="font-medium text-yellow-500">
-                                                Invalid Tower Configuration
-                                            </p>
-                                            <p className="text-sm text-muted-foreground mt-1">
-                                                Each perk must be at least level{' '}
-                                                {maxLevel - 1} before any perk
-                                                can reach level {maxLevel}.
-                                            </p>
-                                            <p className="text-sm text-muted-foreground mt-1">
-                                                Behind:{' '}
-                                                {validation.issues
-                                                    .map(
-                                                        (i) =>
-                                                            `Perk ${i.perkId} (L${i.current} → L${i.required})`,
-                                                    )
-                                                    .join(', ')}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        }
-                        return null;
-                    })()}
-                    <div className="space-y-3">
-                        {TOWER_PERKS.map((perk) => (
-                            <div
-                                key={perk.key}
-                                className="flex items-center justify-between gap-4 rounded-md border p-3"
-                            >
-                                <div className="flex items-baseline gap-2 min-w-0">
-                                    <span className="text-muted-foreground font-mono text-sm shrink-0">
-                                        [{perk.id}]
-                                    </span>
-                                    <span className="text-sm">
-                                        {perk.description}
-                                    </span>
-                                </div>
-                                <LevelSelect
-                                    value={getValue(perk.key)}
-                                    onChange={(v) => updateField(perk.key, v)}
-                                    max={5}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
+			<Card>
+				<CardHeader>
+					<div className="flex items-center justify-between">
+						<div>
+							<CardTitle className="flex items-center gap-2">
+								<CastleTurretIcon className="h-5 w-5" />
+								Tower Perks
+							</CardTitle>
+							<CardDescription>
+								Set your current tower perk levels (0–5)
+							</CardDescription>
+						</div>
+						<div className="text-right">
+							<span className="text-xs text-muted-foreground">
+								Total Kakera Invested
+							</span>
+							<p className="text-lg font-semibold">
+								{calculateTowerInvestment(
+									getTotalTowerFloors(getValue),
+									getValue("kakeraPerFloor"),
+								).toLocaleString()}
+							</p>
+						</div>
+					</div>
+				</CardHeader>
+				<CardContent>
+					{(() => {
+						const validation = validateTowerLevels(getValue);
+						if (!validation.isValid) {
+							const maxLevel = Math.max(
+								...TOWER_PERKS.map((p) => getValue(p.key)),
+							);
+							return (
+								<div className="mb-4 rounded-md border border-yellow-500/50 bg-yellow-500/10 p-3">
+									<div className="flex items-start gap-2">
+										<WarningIcon className="h-5 w-5 text-yellow-500 shrink-0 mt-0.5" />
+										<div>
+											<p className="font-medium text-yellow-500">
+												Invalid Tower Configuration
+											</p>
+											<p className="text-sm text-muted-foreground mt-1">
+												Each perk must be at least level {maxLevel - 1} before
+												any perk can reach level {maxLevel}.
+											</p>
+											<p className="text-sm text-muted-foreground mt-1">
+												Behind:{" "}
+												{validation.issues
+													.map(
+														(i) =>
+															`Perk ${i.perkId} (L${i.current} → L${i.required})`,
+													)
+													.join(", ")}
+											</p>
+										</div>
+									</div>
+								</div>
+							);
+						}
+						return null;
+					})()}
+					<div className="space-y-3">
+						{TOWER_PERKS.map((perk) => (
+							<div
+								key={perk.key}
+								className="flex items-center justify-between gap-4 rounded-md border p-3"
+							>
+								<div className="flex items-baseline gap-2 min-w-0">
+									<span className="text-muted-foreground font-mono text-sm shrink-0">
+										[{perk.id}]
+									</span>
+									<span className="text-sm">{perk.description}</span>
+								</div>
+								<LevelSelect
+									value={getValue(perk.key)}
+									onChange={(v) => updateField(perk.key, v)}
+									max={5}
+								/>
+							</div>
+						))}
+					</div>
+				</CardContent>
+			</Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <DiceFiveIcon className="h-5 w-5" />
-                        Roll Settings
-                    </CardTitle>
-                    <CardDescription>
-                        Manual settings for roll calculations (cannot be
-                        auto-imported)
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-4">
-                        {ROLL_SETTINGS.map((setting) => (
-                            <div
-                                key={setting.key}
-                                className="flex items-center justify-between gap-4 rounded-md border p-3"
-                            >
-                                <div className="flex-1 min-w-0">
-                                    <Label className="font-medium">
-                                        {setting.label}
-                                    </Label>
-                                    <p className="text-xs text-muted-foreground mt-0.5">
-                                        {setting.description}
-                                    </p>
-                                </div>
-                                <Input
-                                    type="number"
-                                    min={0}
-                                    value={getValue(setting.key)}
-                                    onChange={(e) =>
-                                        updateField(
-                                            setting.key,
-                                            parseInt(e.target.value, 10) || 0,
-                                        )
-                                    }
-                                    className="w-32"
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
+			<Card>
+				<CardHeader>
+					<CardTitle className="flex items-center gap-2">
+						<DiceFiveIcon className="h-5 w-5" />
+						Roll Settings
+					</CardTitle>
+					<CardDescription>
+						Manual settings for roll calculations (cannot be auto-imported)
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<div className="space-y-4">
+						{ROLL_SETTINGS.map((setting) => (
+							<div
+								key={setting.key}
+								className="flex items-center justify-between gap-4 rounded-md border p-3"
+							>
+								<div className="flex-1 min-w-0">
+									<Label className="font-medium">{setting.label}</Label>
+									<p className="text-xs text-muted-foreground mt-0.5">
+										{setting.description}
+									</p>
+								</div>
+								<Input
+									type="number"
+									min={0}
+									value={getValue(setting.key)}
+									onChange={(e) =>
+										updateField(setting.key, parseInt(e.target.value, 10) || 0)
+									}
+									className="w-32"
+								/>
+							</div>
+						))}
+					</div>
+				</CardContent>
+			</Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <GearIcon className="h-5 w-5" />
-                        Server Settings
-                    </CardTitle>
-                    <CardDescription>
-                        Configure server-specific kakera values for calculations
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between gap-4 rounded-md border p-3">
-                            <div className="flex-1 min-w-0">
-                                <Label className="font-medium">
-                                    Kakera per Floor
-                                </Label>
-                                <p className="text-xs text-muted-foreground mt-0.5">
-                                    Cost per tower floor level
-                                </p>
-                            </div>
-                            <Input
-                                type="number"
-                                min={0}
-                                value={getValue('kakeraPerFloor')}
-                                onChange={(e) =>
-                                    updateField(
-                                        'kakeraPerFloor',
-                                        parseInt(e.target.value, 10) || 0,
-                                    )
-                                }
-                                className="w-32"
-                            />
-                        </div>
-                        <div className="pt-2">
-                            <Label className="font-medium mb-3 block">
-                                Badge Prices
-                            </Label>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                                {BADGE_PRICES.map((badge) => (
-                                    <div
-                                        key={badge.key}
-                                        className="flex items-center justify-between gap-3 rounded-md border p-3"
-                                    >
-                                        <Label className="font-medium">
-                                            {badge.label}
-                                        </Label>
-                                        <Input
-                                            type="number"
-                                            min={0}
-                                            value={getValue(badge.key)}
-                                            onChange={(e) =>
-                                                updateField(
-                                                    badge.key,
-                                                    parseInt(
-                                                        e.target.value,
-                                                        10,
-                                                    ) || 0,
-                                                )
-                                            }
-                                            className="w-28"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-    );
+			<Card>
+				<CardHeader>
+					<CardTitle className="flex items-center gap-2">
+						<GearIcon className="h-5 w-5" />
+						Server Settings
+					</CardTitle>
+					<CardDescription>
+						Configure server-specific kakera values for calculations
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<div className="space-y-4">
+						<div className="flex items-center justify-between gap-4 rounded-md border p-3">
+							<div className="flex-1 min-w-0">
+								<Label className="font-medium">Kakera per Floor</Label>
+								<p className="text-xs text-muted-foreground mt-0.5">
+									Cost per tower floor level
+								</p>
+							</div>
+							<Input
+								type="number"
+								min={0}
+								value={getValue("kakeraPerFloor")}
+								onChange={(e) =>
+									updateField(
+										"kakeraPerFloor",
+										parseInt(e.target.value, 10) || 0,
+									)
+								}
+								className="w-32"
+							/>
+						</div>
+						<div className="pt-2">
+							<Label className="font-medium mb-3 block">Badge Prices</Label>
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+								{BADGE_PRICES.map((badge) => (
+									<div
+										key={badge.key}
+										className="flex items-center justify-between gap-3 rounded-md border p-3"
+									>
+										<Label className="font-medium">{badge.label}</Label>
+										<Input
+											type="number"
+											min={0}
+											value={getValue(badge.key)}
+											onChange={(e) =>
+												updateField(
+													badge.key,
+													parseInt(e.target.value, 10) || 0,
+												)
+											}
+											className="w-28"
+										/>
+									</div>
+								))}
+							</div>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+		</div>
+	);
 }
