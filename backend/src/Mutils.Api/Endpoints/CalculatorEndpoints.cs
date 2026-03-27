@@ -28,7 +28,9 @@ public static class CalculatorEndpoints {
                     .ToListAsync();
 
                 return Results.Ok(configs);
-            });
+            })
+            .Produces<List<CalculatorConfigDto>>()
+            .Produces(401);
 
         group.MapPost("/", async (
             ClaimsPrincipal user,
@@ -63,7 +65,9 @@ public static class CalculatorEndpoints {
                     config.OwnedTotal, config.OwnedDisabled,
                     config.CreatedAt, config.UpdatedAt
                 ));
-            });
+            })
+            .Produces<CalculatorConfigDto>(201)
+            .Produces(401);
 
         group.MapPut("/{id}", async (
             Guid id,
@@ -98,7 +102,10 @@ public static class CalculatorEndpoints {
                     config.OwnedTotal, config.OwnedDisabled,
                     config.CreatedAt, config.UpdatedAt
                 ));
-            });
+            })
+            .Produces<CalculatorConfigDto>()
+            .Produces(401)
+            .Produces(404);
 
         group.MapDelete("/{id}", async (
             Guid id,
@@ -115,7 +122,10 @@ public static class CalculatorEndpoints {
                 await db.SaveChangesAsync();
 
                 return Results.NoContent();
-            });
+            })
+            .Produces(204)
+            .Produces(401)
+            .Produces(404);
     }
 
     private static Guid? GetUserId(ClaimsPrincipal user) {

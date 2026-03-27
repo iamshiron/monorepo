@@ -43,7 +43,9 @@ public static class KakeraEndpoints {
                     .ToListAsync();
 
                 return Results.Ok(claims);
-            });
+            })
+            .Produces<List<KakeraClaimDto>>()
+            .Produces(401);
 
         group.MapPost("/claims", async (
             ClaimsPrincipal user,
@@ -83,7 +85,9 @@ public static class KakeraEndpoints {
                     claim.IsClaimed,
                     claim.ClaimedAt
                 ));
-            });
+            })
+            .Produces<KakeraClaimDto>(201)
+            .Produces(401);
 
         group.MapGet("/stats", async (
             ClaimsPrincipal user,
@@ -95,21 +99,20 @@ public static class KakeraEndpoints {
                     .Where(c => c.UserId == userId)
                     .ToListAsync();
 
-                var stats = new {
-                    TotalValue = claims.Sum(c => c.Value),
-                    TotalCount = claims.Count,
-                    ByType = claims.GroupBy(c => c.Type)
+                var byType = claims.GroupBy(c => c.Type)
                         .ToDictionary(
                             g => g.Key.ToString(),
-                            g => new {
-                                Count = g.Count(),
-                                TotalValue = g.Sum(c => c.Value)
-                            }
-                        )
-                };
+                            g => new KakeraTypeStats(g.Count(), g.Sum(c => c.Value))
+                        );
 
-                return Results.Ok(stats);
-            });
+                return Results.Ok(new KakeraStatsResponse(
+                    claims.Sum(c => c.Value),
+                    claims.Count,
+                    byType
+                ));
+            })
+            .Produces<KakeraStatsResponse>()
+            .Produces(401);
 
         group.MapDelete("/claims/{id}", async (
             Guid id,
@@ -127,7 +130,10 @@ public static class KakeraEndpoints {
                 await db.SaveChangesAsync();
 
                 return Results.NoContent();
-            });
+            })
+            .Produces(204)
+            .Produces(401)
+            .Produces(404);
 
         group.MapPut("/claims/{id}", async (
             Guid id,
@@ -168,7 +174,10 @@ public static class KakeraEndpoints {
                     claim.IsClaimed,
                     claim.ClaimedAt
                 ));
-            });
+            })
+            .Produces<KakeraClaimDto>()
+            .Produces(401)
+            .Produces(404);
 
         group.MapGet("/export", async (
             ClaimsPrincipal user,
@@ -180,18 +189,20 @@ public static class KakeraEndpoints {
                     .Include(c => c.Character)
                     .Where(c => c.UserId == userId)
                     .OrderByDescending(c => c.ClaimedAt)
-                    .Select(c => new {
+                    .Select(c => new KakeraExportItemDto(
                         c.Id,
-                        CharacterName = c.Character != null ? c.Character.Name : null,
+                        c.Character != null ? c.Character.Name : null,
                         c.Type,
                         c.Value,
                         c.IsClaimed,
                         c.ClaimedAt
-                    })
+                    ))
                     .ToListAsync();
 
                 return Results.Ok(claims);
-            });
+            })
+            .Produces<List<KakeraExportItemDto>>()
+            .Produces(401);
 
         group.MapPost("/import", async (
             ClaimsPrincipal user,
@@ -228,8 +239,10 @@ public static class KakeraEndpoints {
                 }
 
                 await db.SaveChangesAsync();
-                return Results.Ok(new { Imported = imported });
-            });
+                return Results.Ok(new ImportClaimsResponse(imported));
+            })
+            .Produces<ImportClaimsResponse>()
+            .Produces(401);
 
         group.MapDelete("/claims", async (
             ClaimsPrincipal user,
@@ -245,12 +258,15 @@ public static class KakeraEndpoints {
                     db.KakeraClaims.RemoveRange(claims);
                     await db.SaveChangesAsync();
 
-                    return Results.Ok(new { Deleted = claims.Count });
+                    return Results.Ok(new DeleteClaimsResponse(claims.Count));
                 } catch (Exception ex) {
                     var errorMsg = ex.InnerException?.Message ?? ex.Message;
-                    return Results.BadRequest(new { Error = errorMsg });
+                    return Results.BadRequest(new ErrorResponse(errorMsg));
                 }
-            });
+            })
+            .Produces<DeleteClaimsResponse>()
+            .Produces<ErrorResponse>(400)
+            .Produces(401);
 
         group.MapPost("/bulk-import", async (
             ClaimsPrincipal user,
@@ -312,7 +328,9 @@ public static class KakeraEndpoints {
                     }
                     return Results.Ok(new BulkKakeraImportResponse(0, 0, errors));
                 }
-            });
+            })
+            .Produces<BulkKakeraImportResponse>()
+            .Produces(401);
     }
 
     private static Guid? GetUserId(ClaimsPrincipal user) {

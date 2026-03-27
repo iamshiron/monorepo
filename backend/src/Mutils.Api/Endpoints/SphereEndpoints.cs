@@ -33,7 +33,10 @@ public static class SphereEndpoints {
                 entry.SpherePerks.Perk9,
                 entry.SpherePerks.Perk10
             ));
-        });
+        })
+        .Produces<CollectionEntrySpherePerks>()
+        .Produces(401)
+        .Produces(404);
 
         group.MapPost("/{id}/spheres", async (
             Guid id,
@@ -67,8 +70,11 @@ public static class SphereEndpoints {
 
                 await db.SaveChangesAsync();
 
-                return Results.Ok(new { message = "Updated successfully" });
-            });
+                return Results.Ok(new UpdateResponse("Updated successfully"));
+            })
+            .Produces<UpdateResponse>()
+            .Produces(401)
+            .Produces(404);
     }
 
     private static Guid? GetUserId(ClaimsPrincipal user) {

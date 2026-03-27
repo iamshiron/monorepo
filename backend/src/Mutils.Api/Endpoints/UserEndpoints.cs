@@ -24,7 +24,10 @@ public static class UserEndpoints {
                     dbUser.Username,
                     dbUser.AvatarUrl
                 ));
-            });
+            })
+            .Produces<UserDto>()
+            .Produces(401)
+            .Produces(404);
     }
 
     private static Guid? GetUserId(ClaimsPrincipal user) {

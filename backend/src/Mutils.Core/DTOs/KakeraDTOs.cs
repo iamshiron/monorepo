@@ -55,3 +55,24 @@ public record BulkKakeraImportResponse(
     int Skipped,
     List<string> Errors
 );
+
+public record KakeraStatsResponse(
+    int TotalValue,
+    int TotalCount,
+    Dictionary<string, KakeraTypeStats> ByType
+);
+
+public record KakeraTypeStats(int Count, int TotalValue);
+
+public record DeleteClaimsResponse(int Deleted);
+
+public record ImportClaimsResponse(int Imported);
+
+public record KakeraExportItemDto(
+    Guid Id,
+    string? CharacterName,
+    KakeraType Type,
+    int Value,
+    bool IsClaimed,
+    DateTime ClaimedAt
+);

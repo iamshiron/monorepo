@@ -24,7 +24,9 @@ public static class ListEndpoints {
                     .ToListAsync();
 
                 return Results.Ok(lists);
-            });
+            })
+            .Produces<List<EnableListDto>>()
+            .Produces(401);
 
         group.MapPost("/enable", async (
             ClaimsPrincipal user,
@@ -46,7 +48,9 @@ public static class ListEndpoints {
                 return Results.Created($"/api/lists/enable/{list.Id}", new EnableListDto(
                     list.Id, list.Name, list.Content, list.IsActive, list.CreatedAt, list.UpdatedAt
                 ));
-            });
+            })
+            .Produces<EnableListDto>(201)
+            .Produces(401);
 
         group.MapGet("/disable", async (
             ClaimsPrincipal user,
@@ -62,7 +66,9 @@ public static class ListEndpoints {
                     .ToListAsync();
 
                 return Results.Ok(lists);
-            });
+            })
+            .Produces<List<DisableListDto>>()
+            .Produces(401);
 
         group.MapPost("/disable", async (
             ClaimsPrincipal user,
@@ -84,7 +90,9 @@ public static class ListEndpoints {
                 return Results.Created($"/api/lists/disable/{list.Id}", new DisableListDto(
                     list.Id, list.Name, list.Content, list.IsActive, list.CreatedAt, list.UpdatedAt
                 ));
-            });
+            })
+            .Produces<DisableListDto>(201)
+            .Produces(401);
 
         group.MapPut("/{type}/{id}", async (
             string type,
@@ -116,8 +124,12 @@ public static class ListEndpoints {
                 }
 
                 await db.SaveChangesAsync();
-                return Results.Ok(new { message = "Updated successfully" });
-            });
+                return Results.Ok(new UpdateListResponse("Updated successfully"));
+            })
+            .Produces<UpdateListResponse>()
+            .Produces(400)
+            .Produces(401)
+            .Produces(404);
 
         group.MapDelete("/{type}/{id}", async (
             string type,
@@ -143,7 +155,11 @@ public static class ListEndpoints {
 
                 await db.SaveChangesAsync();
                 return Results.NoContent();
-            });
+            })
+            .Produces(204)
+            .Produces(400)
+            .Produces(401)
+            .Produces(404);
 
         group.MapGet("/presets", async (
             ClaimsPrincipal user,
@@ -165,7 +181,9 @@ public static class ListEndpoints {
                     .ToListAsync();
 
                 return Results.Ok(presets);
-            });
+            })
+            .Produces<List<ListPresetDto>>()
+            .Produces(401);
 
         group.MapPost("/export", (
             ExportRequest request,
@@ -177,7 +195,8 @@ public static class ListEndpoints {
                 };
 
                 return Results.Ok(new ExportResponse(characters, 0));
-            });
+            })
+            .Produces<ExportResponse>();
 
         group.MapGet("/wishlist", async (
             ClaimsPrincipal user,
@@ -232,14 +251,16 @@ public static class ListEndpoints {
                     ))
                     .ToListAsync();
 
-                return Results.Ok(new {
-                    items = entries,
-                    total = totalCount,
+                return Results.Ok(new PaginatedWishlistResponse(
+                    entries,
+                    totalCount,
                     page,
                     pageSize,
-                    totalPages = (int) Math.Ceiling(totalCount / (double) pageSize)
-                });
-            });
+                    (int) Math.Ceiling(totalCount / (double) pageSize)
+                ));
+            })
+            .Produces<PaginatedWishlistResponse>()
+            .Produces(401);
 
         group.MapGet("/wishlist/stats", async (
             ClaimsPrincipal user,
@@ -251,7 +272,9 @@ public static class ListEndpoints {
                 var starwishCount = await db.WishlistEntries.CountAsync(w => w.UserId == userId && w.IsStarwish);
 
                 return Results.Ok(new WishlistStatsDto(total, starwishCount, total - starwishCount));
-            });
+            })
+            .Produces<WishlistStatsDto>()
+            .Produces(401);
 
         group.MapPost("/wishlist", async (
             ClaimsPrincipal user,
@@ -263,11 +286,11 @@ public static class ListEndpoints {
                 var existing = await db.WishlistEntries
                     .FirstOrDefaultAsync(w => w.UserId == userId && w.CharacterId == request.CharacterId);
                 if (existing is not null) {
-                    return Results.BadRequest("Character already in wishlist");
+                    return Results.BadRequest(new ErrorResponse("Character already in wishlist"));
                 }
 
                 var character = await db.Characters.FindAsync(request.CharacterId);
-                if (character is null) return Results.NotFound("Character not found");
+                if (character is null) return Results.NotFound(new ErrorResponse("Character not found"));
 
                 var entry = new Core.Entities.WishlistEntry {
                     UserId = userId.Value,
@@ -301,7 +324,11 @@ public static class ListEndpoints {
                     entry.CreatedAt,
                     entry.UpdatedAt
                 ));
-            });
+            })
+            .Produces<WishlistEntryDto>(201)
+            .Produces<ErrorResponse>(400)
+            .Produces(401)
+            .Produces(404);
 
         group.MapPut("/wishlist/{id}", async (
             Guid id,
@@ -320,8 +347,11 @@ public static class ListEndpoints {
                 if (request.Notes is not null) entry.Notes = request.Notes;
 
                 await db.SaveChangesAsync();
-                return Results.Ok(new { message = "Updated successfully" });
-            });
+                return Results.Ok(new UpdateListResponse("Updated successfully"));
+            })
+            .Produces<UpdateListResponse>()
+            .Produces(401)
+            .Produces(404);
 
         group.MapDelete("/wishlist/{id}", async (
             Guid id,
@@ -338,7 +368,10 @@ public static class ListEndpoints {
                 await db.SaveChangesAsync();
 
                 return Results.NoContent();
-            });
+            })
+            .Produces(204)
+            .Produces(401)
+            .Produces(404);
 
         group.MapPost("/wishlist/toggle-starwish/{id}", async (
             Guid id,
@@ -354,8 +387,11 @@ public static class ListEndpoints {
                 entry.IsStarwish = !entry.IsStarwish;
                 await db.SaveChangesAsync();
 
-                return Results.Ok(new { isStarwish = entry.IsStarwish });
-            });
+                return Results.Ok(new ToggleStarwishResponse(entry.IsStarwish));
+            })
+            .Produces<ToggleStarwishResponse>()
+            .Produces(401)
+            .Produces(404);
     }
 
     private static Guid? GetUserId(ClaimsPrincipal user) {

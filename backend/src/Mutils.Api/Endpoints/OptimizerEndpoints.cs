@@ -17,7 +17,9 @@ public static class OptimizerEndpoints {
 
                 var result = await optimizerService.AnalyzeAsync(userId.Value, request);
                 return Results.Ok(result);
-            });
+            })
+            .Produces<OptimizerAnalysisResponse>()
+            .Produces(401);
 
         group.MapGet("/suggest", async (
             ClaimsPrincipal user,
@@ -27,7 +29,9 @@ public static class OptimizerEndpoints {
 
                 var result = await optimizerService.GetSuggestionsAsync(userId.Value);
                 return Results.Ok(result);
-            });
+            })
+            .Produces<OptimizerSuggestionsResponse>()
+            .Produces(401);
     }
 
     private static Guid? GetUserId(ClaimsPrincipal user) {

@@ -130,3 +130,10 @@ public sealed record CollectionEntrySpherePerks(
 ) {
     public static CollectionEntrySpherePerks Empty = new(0, 0, 0, 0, 0, false, false, false, false, false);
 }
+
+public sealed record ProcessImagesResponse(int Queued, string Message);
+public sealed record ImageStatusResponse(int Total, int Stored, int Pending, int Processing, int Failed);
+public sealed record ClearCollectionResponse(int Deleted);
+public sealed record ToggleFavoriteResponse(bool IsFavorite);
+public sealed record UpdateResponse(string Message);
+public sealed record ErrorResponse(string Error);

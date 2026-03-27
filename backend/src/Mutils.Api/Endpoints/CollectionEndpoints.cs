@@ -186,7 +186,9 @@ public static class CollectionEndpoints {
                 return Results.Ok(new PaginatedResponse<CollectionEntryDto>(
                     items, total, page, pageSize, totalPages
                 ));
-            });
+            })
+            .Produces<PaginatedResponse<CollectionEntryDto>>()
+            .Produces(401);
 
         group.MapGet("/stats", async (
             ClaimsPrincipal user,
@@ -223,7 +225,9 @@ public static class CollectionEndpoints {
                     keyDistribution,
                     disabledCount
                 ));
-            });
+            })
+            .Produces<CollectionStatsDto>()
+            .Produces(401);
 
         group.MapGet("/series", async (
             ClaimsPrincipal user,
@@ -249,7 +253,9 @@ public static class CollectionEndpoints {
                     .ToList();
 
                 return Results.Ok(seriesWithCounts);
-            });
+            })
+            .Produces<List<SeriesWithCountDto>>()
+            .Produces(401);
 
         group.MapPost("/export", async (
             ClaimsPrincipal user,
@@ -308,7 +314,9 @@ public static class CollectionEndpoints {
                     .ToListAsync();
 
                 return Results.Ok(new CollectionExportResponse(totalCount, exportedCount, items));
-            });
+            })
+            .Produces<CollectionExportResponse>()
+            .Produces(401);
 
         group.MapPost("/add", async (
             ClaimsPrincipal user,
@@ -318,7 +326,7 @@ public static class CollectionEndpoints {
                 if (userId is null) return Results.Unauthorized();
 
                 if (string.IsNullOrWhiteSpace(request.Name))
-                    return Results.BadRequest(new { error = "Character name is required" });
+                    return Results.BadRequest(new ErrorResponse("Character name is required"));
 
                 var existingCharacter = await db.Characters
                     .FirstOrDefaultAsync(c => c.Name == request.Name);
@@ -386,7 +394,7 @@ public static class CollectionEndpoints {
                     .FirstOrDefaultAsync(e => e.UserId == userId && e.Character.Name == request.Name);
 
                 if (existingEntry is not null)
-                    return Results.BadRequest(new { error = "Character already in collection" });
+                    return Results.BadRequest(new ErrorResponse("Character already in collection"));
 
                 var entry = new CollectionEntry {
                     UserId = userId.Value,
@@ -414,7 +422,10 @@ public static class CollectionEndpoints {
                 await db.SaveChangesAsync();
 
                 return Results.Ok(new AddCharacterResponse(entry.Id, character.Id, isNewCharacter, imagesQueued));
-            });
+            })
+            .Produces<AddCharacterResponse>()
+            .Produces<ErrorResponse>(400)
+            .Produces(401);
 
         group.MapPost("/import", async (
             ClaimsPrincipal user,
@@ -599,7 +610,9 @@ public static class CollectionEndpoints {
 
                 return Results.Ok(new ImportResponse(imported, skipped, updated, new List<string>(), imageJobsCreated,
                     disabledImported > 0 ? disabledImported : null));
-            });
+            })
+            .Produces<ImportResponse>()
+            .Produces(401);
 
         group.MapPost("/import-series", async (
             ClaimsPrincipal user,
@@ -660,7 +673,9 @@ public static class CollectionEndpoints {
                     updated, notFoundNames.Count);
 
                 return Results.Ok(new ImportSeriesResponse(updated, notFoundNames.Count, notFoundNames));
-            });
+            })
+            .Produces<ImportSeriesResponse>()
+            .Produces(401);
 
         group.MapPost("/process-images", async (
             ClaimsPrincipal user,
@@ -676,7 +691,7 @@ public static class CollectionEndpoints {
                     .ToListAsync();
 
                 if (charactersNeedingImages.Count == 0) {
-                    return Results.Ok(new { queued = 0, message = "No images to process" });
+                    return Results.Ok(new ImageStatusResponse(0, 0, 0, 0, 0));
                 }
 
                 var existingStoredUrls = await db.StoredImages
@@ -712,8 +727,10 @@ public static class CollectionEndpoints {
 
                 Logger.LogInformation("Queued {Count} images for processing for user {UserId}", newJobs.Count, userId);
 
-                return Results.Ok(new { queued = newJobs.Count, message = $"Queued {newJobs.Count} images for background processing" });
-            });
+                return Results.Ok(new ImageStatusResponse(newJobs.Count, 0, 0, 0, 0));
+            })
+            .Produces<ImageStatusResponse>()
+            .Produces(401);
 
         group.MapGet("/image-status", async (
             ClaimsPrincipal user,
@@ -744,8 +761,11 @@ public static class CollectionEndpoints {
                                 j.Status == ImageJobStatus.Failed)
                     .CountAsync();
 
-                return Results.Ok(new { total, stored, pending, processing, failed });
-            });
+                return Results.Ok(new ImageStatusResponse(total, stored, pending, processing, failed));
+            })
+            .WithName("GetImageStatus")
+            .Produces<ImageStatusResponse>()
+            .Produces(401);
 
         group.MapDelete("/clear", async (
             ClaimsPrincipal user,
@@ -760,8 +780,10 @@ public static class CollectionEndpoints {
                 db.CollectionEntries.RemoveRange(entries);
                 await db.SaveChangesAsync();
 
-                return Results.Ok(new { deleted = entries.Count });
-            });
+                return Results.Ok(new ClearCollectionResponse(entries.Count));
+            })
+            .Produces<ClearCollectionResponse>()
+            .Produces(401);
 
         group.MapPut("/{id}", async (
             Guid id,
@@ -786,8 +808,11 @@ public static class CollectionEndpoints {
 
                 await db.SaveChangesAsync();
 
-                return Results.Ok(new { message = "Updated successfully" });
-            });
+                return Results.Ok(new UpdateResponse("Updated successfully"));
+            })
+            .Produces<UpdateResponse>()
+            .Produces(401)
+            .Produces(404);
 
         group.MapDelete("/{id}", async (
             Guid id,
@@ -805,7 +830,10 @@ public static class CollectionEndpoints {
                 await db.SaveChangesAsync();
 
                 return Results.NoContent();
-            });
+            })
+            .Produces(204)
+            .Produces(401)
+            .Produces(404);
 
         group.MapPost("/{id}/toggle-favorite", async (
             Guid id,
@@ -822,8 +850,11 @@ public static class CollectionEndpoints {
                 entry.IsFavorite = !entry.IsFavorite;
                 await db.SaveChangesAsync();
 
-                return Results.Ok(new { isFavorite = entry.IsFavorite });
-            });
+                return Results.Ok(new ToggleFavoriteResponse(entry.IsFavorite));
+            })
+            .Produces<ToggleFavoriteResponse>()
+            .Produces(401)
+            .Produces(404);
 
         group.MapGet("/images/{id}", async (
             Guid id,
@@ -836,7 +867,10 @@ public static class CollectionEndpoints {
                 if (stream is null) return Results.NotFound();
 
                 return Results.Stream(stream, storedImage.ContentType);
-            }).AllowAnonymous();
+            })
+            .AllowAnonymous()
+            .Produces<FileStream>(200, "image/png", "image/jpeg", "image/gif", "image/webp")
+            .Produces(404);
     }
 
     private static Guid? GetUserId(ClaimsPrincipal user) {

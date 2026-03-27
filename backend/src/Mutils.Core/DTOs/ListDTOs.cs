@@ -71,3 +71,15 @@ public sealed record WishlistStatsDto(
     int StarwishCount,
     int RegularCount
 );
+
+public sealed record ToggleStarwishResponse(bool IsStarwish);
+
+public sealed record PaginatedWishlistResponse(
+    IReadOnlyList<WishlistEntryDto> Items,
+    int Total,
+    int Page,
+    int PageSize,
+    int TotalPages
+);
+
+public sealed record UpdateListResponse(string Message);

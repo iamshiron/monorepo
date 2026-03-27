@@ -17,3 +17,7 @@ public sealed record UserDto(
 public sealed record RefreshTokenRequest(string RefreshToken);
 
 public sealed record DiscordOAuthCallback(string Code, string? State);
+
+public sealed record RefreshTokenResponse(string Message);
+
+public sealed record AuthErrorResponse(string Error);

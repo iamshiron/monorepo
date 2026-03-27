@@ -26,7 +26,9 @@ public static class ProfileEndpoints {
                 }
 
                 return Results.Ok(ToDto(profile));
-            });
+            })
+            .Produces<UserProfileDto>()
+            .Produces(401);
 
         group.MapPut("/", async (
             ClaimsPrincipal user,
@@ -78,7 +80,9 @@ public static class ProfileEndpoints {
 
                 await db.SaveChangesAsync();
                 return Results.Ok(ToDto(profile));
-            });
+            })
+            .Produces<UserProfileDto>()
+            .Produces(401);
     }
 
     private static UserProfileDto ToDto(UserProfile p) => new(
