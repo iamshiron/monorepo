@@ -1,15 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Shiron.Mutils.Infrastructure.Migrations
-{
+namespace Shiron.Mutils.Infrastructure.Migrations {
     /// <inheritdoc />
-    public partial class AddServerSettingsToProfile : Migration
-    {
+    public partial class AddServerSettingsToProfile : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.AddColumn<int>(
                 name: "BronzeBadgePrice",
                 table: "UserProfiles",
@@ -68,8 +65,7 @@ namespace Shiron.Mutils.Infrastructure.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropColumn(
                 name: "BronzeBadgePrice",
                 table: "UserProfiles");

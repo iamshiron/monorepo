@@ -1,15 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Shiron.Mutils.Infrastructure.Migrations
-{
+namespace Shiron.Mutils.Infrastructure.Migrations {
     /// <inheritdoc />
-    public partial class AddIsFavoriteToCollectionEntry : Migration
-    {
+    public partial class AddIsFavoriteToCollectionEntry : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.AddColumn<bool>(
                 name: "IsFavorite",
                 table: "CollectionEntries",
@@ -24,8 +21,7 @@ namespace Shiron.Mutils.Infrastructure.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropIndex(
                 name: "IX_CollectionEntries_IsFavorite",
                 table: "CollectionEntries");
