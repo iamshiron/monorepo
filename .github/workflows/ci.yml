@@ -8,13 +8,8 @@ on:
 
 jobs:
   frontend:
-    name: Frontend (${{ matrix.project }}, ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        project: [beatdash-web, mutils-web]
+    name: Frontend
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -28,9 +23,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: npx nx run @shiron/${{ matrix.project }}:lint
+      - run: npx nx run-many --target=lint --projects=@shiron/beatdash-web,@shiron/mutils-web
 
-      - run: npx nx run @shiron/${{ matrix.project }}:build
+      - run: npx nx run-many --target=build --projects=@shiron/beatdash-web,@shiron/mutils-web
 
   dotnet:
     name: .NET ${{ matrix.cmd }} (${{ matrix.os }})
