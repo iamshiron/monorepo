@@ -3,11 +3,13 @@ using System.Text.Json.Serialization;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Minio;
 using Scalar.AspNetCore;
 using Shiron.Mutils.Api.Endpoints;
 using Shiron.Mutils.Api.Services;
+using Shiron.Mutils.Core.Configuration;
 using Shiron.Mutils.Core.Services;
 using Shiron.Mutils.Infrastructure.Data;
 using Shiron.Mutils.Infrastructure.Services;
@@ -22,6 +24,15 @@ builder.Services.AddDbContext<MutilsDbContext>(options =>
         ?? throw new InvalidOperationException("Database connection string not configured")
     ));
 
+builder.Services.Configure<StorageOptions>(options => {
+    options.Endpoint = builder.Configuration["MUTILS_MINIO_ENDPOINT"] ?? "localhost:9000";
+    options.AccessKey = builder.Configuration["MUTILS_MINIO_ACCESS_KEY"] ?? "minioadmin";
+    options.SecretKey = builder.Configuration["MUTILS_MINIO_SECRET_KEY"] ?? "minioadmin";
+    options.UseSsl = bool.TryParse(builder.Configuration["MUTILS_MINIO_USE_SSL"], out var ssl) && ssl;
+    options.BucketAssets = builder.Configuration["MUTILS_MINIO_BUCKET_ASSETS"] ?? "mutils-assets";
+    options.BucketUserData = builder.Configuration["MUTILS_MINIO_BUCKET_USER_DATA"] ?? "mutils-user-data";
+});
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IMudaeParser, MudaeParser>();
 builder.Services.AddScoped<IKakeraLogParser, KakeraLogParser>();
@@ -30,16 +41,12 @@ builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<IStorageService, MinioStorageService>();
 builder.Services.AddHostedService<ImageProcessingService>();
 
-var minioEndpoint = builder.Configuration["MUTILS_MINIO_ENDPOINT"] ?? "localhost:9000";
-var minioAccessKey = builder.Configuration["MUTILS_MINIO_ACCESS_KEY"] ?? "minioadmin";
-var minioSecretKey = builder.Configuration["MUTILS_MINIO_SECRET_KEY"] ?? "minioadmin";
-var minioUseSsl = bool.TryParse(builder.Configuration["MUTILS_MINIO_USE_SSL"], out var ssl) && ssl;
-
 builder.Services.AddSingleton<IMinioClient>(sp => {
+    var opts = sp.GetRequiredService<IOptions<StorageOptions>>().Value;
     return new MinioClient()
-        .WithEndpoint(minioEndpoint)
-        .WithCredentials(minioAccessKey, minioSecretKey)
-        .WithSSL(minioUseSsl)
+        .WithEndpoint(opts.Endpoint)
+        .WithCredentials(opts.AccessKey, opts.SecretKey)
+        .WithSSL(opts.UseSsl)
         .Build();
 });
 

@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NX_CI_EXECUTION: true
+
 jobs:
   frontend:
     name: Frontend
@@ -16,12 +20,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
       - uses: pnpm/action-setup@v4
         with:
           version: 9
 
       - run: pnpm install --frozen-lockfile
+
+      - uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: nx-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            nx-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            nx-${{ runner.os }}-
 
       - run: npx nx run-many --target=lint --projects=@shiron/beatdash-web,@shiron/mutils-web
 
@@ -45,15 +58,9 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
-      - name: Build .NET (all projects)
-        if: matrix.cmd == 'build' && runner.os == 'Windows'
+      - name: Build .NET (solution)
+        if: matrix.cmd == 'build'
         run: dotnet build Shiron.slnx
-
-      - name: Build .NET (cross-platform)
-        if: matrix.cmd == 'build' && runner.os != 'Windows'
-        run: |
-          dotnet build backend/src/Mutils.Api/Shiron.Mutils.Api.csproj
-          dotnet build backend/src/BeatDash.API/Shiron.BeatDash.API.csproj
 
       - name: Test .NET
         if: matrix.cmd == 'test'
