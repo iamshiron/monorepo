@@ -118,6 +118,22 @@ public static class CollectionEndpoints {
                     ("user_kakera", "desc") => query.OrderByDescending(e => db.KakeraClaims
                         .Where(c => c.CharacterId == e.CharacterId && c.UserId == userId)
                         .Sum(c => (int?) c.Value) ?? 0),
+                    ("spheres", "asc") => query.OrderBy(e => e.SpherePerks != null
+                        ? (e.SpherePerks.Perk1 + e.SpherePerks.Perk2 + e.SpherePerks.Perk3 + e.SpherePerks.Perk4 + e.SpherePerks.Perk5) * 200
+                        + (e.SpherePerks.Perk6 ? 1000 : 0)
+                        + (e.SpherePerks.Perk7 ? 1000 : 0)
+                        + (e.SpherePerks.Perk8 ? 1000 : 0)
+                        + (e.SpherePerks.Perk9 ? 1000 : 0)
+                        + (e.SpherePerks.Perk10 ? 1000 : 0)
+                        : 0),
+                    ("spheres", "desc") => query.OrderByDescending(e => e.SpherePerks != null
+                        ? (e.SpherePerks.Perk1 + e.SpherePerks.Perk2 + e.SpherePerks.Perk3 + e.SpherePerks.Perk4 + e.SpherePerks.Perk5) * 200
+                        + (e.SpherePerks.Perk6 ? 1000 : 0)
+                        + (e.SpherePerks.Perk7 ? 1000 : 0)
+                        + (e.SpherePerks.Perk8 ? 1000 : 0)
+                        + (e.SpherePerks.Perk9 ? 1000 : 0)
+                        + (e.SpherePerks.Perk10 ? 1000 : 0)
+                        : 0),
                     ("acquiredat", _) => query.OrderByDescending(e => e.AcquiredAt),
                     _ => query.OrderBy(e => e.Character.Rank ?? int.MaxValue)
                 };

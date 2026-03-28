@@ -585,6 +585,7 @@ function CollectionPage() {
 						<SelectItem value="user_kakera">Best Performing</SelectItem>
 						<SelectItem value="claims">Claims</SelectItem>
 						<SelectItem value="keys">Keys</SelectItem>
+						<SelectItem value="spheres">Spheres</SelectItem>
 					</SelectContent>
 				</Select>
 
