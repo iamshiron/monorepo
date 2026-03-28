@@ -1,4 +1,4 @@
-import Axios, { AxiosRequestConfig, AxiosError } from "axios";
+import Axios, { type AxiosRequestConfig, type AxiosError } from "axios";
 
 export const AXIOS_INSTANCE = Axios.create({
 	baseURL: import.meta.env.VITE_MUTILS_API_URL || "/api",

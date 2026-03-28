@@ -24,7 +24,7 @@ namespace Shiron.Mutils.Desktop;
 public partial class MainWindow : Window {
     private readonly SettingsService _settingsService;
     private readonly DesktopAuthService _authService;
-    private readonly HttpClient _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(3) };
+    private readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromSeconds(3) };
     private CancellationTokenSource? _searchCts;
 
     public MainWindow() {
@@ -146,8 +146,7 @@ public partial class MainWindow : Window {
                     HistoryListView.ItemsSource = items;
                 }
             }
-        } catch (Exception ex) {
-            // Log error
+        } catch (Exception) {
         }
     }
 
@@ -167,7 +166,7 @@ public partial class MainWindow : Window {
         }
 
         if (KakeraTypeComboBox.SelectedItem is not ComboBoxItem selectedType) return;
-        if (!int.TryParse(ClaimValueTextBox.Text, out int value)) {
+        if (!int.TryParse(ClaimValueTextBox.Text, out var value)) {
             MessageBox.Show("Invalid value.");
             return;
         }
@@ -176,12 +175,12 @@ public partial class MainWindow : Window {
         if (!Enum.TryParse<KakeraType>(typeStr, out var type)) return;
 
         var claimRequest = new CreateKakeraClaimRequest(
-            CharacterId: null,
-            CharacterName: ClaimCharacterTextBox.Text,
-            Type: type,
-            Value: value,
-            IsClaimed: IsClaimedCheckBox.IsChecked ?? false,
-            ClaimedAt: ClaimedDatePicker.SelectedDate?.ToUniversalTime()
+            null,
+            ClaimCharacterTextBox.Text,
+            type,
+            value,
+            IsClaimedCheckBox.IsChecked ?? false,
+            ClaimedDatePicker.SelectedDate?.ToUniversalTime()
         );
 
         var baseUrl = _settingsService.Current.ApiBaseUrl.TrimEnd('/');
@@ -266,7 +265,7 @@ public partial class MainWindow : Window {
         var url = ApiUrlTextBox.Text;
         if (string.IsNullOrEmpty(url)) return;
 
-        bool connected = false;
+        var connected = false;
         try {
             // Check health or common endpoint
             var response = await _httpClient.GetAsync(url.TrimEnd('/') + "/api/user/me");
