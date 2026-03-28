@@ -22,49 +22,41 @@ const StatisticsRoute = StatisticsRouteImport.update({
   id: '/statistics',
   path: '/statistics',
   getParentRoute: () => rootRouteImport,
-  // biome-ignore lint/suspicious/noExplicitAny: auto-generated
 } as any)
 const RollsRoute = RollsRouteImport.update({
   id: '/rolls',
   path: '/rolls',
   getParentRoute: () => rootRouteImport,
-  // biome-ignore lint/suspicious/noExplicitAny: auto-generated
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
   getParentRoute: () => rootRouteImport,
-  // biome-ignore lint/suspicious/noExplicitAny: auto-generated
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
-  // biome-ignore lint/suspicious/noExplicitAny: auto-generated
 } as any)
 const CollectionRoute = CollectionRouteImport.update({
   id: '/collection',
   path: '/collection',
   getParentRoute: () => rootRouteImport,
-  // biome-ignore lint/suspicious/noExplicitAny: auto-generated
 } as any)
 const CalculatorRoute = CalculatorRouteImport.update({
   id: '/calculator',
   path: '/calculator',
   getParentRoute: () => rootRouteImport,
-  // biome-ignore lint/suspicious/noExplicitAny: auto-generated
 } as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-  // biome-ignore lint/suspicious/noExplicitAny: auto-generated
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
-  // biome-ignore lint/suspicious/noExplicitAny: auto-generated
 } as any)
 
 export interface FileRoutesByFullPath {

@@ -52,18 +52,6 @@ function DashboardPage() {
 								</p>
 							</Link>
 						</Button>
-						<Button
-							asChild
-							variant="ghost"
-							className="h-auto p-4 justify-start hover:bg-primary/10"
-						>
-							<Link to="/lists" className="flex flex-col items-start">
-								<span className="font-medium">Create List</span>
-								<p className="text-sm text-muted-foreground">
-									Build enable/disable lists
-								</p>
-							</Link>
-						</Button>
 					</div>
 				</CardContent>
 			</Card>
