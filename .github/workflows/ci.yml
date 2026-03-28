@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: CI (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+          dotnet-quality: "preview"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Lint frontend
+        run: pnpm lint
+
+      - name: Build frontend
+        run: pnpm build
+
+      - name: Build .NET (all projects)
+        if: runner.os == 'Windows'
+        run: dotnet build Shiron.slnx
+
+      - name: Build .NET (cross-platform only)
+        if: runner.os != 'Windows'
+        run: >-
+          dotnet build
+          backend/src/BeatDash.API/Shiron.BeatDash.API.csproj
+          backend/src/Mutils.Api/Shiron.Mutils.Api.csproj
+          backend/src/Mutils.Core/Shiron.Mutils.Core.csproj
+          backend/src/Mutils.Infrastructure/Shiron.Mutils.Infrastructure.csproj
+
+      - name: Test .NET
+        if: runner.os == 'Linux'
+        run: dotnet test backend/tests/Mutils.Tests/Shiron.Mutils.Tests.csproj
