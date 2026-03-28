@@ -1,38 +1,38 @@
 {
-    "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
-    "metadata": [
-        {
-            "src": [
-                {
-                    "files": ["**/*.csproj"],
-                    "exclude": ["**/bin/**", "**/obj/**"],
-                    "src": "../backend/"
-                }
-            ],
-            "output": "api"
-        }
-    ],
-    "build": {
-        "content": [
-            {
-                "files": ["**/*.{md,yml}"],
-                "exclude": ["_site/**"]
-            }
-        ],
-        "resource": [
-            {
-                "files": ["images/**"]
-            }
-        ],
-        "output": "_site",
-        "xref": [],
-        "template": ["default", "modern", "templates/tokyo_night"],
-        "globalMetadata": {
-            "_appName": "Shiron Monorepo",
-            "_appTitle": "Shiron Monorepo",
-            "_appFooter": "© 2026 Shiron",
-            "_enableSearch": true,
-            "pdf": false
-        }
-    }
+	"$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+	"metadata": [
+		{
+			"src": [
+				{
+					"files": ["**/*.csproj"],
+					"exclude": ["**/bin/**", "**/obj/**", "**/Mutils.Desktop/**"],
+					"src": "../backend/"
+				}
+			],
+			"output": "api"
+		}
+	],
+	"build": {
+		"content": [
+			{
+				"files": ["**/*.{md,yml}"],
+				"exclude": ["_site/**"]
+			}
+		],
+		"resource": [
+			{
+				"files": ["images/**"]
+			}
+		],
+		"output": "_site",
+		"xref": [],
+		"template": ["default", "modern", "templates/tokyo_night"],
+		"globalMetadata": {
+			"_appName": "Shiron Monorepo",
+			"_appTitle": "Shiron Monorepo",
+			"_appFooter": "© 2026 Shiron",
+			"_enableSearch": true,
+			"pdf": false
+		}
+	}
 }

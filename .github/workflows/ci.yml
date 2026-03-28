@@ -37,7 +37,7 @@ jobs:
         run: pnpm lint
 
       - name: Build frontend
-        run: pnpm build
+        run: npx nx run-many --target=build --projects=@shiron/beatdash-web,@shiron/mutils-web
 
       - name: Build .NET (all projects)
         if: runner.os == 'Windows'
