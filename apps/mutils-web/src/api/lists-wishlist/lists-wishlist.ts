@@ -6,1563 +6,1560 @@
  */
 
 import type {
-    DataTag,
-    DefinedInitialDataOptions,
-    DefinedUseQueryResult,
-    MutationFunction,
-    QueryClient,
-    QueryFunction,
-    QueryKey,
-    UndefinedInitialDataOptions,
-    UseMutationOptions,
-    UseMutationResult,
-    UseQueryOptions,
-    UseQueryResult,
+	DataTag,
+	DefinedInitialDataOptions,
+	DefinedUseQueryResult,
+	MutationFunction,
+	QueryClient,
+	QueryFunction,
+	QueryKey,
+	UndefinedInitialDataOptions,
+	UseMutationOptions,
+	UseMutationResult,
+	UseQueryOptions,
+	UseQueryResult,
 } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { BodyType, ErrorType } from "../../lib/custom-instance";
 
 import { customInstance } from "../../lib/custom-instance";
 import type {
-    CreateListRequest,
-    CreateWishlistEntryRequest,
-    DisableListDto,
-    EnableListDto,
-    ErrorResponse,
-    ExportRequest,
-    ExportResponse,
-    GetApiListsPresetsParams,
-    GetApiListsWishlistParams,
-    ListPresetDto,
-    PaginatedWishlistResponse,
-    ToggleStarwishResponse,
-    UpdateListRequest,
-    UpdateListResponse,
-    UpdateWishlistEntryRequest,
-    WishlistEntryDto,
-    WishlistStatsDto,
+	CreateListRequest,
+	CreateWishlistEntryRequest,
+	DisableListDto,
+	EnableListDto,
+	ErrorResponse,
+	ExportRequest,
+	ExportResponse,
+	GetApiListsPresetsParams,
+	GetApiListsWishlistParams,
+	ListPresetDto,
+	PaginatedWishlistResponse,
+	ToggleStarwishResponse,
+	UpdateListRequest,
+	UpdateListResponse,
+	UpdateWishlistEntryRequest,
+	WishlistEntryDto,
+	WishlistStatsDto,
 } from "../model";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 export const getApiListsEnable = (
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<EnableListDto[]>(
-        { url: `/api/lists/enable`, method: "GET", signal },
-        options
-    );
+	return customInstance<EnableListDto[]>(
+		{ url: `/api/lists/enable`, method: "GET", signal },
+		options,
+	);
 };
 
 export const getGetApiListsEnableQueryKey = () => {
-    return [`/api/lists/enable`] as const;
+	return [`/api/lists/enable`] as const;
 };
 
 export const getGetApiListsEnableQueryOptions = <
-    TData = Awaited<ReturnType<typeof getApiListsEnable>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsEnable>>,
+	TError = ErrorType<void>,
 >(options?: {
-    query?: Partial<
-        UseQueryOptions<
-            Awaited<ReturnType<typeof getApiListsEnable>>,
-            TError,
-            TData
-        >
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	query?: Partial<
+		UseQueryOptions<
+			Awaited<ReturnType<typeof getApiListsEnable>>,
+			TError,
+			TData
+		>
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
+	const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getGetApiListsEnableQueryKey();
+	const queryKey = queryOptions?.queryKey ?? getGetApiListsEnableQueryKey();
 
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof getApiListsEnable>>
-    > = ({ signal }) => getApiListsEnable(requestOptions, signal);
+	const queryFn: QueryFunction<
+		Awaited<ReturnType<typeof getApiListsEnable>>
+	> = ({ signal }) => getApiListsEnable(requestOptions, signal);
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getApiListsEnable>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+		Awaited<ReturnType<typeof getApiListsEnable>>,
+		TError,
+		TData
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
 export type GetApiListsEnableQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getApiListsEnable>>
+	Awaited<ReturnType<typeof getApiListsEnable>>
 >;
 export type GetApiListsEnableQueryError = ErrorType<void>;
 
 export function useGetApiListsEnable<
-    TData = Awaited<ReturnType<typeof getApiListsEnable>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsEnable>>,
+	TError = ErrorType<void>,
 >(
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsEnable>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiListsEnable>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiListsEnable>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options: {
+		query: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsEnable>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				DefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiListsEnable>>,
+					TError,
+					Awaited<ReturnType<typeof getApiListsEnable>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiListsEnable<
-    TData = Awaited<ReturnType<typeof getApiListsEnable>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsEnable>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsEnable>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiListsEnable>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiListsEnable>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsEnable>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				UndefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiListsEnable>>,
+					TError,
+					Awaited<ReturnType<typeof getApiListsEnable>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiListsEnable<
-    TData = Awaited<ReturnType<typeof getApiListsEnable>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsEnable>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsEnable>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsEnable>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 
 export function useGetApiListsEnable<
-    TData = Awaited<ReturnType<typeof getApiListsEnable>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsEnable>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsEnable>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsEnable>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 } {
-    const queryOptions = getGetApiListsEnableQueryOptions(options);
+	const queryOptions = getGetApiListsEnableQueryOptions(options);
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-        TData,
-        TError
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+		TData,
+		TError
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return { ...query, queryKey: queryOptions.queryKey };
+	return { ...query, queryKey: queryOptions.queryKey };
 }
 
 export const postApiListsEnable = (
-    createListRequest: BodyType<CreateListRequest>,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	createListRequest: BodyType<CreateListRequest>,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<EnableListDto>(
-        {
-            url: `/api/lists/enable`,
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            data: createListRequest,
-            signal,
-        },
-        options
-    );
+	return customInstance<EnableListDto>(
+		{
+			url: `/api/lists/enable`,
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			data: createListRequest,
+			signal,
+		},
+		options,
+	);
 };
 
 export const getPostApiListsEnableMutationOptions = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof postApiListsEnable>>,
-        TError,
-        { data: BodyType<CreateListRequest> },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof postApiListsEnable>>,
+		TError,
+		{ data: BodyType<CreateListRequest> },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof postApiListsEnable>>,
-    TError,
-    { data: BodyType<CreateListRequest> },
-    TContext
+	Awaited<ReturnType<typeof postApiListsEnable>>,
+	TError,
+	{ data: BodyType<CreateListRequest> },
+	TContext
 > => {
-    const mutationKey = ["postApiListsEnable"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["postApiListsEnable"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof postApiListsEnable>>,
-        { data: BodyType<CreateListRequest> }
-    > = (props) => {
-        const { data } = props ?? {};
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof postApiListsEnable>>,
+		{ data: BodyType<CreateListRequest> }
+	> = (props) => {
+		const { data } = props ?? {};
 
-        return postApiListsEnable(data, requestOptions);
-    };
+		return postApiListsEnable(data, requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type PostApiListsEnableMutationResult = NonNullable<
-    Awaited<ReturnType<typeof postApiListsEnable>>
+	Awaited<ReturnType<typeof postApiListsEnable>>
 >;
 export type PostApiListsEnableMutationBody = BodyType<CreateListRequest>;
 export type PostApiListsEnableMutationError = ErrorType<void>;
 
 export const usePostApiListsEnable = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof postApiListsEnable>>,
-            TError,
-            { data: BodyType<CreateListRequest> },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof postApiListsEnable>>,
+			TError,
+			{ data: BodyType<CreateListRequest> },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof postApiListsEnable>>,
-    TError,
-    { data: BodyType<CreateListRequest> },
-    TContext
+	Awaited<ReturnType<typeof postApiListsEnable>>,
+	TError,
+	{ data: BodyType<CreateListRequest> },
+	TContext
 > => {
-    return useMutation(
-        getPostApiListsEnableMutationOptions(options),
-        queryClient
-    );
+	return useMutation(
+		getPostApiListsEnableMutationOptions(options),
+		queryClient,
+	);
 };
 export const getApiListsDisable = (
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<DisableListDto[]>(
-        { url: `/api/lists/disable`, method: "GET", signal },
-        options
-    );
+	return customInstance<DisableListDto[]>(
+		{ url: `/api/lists/disable`, method: "GET", signal },
+		options,
+	);
 };
 
 export const getGetApiListsDisableQueryKey = () => {
-    return [`/api/lists/disable`] as const;
+	return [`/api/lists/disable`] as const;
 };
 
 export const getGetApiListsDisableQueryOptions = <
-    TData = Awaited<ReturnType<typeof getApiListsDisable>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsDisable>>,
+	TError = ErrorType<void>,
 >(options?: {
-    query?: Partial<
-        UseQueryOptions<
-            Awaited<ReturnType<typeof getApiListsDisable>>,
-            TError,
-            TData
-        >
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	query?: Partial<
+		UseQueryOptions<
+			Awaited<ReturnType<typeof getApiListsDisable>>,
+			TError,
+			TData
+		>
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
+	const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getGetApiListsDisableQueryKey();
+	const queryKey = queryOptions?.queryKey ?? getGetApiListsDisableQueryKey();
 
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof getApiListsDisable>>
-    > = ({ signal }) => getApiListsDisable(requestOptions, signal);
+	const queryFn: QueryFunction<
+		Awaited<ReturnType<typeof getApiListsDisable>>
+	> = ({ signal }) => getApiListsDisable(requestOptions, signal);
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getApiListsDisable>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+		Awaited<ReturnType<typeof getApiListsDisable>>,
+		TError,
+		TData
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
 export type GetApiListsDisableQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getApiListsDisable>>
+	Awaited<ReturnType<typeof getApiListsDisable>>
 >;
 export type GetApiListsDisableQueryError = ErrorType<void>;
 
 export function useGetApiListsDisable<
-    TData = Awaited<ReturnType<typeof getApiListsDisable>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsDisable>>,
+	TError = ErrorType<void>,
 >(
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsDisable>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiListsDisable>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiListsDisable>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options: {
+		query: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsDisable>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				DefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiListsDisable>>,
+					TError,
+					Awaited<ReturnType<typeof getApiListsDisable>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiListsDisable<
-    TData = Awaited<ReturnType<typeof getApiListsDisable>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsDisable>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsDisable>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiListsDisable>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiListsDisable>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsDisable>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				UndefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiListsDisable>>,
+					TError,
+					Awaited<ReturnType<typeof getApiListsDisable>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiListsDisable<
-    TData = Awaited<ReturnType<typeof getApiListsDisable>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsDisable>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsDisable>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsDisable>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 
 export function useGetApiListsDisable<
-    TData = Awaited<ReturnType<typeof getApiListsDisable>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsDisable>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsDisable>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsDisable>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 } {
-    const queryOptions = getGetApiListsDisableQueryOptions(options);
+	const queryOptions = getGetApiListsDisableQueryOptions(options);
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-        TData,
-        TError
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+		TData,
+		TError
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return { ...query, queryKey: queryOptions.queryKey };
+	return { ...query, queryKey: queryOptions.queryKey };
 }
 
 export const postApiListsDisable = (
-    createListRequest: BodyType<CreateListRequest>,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	createListRequest: BodyType<CreateListRequest>,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<DisableListDto>(
-        {
-            url: `/api/lists/disable`,
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            data: createListRequest,
-            signal,
-        },
-        options
-    );
+	return customInstance<DisableListDto>(
+		{
+			url: `/api/lists/disable`,
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			data: createListRequest,
+			signal,
+		},
+		options,
+	);
 };
 
 export const getPostApiListsDisableMutationOptions = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof postApiListsDisable>>,
-        TError,
-        { data: BodyType<CreateListRequest> },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof postApiListsDisable>>,
+		TError,
+		{ data: BodyType<CreateListRequest> },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof postApiListsDisable>>,
-    TError,
-    { data: BodyType<CreateListRequest> },
-    TContext
+	Awaited<ReturnType<typeof postApiListsDisable>>,
+	TError,
+	{ data: BodyType<CreateListRequest> },
+	TContext
 > => {
-    const mutationKey = ["postApiListsDisable"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["postApiListsDisable"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof postApiListsDisable>>,
-        { data: BodyType<CreateListRequest> }
-    > = (props) => {
-        const { data } = props ?? {};
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof postApiListsDisable>>,
+		{ data: BodyType<CreateListRequest> }
+	> = (props) => {
+		const { data } = props ?? {};
 
-        return postApiListsDisable(data, requestOptions);
-    };
+		return postApiListsDisable(data, requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type PostApiListsDisableMutationResult = NonNullable<
-    Awaited<ReturnType<typeof postApiListsDisable>>
+	Awaited<ReturnType<typeof postApiListsDisable>>
 >;
 export type PostApiListsDisableMutationBody = BodyType<CreateListRequest>;
 export type PostApiListsDisableMutationError = ErrorType<void>;
 
 export const usePostApiListsDisable = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof postApiListsDisable>>,
-            TError,
-            { data: BodyType<CreateListRequest> },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof postApiListsDisable>>,
+			TError,
+			{ data: BodyType<CreateListRequest> },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof postApiListsDisable>>,
-    TError,
-    { data: BodyType<CreateListRequest> },
-    TContext
+	Awaited<ReturnType<typeof postApiListsDisable>>,
+	TError,
+	{ data: BodyType<CreateListRequest> },
+	TContext
 > => {
-    return useMutation(
-        getPostApiListsDisableMutationOptions(options),
-        queryClient
-    );
+	return useMutation(
+		getPostApiListsDisableMutationOptions(options),
+		queryClient,
+	);
 };
 export const putApiListsTypeId = (
-    type: string,
-    id: string,
-    updateListRequest: BodyType<UpdateListRequest>,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	type: string,
+	id: string,
+	updateListRequest: BodyType<UpdateListRequest>,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<UpdateListResponse>(
-        {
-            url: `/api/lists/${type}/${id}`,
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            data: updateListRequest,
-            signal,
-        },
-        options
-    );
+	return customInstance<UpdateListResponse>(
+		{
+			url: `/api/lists/${type}/${id}`,
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			data: updateListRequest,
+			signal,
+		},
+		options,
+	);
 };
 
 export const getPutApiListsTypeIdMutationOptions = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof putApiListsTypeId>>,
-        TError,
-        { type: string; id: string; data: BodyType<UpdateListRequest> },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof putApiListsTypeId>>,
+		TError,
+		{ type: string; id: string; data: BodyType<UpdateListRequest> },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof putApiListsTypeId>>,
-    TError,
-    { type: string; id: string; data: BodyType<UpdateListRequest> },
-    TContext
+	Awaited<ReturnType<typeof putApiListsTypeId>>,
+	TError,
+	{ type: string; id: string; data: BodyType<UpdateListRequest> },
+	TContext
 > => {
-    const mutationKey = ["putApiListsTypeId"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["putApiListsTypeId"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof putApiListsTypeId>>,
-        { type: string; id: string; data: BodyType<UpdateListRequest> }
-    > = (props) => {
-        const { type, id, data } = props ?? {};
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof putApiListsTypeId>>,
+		{ type: string; id: string; data: BodyType<UpdateListRequest> }
+	> = (props) => {
+		const { type, id, data } = props ?? {};
 
-        return putApiListsTypeId(type, id, data, requestOptions);
-    };
+		return putApiListsTypeId(type, id, data, requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type PutApiListsTypeIdMutationResult = NonNullable<
-    Awaited<ReturnType<typeof putApiListsTypeId>>
+	Awaited<ReturnType<typeof putApiListsTypeId>>
 >;
 export type PutApiListsTypeIdMutationBody = BodyType<UpdateListRequest>;
 export type PutApiListsTypeIdMutationError = ErrorType<void>;
 
 export const usePutApiListsTypeId = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof putApiListsTypeId>>,
-            TError,
-            { type: string; id: string; data: BodyType<UpdateListRequest> },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof putApiListsTypeId>>,
+			TError,
+			{ type: string; id: string; data: BodyType<UpdateListRequest> },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof putApiListsTypeId>>,
-    TError,
-    { type: string; id: string; data: BodyType<UpdateListRequest> },
-    TContext
+	Awaited<ReturnType<typeof putApiListsTypeId>>,
+	TError,
+	{ type: string; id: string; data: BodyType<UpdateListRequest> },
+	TContext
 > => {
-    return useMutation(
-        getPutApiListsTypeIdMutationOptions(options),
-        queryClient
-    );
+	return useMutation(getPutApiListsTypeIdMutationOptions(options), queryClient);
 };
 export const deleteApiListsTypeId = (
-    type: string,
-    id: string,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	type: string,
+	id: string,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<void>(
-        { url: `/api/lists/${type}/${id}`, method: "DELETE", signal },
-        options
-    );
+	return customInstance<void>(
+		{ url: `/api/lists/${type}/${id}`, method: "DELETE", signal },
+		options,
+	);
 };
 
 export const getDeleteApiListsTypeIdMutationOptions = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof deleteApiListsTypeId>>,
-        TError,
-        { type: string; id: string },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof deleteApiListsTypeId>>,
+		TError,
+		{ type: string; id: string },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof deleteApiListsTypeId>>,
-    TError,
-    { type: string; id: string },
-    TContext
+	Awaited<ReturnType<typeof deleteApiListsTypeId>>,
+	TError,
+	{ type: string; id: string },
+	TContext
 > => {
-    const mutationKey = ["deleteApiListsTypeId"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["deleteApiListsTypeId"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof deleteApiListsTypeId>>,
-        { type: string; id: string }
-    > = (props) => {
-        const { type, id } = props ?? {};
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof deleteApiListsTypeId>>,
+		{ type: string; id: string }
+	> = (props) => {
+		const { type, id } = props ?? {};
 
-        return deleteApiListsTypeId(type, id, requestOptions);
-    };
+		return deleteApiListsTypeId(type, id, requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type DeleteApiListsTypeIdMutationResult = NonNullable<
-    Awaited<ReturnType<typeof deleteApiListsTypeId>>
+	Awaited<ReturnType<typeof deleteApiListsTypeId>>
 >;
 
 export type DeleteApiListsTypeIdMutationError = ErrorType<void>;
 
 export const useDeleteApiListsTypeId = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof deleteApiListsTypeId>>,
-            TError,
-            { type: string; id: string },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof deleteApiListsTypeId>>,
+			TError,
+			{ type: string; id: string },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof deleteApiListsTypeId>>,
-    TError,
-    { type: string; id: string },
-    TContext
+	Awaited<ReturnType<typeof deleteApiListsTypeId>>,
+	TError,
+	{ type: string; id: string },
+	TContext
 > => {
-    return useMutation(
-        getDeleteApiListsTypeIdMutationOptions(options),
-        queryClient
-    );
+	return useMutation(
+		getDeleteApiListsTypeIdMutationOptions(options),
+		queryClient,
+	);
 };
 export const getApiListsPresets = (
-    params?: GetApiListsPresetsParams,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	params?: GetApiListsPresetsParams,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<ListPresetDto[]>(
-        { url: `/api/lists/presets`, method: "GET", params, signal },
-        options
-    );
+	return customInstance<ListPresetDto[]>(
+		{ url: `/api/lists/presets`, method: "GET", params, signal },
+		options,
+	);
 };
 
 export const getGetApiListsPresetsQueryKey = (
-    params?: GetApiListsPresetsParams
+	params?: GetApiListsPresetsParams,
 ) => {
-    return [`/api/lists/presets`, ...(params ? [params] : [])] as const;
+	return [`/api/lists/presets`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiListsPresetsQueryOptions = <
-    TData = Awaited<ReturnType<typeof getApiListsPresets>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsPresets>>,
+	TError = ErrorType<void>,
 >(
-    params?: GetApiListsPresetsParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsPresets>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    }
+	params?: GetApiListsPresetsParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsPresets>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
 ) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
+	const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryKey =
-        queryOptions?.queryKey ?? getGetApiListsPresetsQueryKey(params);
+	const queryKey =
+		queryOptions?.queryKey ?? getGetApiListsPresetsQueryKey(params);
 
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof getApiListsPresets>>
-    > = ({ signal }) => getApiListsPresets(params, requestOptions, signal);
+	const queryFn: QueryFunction<
+		Awaited<ReturnType<typeof getApiListsPresets>>
+	> = ({ signal }) => getApiListsPresets(params, requestOptions, signal);
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getApiListsPresets>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+		Awaited<ReturnType<typeof getApiListsPresets>>,
+		TError,
+		TData
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
 export type GetApiListsPresetsQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getApiListsPresets>>
+	Awaited<ReturnType<typeof getApiListsPresets>>
 >;
 export type GetApiListsPresetsQueryError = ErrorType<void>;
 
 export function useGetApiListsPresets<
-    TData = Awaited<ReturnType<typeof getApiListsPresets>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsPresets>>,
+	TError = ErrorType<void>,
 >(
-    params: undefined | GetApiListsPresetsParams,
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsPresets>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiListsPresets>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiListsPresets>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	params: undefined | GetApiListsPresetsParams,
+	options: {
+		query: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsPresets>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				DefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiListsPresets>>,
+					TError,
+					Awaited<ReturnType<typeof getApiListsPresets>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiListsPresets<
-    TData = Awaited<ReturnType<typeof getApiListsPresets>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsPresets>>,
+	TError = ErrorType<void>,
 >(
-    params?: GetApiListsPresetsParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsPresets>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiListsPresets>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiListsPresets>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	params?: GetApiListsPresetsParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsPresets>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				UndefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiListsPresets>>,
+					TError,
+					Awaited<ReturnType<typeof getApiListsPresets>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiListsPresets<
-    TData = Awaited<ReturnType<typeof getApiListsPresets>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsPresets>>,
+	TError = ErrorType<void>,
 >(
-    params?: GetApiListsPresetsParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsPresets>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	params?: GetApiListsPresetsParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsPresets>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 
 export function useGetApiListsPresets<
-    TData = Awaited<ReturnType<typeof getApiListsPresets>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsPresets>>,
+	TError = ErrorType<void>,
 >(
-    params?: GetApiListsPresetsParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsPresets>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	params?: GetApiListsPresetsParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsPresets>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 } {
-    const queryOptions = getGetApiListsPresetsQueryOptions(params, options);
+	const queryOptions = getGetApiListsPresetsQueryOptions(params, options);
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-        TData,
-        TError
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+		TData,
+		TError
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return { ...query, queryKey: queryOptions.queryKey };
+	return { ...query, queryKey: queryOptions.queryKey };
 }
 
 export const postApiListsExport = (
-    exportRequest: BodyType<ExportRequest>,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	exportRequest: BodyType<ExportRequest>,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<ExportResponse>(
-        {
-            url: `/api/lists/export`,
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            data: exportRequest,
-            signal,
-        },
-        options
-    );
+	return customInstance<ExportResponse>(
+		{
+			url: `/api/lists/export`,
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			data: exportRequest,
+			signal,
+		},
+		options,
+	);
 };
 
 export const getPostApiListsExportMutationOptions = <
-    TError = ErrorType<unknown>,
-    TContext = unknown
+	TError = ErrorType<unknown>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof postApiListsExport>>,
-        TError,
-        { data: BodyType<ExportRequest> },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof postApiListsExport>>,
+		TError,
+		{ data: BodyType<ExportRequest> },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof postApiListsExport>>,
-    TError,
-    { data: BodyType<ExportRequest> },
-    TContext
+	Awaited<ReturnType<typeof postApiListsExport>>,
+	TError,
+	{ data: BodyType<ExportRequest> },
+	TContext
 > => {
-    const mutationKey = ["postApiListsExport"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["postApiListsExport"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof postApiListsExport>>,
-        { data: BodyType<ExportRequest> }
-    > = (props) => {
-        const { data } = props ?? {};
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof postApiListsExport>>,
+		{ data: BodyType<ExportRequest> }
+	> = (props) => {
+		const { data } = props ?? {};
 
-        return postApiListsExport(data, requestOptions);
-    };
+		return postApiListsExport(data, requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type PostApiListsExportMutationResult = NonNullable<
-    Awaited<ReturnType<typeof postApiListsExport>>
+	Awaited<ReturnType<typeof postApiListsExport>>
 >;
 export type PostApiListsExportMutationBody = BodyType<ExportRequest>;
 export type PostApiListsExportMutationError = ErrorType<unknown>;
 
 export const usePostApiListsExport = <
-    TError = ErrorType<unknown>,
-    TContext = unknown
+	TError = ErrorType<unknown>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof postApiListsExport>>,
-            TError,
-            { data: BodyType<ExportRequest> },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof postApiListsExport>>,
+			TError,
+			{ data: BodyType<ExportRequest> },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof postApiListsExport>>,
-    TError,
-    { data: BodyType<ExportRequest> },
-    TContext
+	Awaited<ReturnType<typeof postApiListsExport>>,
+	TError,
+	{ data: BodyType<ExportRequest> },
+	TContext
 > => {
-    return useMutation(
-        getPostApiListsExportMutationOptions(options),
-        queryClient
-    );
+	return useMutation(
+		getPostApiListsExportMutationOptions(options),
+		queryClient,
+	);
 };
 export const getApiListsWishlist = (
-    params?: GetApiListsWishlistParams,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	params?: GetApiListsWishlistParams,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<PaginatedWishlistResponse>(
-        { url: `/api/lists/wishlist`, method: "GET", params, signal },
-        options
-    );
+	return customInstance<PaginatedWishlistResponse>(
+		{ url: `/api/lists/wishlist`, method: "GET", params, signal },
+		options,
+	);
 };
 
 export const getGetApiListsWishlistQueryKey = (
-    params?: GetApiListsWishlistParams
+	params?: GetApiListsWishlistParams,
 ) => {
-    return [`/api/lists/wishlist`, ...(params ? [params] : [])] as const;
+	return [`/api/lists/wishlist`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiListsWishlistQueryOptions = <
-    TData = Awaited<ReturnType<typeof getApiListsWishlist>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsWishlist>>,
+	TError = ErrorType<void>,
 >(
-    params?: GetApiListsWishlistParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsWishlist>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    }
+	params?: GetApiListsWishlistParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsWishlist>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
 ) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
+	const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryKey =
-        queryOptions?.queryKey ?? getGetApiListsWishlistQueryKey(params);
+	const queryKey =
+		queryOptions?.queryKey ?? getGetApiListsWishlistQueryKey(params);
 
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof getApiListsWishlist>>
-    > = ({ signal }) => getApiListsWishlist(params, requestOptions, signal);
+	const queryFn: QueryFunction<
+		Awaited<ReturnType<typeof getApiListsWishlist>>
+	> = ({ signal }) => getApiListsWishlist(params, requestOptions, signal);
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getApiListsWishlist>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+		Awaited<ReturnType<typeof getApiListsWishlist>>,
+		TError,
+		TData
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
 export type GetApiListsWishlistQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getApiListsWishlist>>
+	Awaited<ReturnType<typeof getApiListsWishlist>>
 >;
 export type GetApiListsWishlistQueryError = ErrorType<void>;
 
 export function useGetApiListsWishlist<
-    TData = Awaited<ReturnType<typeof getApiListsWishlist>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsWishlist>>,
+	TError = ErrorType<void>,
 >(
-    params: undefined | GetApiListsWishlistParams,
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsWishlist>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiListsWishlist>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiListsWishlist>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	params: undefined | GetApiListsWishlistParams,
+	options: {
+		query: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsWishlist>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				DefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiListsWishlist>>,
+					TError,
+					Awaited<ReturnType<typeof getApiListsWishlist>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiListsWishlist<
-    TData = Awaited<ReturnType<typeof getApiListsWishlist>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsWishlist>>,
+	TError = ErrorType<void>,
 >(
-    params?: GetApiListsWishlistParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsWishlist>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiListsWishlist>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiListsWishlist>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	params?: GetApiListsWishlistParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsWishlist>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				UndefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiListsWishlist>>,
+					TError,
+					Awaited<ReturnType<typeof getApiListsWishlist>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiListsWishlist<
-    TData = Awaited<ReturnType<typeof getApiListsWishlist>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsWishlist>>,
+	TError = ErrorType<void>,
 >(
-    params?: GetApiListsWishlistParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsWishlist>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	params?: GetApiListsWishlistParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsWishlist>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 
 export function useGetApiListsWishlist<
-    TData = Awaited<ReturnType<typeof getApiListsWishlist>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsWishlist>>,
+	TError = ErrorType<void>,
 >(
-    params?: GetApiListsWishlistParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsWishlist>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	params?: GetApiListsWishlistParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsWishlist>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 } {
-    const queryOptions = getGetApiListsWishlistQueryOptions(params, options);
+	const queryOptions = getGetApiListsWishlistQueryOptions(params, options);
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-        TData,
-        TError
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+		TData,
+		TError
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return { ...query, queryKey: queryOptions.queryKey };
+	return { ...query, queryKey: queryOptions.queryKey };
 }
 
 export const postApiListsWishlist = (
-    createWishlistEntryRequest: BodyType<CreateWishlistEntryRequest>,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	createWishlistEntryRequest: BodyType<CreateWishlistEntryRequest>,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<WishlistEntryDto>(
-        {
-            url: `/api/lists/wishlist`,
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            data: createWishlistEntryRequest,
-            signal,
-        },
-        options
-    );
+	return customInstance<WishlistEntryDto>(
+		{
+			url: `/api/lists/wishlist`,
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			data: createWishlistEntryRequest,
+			signal,
+		},
+		options,
+	);
 };
 
 export const getPostApiListsWishlistMutationOptions = <
-    TError = ErrorType<ErrorResponse | undefined>,
-    TContext = unknown
+	TError = ErrorType<ErrorResponse | undefined>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof postApiListsWishlist>>,
-        TError,
-        { data: BodyType<CreateWishlistEntryRequest> },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof postApiListsWishlist>>,
+		TError,
+		{ data: BodyType<CreateWishlistEntryRequest> },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof postApiListsWishlist>>,
-    TError,
-    { data: BodyType<CreateWishlistEntryRequest> },
-    TContext
+	Awaited<ReturnType<typeof postApiListsWishlist>>,
+	TError,
+	{ data: BodyType<CreateWishlistEntryRequest> },
+	TContext
 > => {
-    const mutationKey = ["postApiListsWishlist"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["postApiListsWishlist"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof postApiListsWishlist>>,
-        { data: BodyType<CreateWishlistEntryRequest> }
-    > = (props) => {
-        const { data } = props ?? {};
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof postApiListsWishlist>>,
+		{ data: BodyType<CreateWishlistEntryRequest> }
+	> = (props) => {
+		const { data } = props ?? {};
 
-        return postApiListsWishlist(data, requestOptions);
-    };
+		return postApiListsWishlist(data, requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type PostApiListsWishlistMutationResult = NonNullable<
-    Awaited<ReturnType<typeof postApiListsWishlist>>
+	Awaited<ReturnType<typeof postApiListsWishlist>>
 >;
 export type PostApiListsWishlistMutationBody =
-    BodyType<CreateWishlistEntryRequest>;
+	BodyType<CreateWishlistEntryRequest>;
 export type PostApiListsWishlistMutationError = ErrorType<
-    ErrorResponse | undefined
+	ErrorResponse | undefined
 >;
 
 export const usePostApiListsWishlist = <
-    TError = ErrorType<ErrorResponse | undefined>,
-    TContext = unknown
+	TError = ErrorType<ErrorResponse | undefined>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof postApiListsWishlist>>,
-            TError,
-            { data: BodyType<CreateWishlistEntryRequest> },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof postApiListsWishlist>>,
+			TError,
+			{ data: BodyType<CreateWishlistEntryRequest> },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof postApiListsWishlist>>,
-    TError,
-    { data: BodyType<CreateWishlistEntryRequest> },
-    TContext
+	Awaited<ReturnType<typeof postApiListsWishlist>>,
+	TError,
+	{ data: BodyType<CreateWishlistEntryRequest> },
+	TContext
 > => {
-    return useMutation(
-        getPostApiListsWishlistMutationOptions(options),
-        queryClient
-    );
+	return useMutation(
+		getPostApiListsWishlistMutationOptions(options),
+		queryClient,
+	);
 };
 export const getApiListsWishlistStats = (
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<WishlistStatsDto>(
-        { url: `/api/lists/wishlist/stats`, method: "GET", signal },
-        options
-    );
+	return customInstance<WishlistStatsDto>(
+		{ url: `/api/lists/wishlist/stats`, method: "GET", signal },
+		options,
+	);
 };
 
 export const getGetApiListsWishlistStatsQueryKey = () => {
-    return [`/api/lists/wishlist/stats`] as const;
+	return [`/api/lists/wishlist/stats`] as const;
 };
 
 export const getGetApiListsWishlistStatsQueryOptions = <
-    TData = Awaited<ReturnType<typeof getApiListsWishlistStats>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsWishlistStats>>,
+	TError = ErrorType<void>,
 >(options?: {
-    query?: Partial<
-        UseQueryOptions<
-            Awaited<ReturnType<typeof getApiListsWishlistStats>>,
-            TError,
-            TData
-        >
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	query?: Partial<
+		UseQueryOptions<
+			Awaited<ReturnType<typeof getApiListsWishlistStats>>,
+			TError,
+			TData
+		>
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
+	const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryKey =
-        queryOptions?.queryKey ?? getGetApiListsWishlistStatsQueryKey();
+	const queryKey =
+		queryOptions?.queryKey ?? getGetApiListsWishlistStatsQueryKey();
 
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof getApiListsWishlistStats>>
-    > = ({ signal }) => getApiListsWishlistStats(requestOptions, signal);
+	const queryFn: QueryFunction<
+		Awaited<ReturnType<typeof getApiListsWishlistStats>>
+	> = ({ signal }) => getApiListsWishlistStats(requestOptions, signal);
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getApiListsWishlistStats>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+		Awaited<ReturnType<typeof getApiListsWishlistStats>>,
+		TError,
+		TData
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
 export type GetApiListsWishlistStatsQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getApiListsWishlistStats>>
+	Awaited<ReturnType<typeof getApiListsWishlistStats>>
 >;
 export type GetApiListsWishlistStatsQueryError = ErrorType<void>;
 
 export function useGetApiListsWishlistStats<
-    TData = Awaited<ReturnType<typeof getApiListsWishlistStats>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsWishlistStats>>,
+	TError = ErrorType<void>,
 >(
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsWishlistStats>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiListsWishlistStats>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiListsWishlistStats>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options: {
+		query: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsWishlistStats>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				DefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiListsWishlistStats>>,
+					TError,
+					Awaited<ReturnType<typeof getApiListsWishlistStats>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiListsWishlistStats<
-    TData = Awaited<ReturnType<typeof getApiListsWishlistStats>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsWishlistStats>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsWishlistStats>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiListsWishlistStats>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiListsWishlistStats>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsWishlistStats>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				UndefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiListsWishlistStats>>,
+					TError,
+					Awaited<ReturnType<typeof getApiListsWishlistStats>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiListsWishlistStats<
-    TData = Awaited<ReturnType<typeof getApiListsWishlistStats>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsWishlistStats>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsWishlistStats>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsWishlistStats>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 
 export function useGetApiListsWishlistStats<
-    TData = Awaited<ReturnType<typeof getApiListsWishlistStats>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiListsWishlistStats>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiListsWishlistStats>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiListsWishlistStats>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 } {
-    const queryOptions = getGetApiListsWishlistStatsQueryOptions(options);
+	const queryOptions = getGetApiListsWishlistStatsQueryOptions(options);
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-        TData,
-        TError
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+		TData,
+		TError
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return { ...query, queryKey: queryOptions.queryKey };
+	return { ...query, queryKey: queryOptions.queryKey };
 }
 
 export const putApiListsWishlistId = (
-    id: string,
-    updateWishlistEntryRequest: BodyType<UpdateWishlistEntryRequest>,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	id: string,
+	updateWishlistEntryRequest: BodyType<UpdateWishlistEntryRequest>,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<UpdateListResponse>(
-        {
-            url: `/api/lists/wishlist/${id}`,
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            data: updateWishlistEntryRequest,
-            signal,
-        },
-        options
-    );
+	return customInstance<UpdateListResponse>(
+		{
+			url: `/api/lists/wishlist/${id}`,
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			data: updateWishlistEntryRequest,
+			signal,
+		},
+		options,
+	);
 };
 
 export const getPutApiListsWishlistIdMutationOptions = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof putApiListsWishlistId>>,
-        TError,
-        { id: string; data: BodyType<UpdateWishlistEntryRequest> },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof putApiListsWishlistId>>,
+		TError,
+		{ id: string; data: BodyType<UpdateWishlistEntryRequest> },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof putApiListsWishlistId>>,
-    TError,
-    { id: string; data: BodyType<UpdateWishlistEntryRequest> },
-    TContext
+	Awaited<ReturnType<typeof putApiListsWishlistId>>,
+	TError,
+	{ id: string; data: BodyType<UpdateWishlistEntryRequest> },
+	TContext
 > => {
-    const mutationKey = ["putApiListsWishlistId"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["putApiListsWishlistId"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof putApiListsWishlistId>>,
-        { id: string; data: BodyType<UpdateWishlistEntryRequest> }
-    > = (props) => {
-        const { id, data } = props ?? {};
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof putApiListsWishlistId>>,
+		{ id: string; data: BodyType<UpdateWishlistEntryRequest> }
+	> = (props) => {
+		const { id, data } = props ?? {};
 
-        return putApiListsWishlistId(id, data, requestOptions);
-    };
+		return putApiListsWishlistId(id, data, requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type PutApiListsWishlistIdMutationResult = NonNullable<
-    Awaited<ReturnType<typeof putApiListsWishlistId>>
+	Awaited<ReturnType<typeof putApiListsWishlistId>>
 >;
 export type PutApiListsWishlistIdMutationBody =
-    BodyType<UpdateWishlistEntryRequest>;
+	BodyType<UpdateWishlistEntryRequest>;
 export type PutApiListsWishlistIdMutationError = ErrorType<void>;
 
 export const usePutApiListsWishlistId = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof putApiListsWishlistId>>,
-            TError,
-            { id: string; data: BodyType<UpdateWishlistEntryRequest> },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof putApiListsWishlistId>>,
+			TError,
+			{ id: string; data: BodyType<UpdateWishlistEntryRequest> },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof putApiListsWishlistId>>,
-    TError,
-    { id: string; data: BodyType<UpdateWishlistEntryRequest> },
-    TContext
+	Awaited<ReturnType<typeof putApiListsWishlistId>>,
+	TError,
+	{ id: string; data: BodyType<UpdateWishlistEntryRequest> },
+	TContext
 > => {
-    return useMutation(
-        getPutApiListsWishlistIdMutationOptions(options),
-        queryClient
-    );
+	return useMutation(
+		getPutApiListsWishlistIdMutationOptions(options),
+		queryClient,
+	);
 };
 export const deleteApiListsWishlistId = (
-    id: string,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	id: string,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<void>(
-        { url: `/api/lists/wishlist/${id}`, method: "DELETE", signal },
-        options
-    );
+	return customInstance<void>(
+		{ url: `/api/lists/wishlist/${id}`, method: "DELETE", signal },
+		options,
+	);
 };
 
 export const getDeleteApiListsWishlistIdMutationOptions = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof deleteApiListsWishlistId>>,
-        TError,
-        { id: string },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof deleteApiListsWishlistId>>,
+		TError,
+		{ id: string },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof deleteApiListsWishlistId>>,
-    TError,
-    { id: string },
-    TContext
+	Awaited<ReturnType<typeof deleteApiListsWishlistId>>,
+	TError,
+	{ id: string },
+	TContext
 > => {
-    const mutationKey = ["deleteApiListsWishlistId"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["deleteApiListsWishlistId"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof deleteApiListsWishlistId>>,
-        { id: string }
-    > = (props) => {
-        const { id } = props ?? {};
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof deleteApiListsWishlistId>>,
+		{ id: string }
+	> = (props) => {
+		const { id } = props ?? {};
 
-        return deleteApiListsWishlistId(id, requestOptions);
-    };
+		return deleteApiListsWishlistId(id, requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type DeleteApiListsWishlistIdMutationResult = NonNullable<
-    Awaited<ReturnType<typeof deleteApiListsWishlistId>>
+	Awaited<ReturnType<typeof deleteApiListsWishlistId>>
 >;
 
 export type DeleteApiListsWishlistIdMutationError = ErrorType<void>;
 
 export const useDeleteApiListsWishlistId = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof deleteApiListsWishlistId>>,
-            TError,
-            { id: string },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof deleteApiListsWishlistId>>,
+			TError,
+			{ id: string },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof deleteApiListsWishlistId>>,
-    TError,
-    { id: string },
-    TContext
+	Awaited<ReturnType<typeof deleteApiListsWishlistId>>,
+	TError,
+	{ id: string },
+	TContext
 > => {
-    return useMutation(
-        getDeleteApiListsWishlistIdMutationOptions(options),
-        queryClient
-    );
+	return useMutation(
+		getDeleteApiListsWishlistIdMutationOptions(options),
+		queryClient,
+	);
 };
 export const postApiListsWishlistToggleStarwishId = (
-    id: string,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	id: string,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<ToggleStarwishResponse>(
-        {
-            url: `/api/lists/wishlist/toggle-starwish/${id}`,
-            method: "POST",
-            signal,
-        },
-        options
-    );
+	return customInstance<ToggleStarwishResponse>(
+		{
+			url: `/api/lists/wishlist/toggle-starwish/${id}`,
+			method: "POST",
+			signal,
+		},
+		options,
+	);
 };
 
 export const getPostApiListsWishlistToggleStarwishIdMutationOptions = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof postApiListsWishlistToggleStarwishId>>,
-        TError,
-        { id: string },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof postApiListsWishlistToggleStarwishId>>,
+		TError,
+		{ id: string },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof postApiListsWishlistToggleStarwishId>>,
-    TError,
-    { id: string },
-    TContext
+	Awaited<ReturnType<typeof postApiListsWishlistToggleStarwishId>>,
+	TError,
+	{ id: string },
+	TContext
 > => {
-    const mutationKey = ["postApiListsWishlistToggleStarwishId"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["postApiListsWishlistToggleStarwishId"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof postApiListsWishlistToggleStarwishId>>,
-        { id: string }
-    > = (props) => {
-        const { id } = props ?? {};
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof postApiListsWishlistToggleStarwishId>>,
+		{ id: string }
+	> = (props) => {
+		const { id } = props ?? {};
 
-        return postApiListsWishlistToggleStarwishId(id, requestOptions);
-    };
+		return postApiListsWishlistToggleStarwishId(id, requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type PostApiListsWishlistToggleStarwishIdMutationResult = NonNullable<
-    Awaited<ReturnType<typeof postApiListsWishlistToggleStarwishId>>
+	Awaited<ReturnType<typeof postApiListsWishlistToggleStarwishId>>
 >;
 
 export type PostApiListsWishlistToggleStarwishIdMutationError = ErrorType<void>;
 
 export const usePostApiListsWishlistToggleStarwishId = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof postApiListsWishlistToggleStarwishId>>,
-            TError,
-            { id: string },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof postApiListsWishlistToggleStarwishId>>,
+			TError,
+			{ id: string },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof postApiListsWishlistToggleStarwishId>>,
-    TError,
-    { id: string },
-    TContext
+	Awaited<ReturnType<typeof postApiListsWishlistToggleStarwishId>>,
+	TError,
+	{ id: string },
+	TContext
 > => {
-    return useMutation(
-        getPostApiListsWishlistToggleStarwishIdMutationOptions(options),
-        queryClient
-    );
+	return useMutation(
+		getPostApiListsWishlistToggleStarwishIdMutationOptions(options),
+		queryClient,
+	);
 };

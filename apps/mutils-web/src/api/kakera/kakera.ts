@@ -6,993 +6,993 @@
  */
 
 import type {
-    DataTag,
-    DefinedInitialDataOptions,
-    DefinedUseQueryResult,
-    MutationFunction,
-    QueryClient,
-    QueryFunction,
-    QueryKey,
-    UndefinedInitialDataOptions,
-    UseMutationOptions,
-    UseMutationResult,
-    UseQueryOptions,
-    UseQueryResult,
+	DataTag,
+	DefinedInitialDataOptions,
+	DefinedUseQueryResult,
+	MutationFunction,
+	QueryClient,
+	QueryFunction,
+	QueryKey,
+	UndefinedInitialDataOptions,
+	UseMutationOptions,
+	UseMutationResult,
+	UseQueryOptions,
+	UseQueryResult,
 } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { BodyType, ErrorType } from "../../lib/custom-instance";
 
 import { customInstance } from "../../lib/custom-instance";
 import type {
-    BulkKakeraImportRequest,
-    BulkKakeraImportResponse,
-    CreateKakeraClaimRequest,
-    DeleteClaimsResponse,
-    ErrorResponse,
-    GetApiKakeraClaimsParams,
-    ImportClaimsResponse,
-    ImportKakeraClaimItem,
-    KakeraClaimDto,
-    KakeraExportItemDto,
-    KakeraStatsResponse,
-    UpdateKakeraClaimRequest,
+	BulkKakeraImportRequest,
+	BulkKakeraImportResponse,
+	CreateKakeraClaimRequest,
+	DeleteClaimsResponse,
+	ErrorResponse,
+	GetApiKakeraClaimsParams,
+	ImportClaimsResponse,
+	ImportKakeraClaimItem,
+	KakeraClaimDto,
+	KakeraExportItemDto,
+	KakeraStatsResponse,
+	UpdateKakeraClaimRequest,
 } from "../model";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 export const getApiKakeraClaims = (
-    params?: GetApiKakeraClaimsParams,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	params?: GetApiKakeraClaimsParams,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<KakeraClaimDto[]>(
-        { url: `/api/kakera/claims`, method: "GET", params, signal },
-        options
-    );
+	return customInstance<KakeraClaimDto[]>(
+		{ url: `/api/kakera/claims`, method: "GET", params, signal },
+		options,
+	);
 };
 
 export const getGetApiKakeraClaimsQueryKey = (
-    params?: GetApiKakeraClaimsParams
+	params?: GetApiKakeraClaimsParams,
 ) => {
-    return [`/api/kakera/claims`, ...(params ? [params] : [])] as const;
+	return [`/api/kakera/claims`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetApiKakeraClaimsQueryOptions = <
-    TData = Awaited<ReturnType<typeof getApiKakeraClaims>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraClaims>>,
+	TError = ErrorType<void>,
 >(
-    params?: GetApiKakeraClaimsParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiKakeraClaims>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    }
+	params?: GetApiKakeraClaimsParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiKakeraClaims>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
 ) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
+	const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryKey =
-        queryOptions?.queryKey ?? getGetApiKakeraClaimsQueryKey(params);
+	const queryKey =
+		queryOptions?.queryKey ?? getGetApiKakeraClaimsQueryKey(params);
 
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof getApiKakeraClaims>>
-    > = ({ signal }) => getApiKakeraClaims(params, requestOptions, signal);
+	const queryFn: QueryFunction<
+		Awaited<ReturnType<typeof getApiKakeraClaims>>
+	> = ({ signal }) => getApiKakeraClaims(params, requestOptions, signal);
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getApiKakeraClaims>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+		Awaited<ReturnType<typeof getApiKakeraClaims>>,
+		TError,
+		TData
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
 export type GetApiKakeraClaimsQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getApiKakeraClaims>>
+	Awaited<ReturnType<typeof getApiKakeraClaims>>
 >;
 export type GetApiKakeraClaimsQueryError = ErrorType<void>;
 
 export function useGetApiKakeraClaims<
-    TData = Awaited<ReturnType<typeof getApiKakeraClaims>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraClaims>>,
+	TError = ErrorType<void>,
 >(
-    params: undefined | GetApiKakeraClaimsParams,
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiKakeraClaims>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiKakeraClaims>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiKakeraClaims>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	params: undefined | GetApiKakeraClaimsParams,
+	options: {
+		query: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiKakeraClaims>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				DefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiKakeraClaims>>,
+					TError,
+					Awaited<ReturnType<typeof getApiKakeraClaims>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiKakeraClaims<
-    TData = Awaited<ReturnType<typeof getApiKakeraClaims>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraClaims>>,
+	TError = ErrorType<void>,
 >(
-    params?: GetApiKakeraClaimsParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiKakeraClaims>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiKakeraClaims>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiKakeraClaims>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	params?: GetApiKakeraClaimsParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiKakeraClaims>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				UndefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiKakeraClaims>>,
+					TError,
+					Awaited<ReturnType<typeof getApiKakeraClaims>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiKakeraClaims<
-    TData = Awaited<ReturnType<typeof getApiKakeraClaims>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraClaims>>,
+	TError = ErrorType<void>,
 >(
-    params?: GetApiKakeraClaimsParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiKakeraClaims>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	params?: GetApiKakeraClaimsParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiKakeraClaims>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 
 export function useGetApiKakeraClaims<
-    TData = Awaited<ReturnType<typeof getApiKakeraClaims>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraClaims>>,
+	TError = ErrorType<void>,
 >(
-    params?: GetApiKakeraClaimsParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiKakeraClaims>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	params?: GetApiKakeraClaimsParams,
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiKakeraClaims>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 } {
-    const queryOptions = getGetApiKakeraClaimsQueryOptions(params, options);
+	const queryOptions = getGetApiKakeraClaimsQueryOptions(params, options);
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-        TData,
-        TError
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+		TData,
+		TError
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return { ...query, queryKey: queryOptions.queryKey };
+	return { ...query, queryKey: queryOptions.queryKey };
 }
 
 export const postApiKakeraClaims = (
-    createKakeraClaimRequest: BodyType<CreateKakeraClaimRequest>,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	createKakeraClaimRequest: BodyType<CreateKakeraClaimRequest>,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<KakeraClaimDto>(
-        {
-            url: `/api/kakera/claims`,
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            data: createKakeraClaimRequest,
-            signal,
-        },
-        options
-    );
+	return customInstance<KakeraClaimDto>(
+		{
+			url: `/api/kakera/claims`,
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			data: createKakeraClaimRequest,
+			signal,
+		},
+		options,
+	);
 };
 
 export const getPostApiKakeraClaimsMutationOptions = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof postApiKakeraClaims>>,
-        TError,
-        { data: BodyType<CreateKakeraClaimRequest> },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof postApiKakeraClaims>>,
+		TError,
+		{ data: BodyType<CreateKakeraClaimRequest> },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof postApiKakeraClaims>>,
-    TError,
-    { data: BodyType<CreateKakeraClaimRequest> },
-    TContext
+	Awaited<ReturnType<typeof postApiKakeraClaims>>,
+	TError,
+	{ data: BodyType<CreateKakeraClaimRequest> },
+	TContext
 > => {
-    const mutationKey = ["postApiKakeraClaims"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["postApiKakeraClaims"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof postApiKakeraClaims>>,
-        { data: BodyType<CreateKakeraClaimRequest> }
-    > = (props) => {
-        const { data } = props ?? {};
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof postApiKakeraClaims>>,
+		{ data: BodyType<CreateKakeraClaimRequest> }
+	> = (props) => {
+		const { data } = props ?? {};
 
-        return postApiKakeraClaims(data, requestOptions);
-    };
+		return postApiKakeraClaims(data, requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type PostApiKakeraClaimsMutationResult = NonNullable<
-    Awaited<ReturnType<typeof postApiKakeraClaims>>
+	Awaited<ReturnType<typeof postApiKakeraClaims>>
 >;
 export type PostApiKakeraClaimsMutationBody =
-    BodyType<CreateKakeraClaimRequest>;
+	BodyType<CreateKakeraClaimRequest>;
 export type PostApiKakeraClaimsMutationError = ErrorType<void>;
 
 export const usePostApiKakeraClaims = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof postApiKakeraClaims>>,
-            TError,
-            { data: BodyType<CreateKakeraClaimRequest> },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof postApiKakeraClaims>>,
+			TError,
+			{ data: BodyType<CreateKakeraClaimRequest> },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof postApiKakeraClaims>>,
-    TError,
-    { data: BodyType<CreateKakeraClaimRequest> },
-    TContext
+	Awaited<ReturnType<typeof postApiKakeraClaims>>,
+	TError,
+	{ data: BodyType<CreateKakeraClaimRequest> },
+	TContext
 > => {
-    return useMutation(
-        getPostApiKakeraClaimsMutationOptions(options),
-        queryClient
-    );
+	return useMutation(
+		getPostApiKakeraClaimsMutationOptions(options),
+		queryClient,
+	);
 };
 export const deleteApiKakeraClaims = (
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<DeleteClaimsResponse>(
-        { url: `/api/kakera/claims`, method: "DELETE", signal },
-        options
-    );
+	return customInstance<DeleteClaimsResponse>(
+		{ url: `/api/kakera/claims`, method: "DELETE", signal },
+		options,
+	);
 };
 
 export const getDeleteApiKakeraClaimsMutationOptions = <
-    TError = ErrorType<ErrorResponse | undefined>,
-    TContext = unknown
+	TError = ErrorType<ErrorResponse | undefined>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof deleteApiKakeraClaims>>,
-        TError,
-        void,
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof deleteApiKakeraClaims>>,
+		TError,
+		void,
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof deleteApiKakeraClaims>>,
-    TError,
-    void,
-    TContext
+	Awaited<ReturnType<typeof deleteApiKakeraClaims>>,
+	TError,
+	void,
+	TContext
 > => {
-    const mutationKey = ["deleteApiKakeraClaims"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["deleteApiKakeraClaims"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof deleteApiKakeraClaims>>,
-        void
-    > = () => {
-        return deleteApiKakeraClaims(requestOptions);
-    };
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof deleteApiKakeraClaims>>,
+		void
+	> = () => {
+		return deleteApiKakeraClaims(requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type DeleteApiKakeraClaimsMutationResult = NonNullable<
-    Awaited<ReturnType<typeof deleteApiKakeraClaims>>
+	Awaited<ReturnType<typeof deleteApiKakeraClaims>>
 >;
 
 export type DeleteApiKakeraClaimsMutationError = ErrorType<
-    ErrorResponse | undefined
+	ErrorResponse | undefined
 >;
 
 export const useDeleteApiKakeraClaims = <
-    TError = ErrorType<ErrorResponse | undefined>,
-    TContext = unknown
+	TError = ErrorType<ErrorResponse | undefined>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof deleteApiKakeraClaims>>,
-            TError,
-            void,
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof deleteApiKakeraClaims>>,
+			TError,
+			void,
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof deleteApiKakeraClaims>>,
-    TError,
-    void,
-    TContext
+	Awaited<ReturnType<typeof deleteApiKakeraClaims>>,
+	TError,
+	void,
+	TContext
 > => {
-    return useMutation(
-        getDeleteApiKakeraClaimsMutationOptions(options),
-        queryClient
-    );
+	return useMutation(
+		getDeleteApiKakeraClaimsMutationOptions(options),
+		queryClient,
+	);
 };
 export const getApiKakeraStats = (
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<KakeraStatsResponse>(
-        { url: `/api/kakera/stats`, method: "GET", signal },
-        options
-    );
+	return customInstance<KakeraStatsResponse>(
+		{ url: `/api/kakera/stats`, method: "GET", signal },
+		options,
+	);
 };
 
 export const getGetApiKakeraStatsQueryKey = () => {
-    return [`/api/kakera/stats`] as const;
+	return [`/api/kakera/stats`] as const;
 };
 
 export const getGetApiKakeraStatsQueryOptions = <
-    TData = Awaited<ReturnType<typeof getApiKakeraStats>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraStats>>,
+	TError = ErrorType<void>,
 >(options?: {
-    query?: Partial<
-        UseQueryOptions<
-            Awaited<ReturnType<typeof getApiKakeraStats>>,
-            TError,
-            TData
-        >
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	query?: Partial<
+		UseQueryOptions<
+			Awaited<ReturnType<typeof getApiKakeraStats>>,
+			TError,
+			TData
+		>
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
+	const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getGetApiKakeraStatsQueryKey();
+	const queryKey = queryOptions?.queryKey ?? getGetApiKakeraStatsQueryKey();
 
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof getApiKakeraStats>>
-    > = ({ signal }) => getApiKakeraStats(requestOptions, signal);
+	const queryFn: QueryFunction<
+		Awaited<ReturnType<typeof getApiKakeraStats>>
+	> = ({ signal }) => getApiKakeraStats(requestOptions, signal);
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getApiKakeraStats>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+		Awaited<ReturnType<typeof getApiKakeraStats>>,
+		TError,
+		TData
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
 export type GetApiKakeraStatsQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getApiKakeraStats>>
+	Awaited<ReturnType<typeof getApiKakeraStats>>
 >;
 export type GetApiKakeraStatsQueryError = ErrorType<void>;
 
 export function useGetApiKakeraStats<
-    TData = Awaited<ReturnType<typeof getApiKakeraStats>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraStats>>,
+	TError = ErrorType<void>,
 >(
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiKakeraStats>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiKakeraStats>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiKakeraStats>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options: {
+		query: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiKakeraStats>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				DefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiKakeraStats>>,
+					TError,
+					Awaited<ReturnType<typeof getApiKakeraStats>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiKakeraStats<
-    TData = Awaited<ReturnType<typeof getApiKakeraStats>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraStats>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiKakeraStats>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiKakeraStats>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiKakeraStats>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiKakeraStats>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				UndefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiKakeraStats>>,
+					TError,
+					Awaited<ReturnType<typeof getApiKakeraStats>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiKakeraStats<
-    TData = Awaited<ReturnType<typeof getApiKakeraStats>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraStats>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiKakeraStats>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiKakeraStats>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 
 export function useGetApiKakeraStats<
-    TData = Awaited<ReturnType<typeof getApiKakeraStats>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraStats>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiKakeraStats>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiKakeraStats>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 } {
-    const queryOptions = getGetApiKakeraStatsQueryOptions(options);
+	const queryOptions = getGetApiKakeraStatsQueryOptions(options);
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-        TData,
-        TError
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+		TData,
+		TError
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return { ...query, queryKey: queryOptions.queryKey };
+	return { ...query, queryKey: queryOptions.queryKey };
 }
 
 export const deleteApiKakeraClaimsId = (
-    id: string,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	id: string,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<void>(
-        { url: `/api/kakera/claims/${id}`, method: "DELETE", signal },
-        options
-    );
+	return customInstance<void>(
+		{ url: `/api/kakera/claims/${id}`, method: "DELETE", signal },
+		options,
+	);
 };
 
 export const getDeleteApiKakeraClaimsIdMutationOptions = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof deleteApiKakeraClaimsId>>,
-        TError,
-        { id: string },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof deleteApiKakeraClaimsId>>,
+		TError,
+		{ id: string },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof deleteApiKakeraClaimsId>>,
-    TError,
-    { id: string },
-    TContext
+	Awaited<ReturnType<typeof deleteApiKakeraClaimsId>>,
+	TError,
+	{ id: string },
+	TContext
 > => {
-    const mutationKey = ["deleteApiKakeraClaimsId"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["deleteApiKakeraClaimsId"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof deleteApiKakeraClaimsId>>,
-        { id: string }
-    > = (props) => {
-        const { id } = props ?? {};
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof deleteApiKakeraClaimsId>>,
+		{ id: string }
+	> = (props) => {
+		const { id } = props ?? {};
 
-        return deleteApiKakeraClaimsId(id, requestOptions);
-    };
+		return deleteApiKakeraClaimsId(id, requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type DeleteApiKakeraClaimsIdMutationResult = NonNullable<
-    Awaited<ReturnType<typeof deleteApiKakeraClaimsId>>
+	Awaited<ReturnType<typeof deleteApiKakeraClaimsId>>
 >;
 
 export type DeleteApiKakeraClaimsIdMutationError = ErrorType<void>;
 
 export const useDeleteApiKakeraClaimsId = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof deleteApiKakeraClaimsId>>,
-            TError,
-            { id: string },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof deleteApiKakeraClaimsId>>,
+			TError,
+			{ id: string },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof deleteApiKakeraClaimsId>>,
-    TError,
-    { id: string },
-    TContext
+	Awaited<ReturnType<typeof deleteApiKakeraClaimsId>>,
+	TError,
+	{ id: string },
+	TContext
 > => {
-    return useMutation(
-        getDeleteApiKakeraClaimsIdMutationOptions(options),
-        queryClient
-    );
+	return useMutation(
+		getDeleteApiKakeraClaimsIdMutationOptions(options),
+		queryClient,
+	);
 };
 export const putApiKakeraClaimsId = (
-    id: string,
-    updateKakeraClaimRequest: BodyType<UpdateKakeraClaimRequest>,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	id: string,
+	updateKakeraClaimRequest: BodyType<UpdateKakeraClaimRequest>,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<KakeraClaimDto>(
-        {
-            url: `/api/kakera/claims/${id}`,
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            data: updateKakeraClaimRequest,
-            signal,
-        },
-        options
-    );
+	return customInstance<KakeraClaimDto>(
+		{
+			url: `/api/kakera/claims/${id}`,
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			data: updateKakeraClaimRequest,
+			signal,
+		},
+		options,
+	);
 };
 
 export const getPutApiKakeraClaimsIdMutationOptions = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof putApiKakeraClaimsId>>,
-        TError,
-        { id: string; data: BodyType<UpdateKakeraClaimRequest> },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof putApiKakeraClaimsId>>,
+		TError,
+		{ id: string; data: BodyType<UpdateKakeraClaimRequest> },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof putApiKakeraClaimsId>>,
-    TError,
-    { id: string; data: BodyType<UpdateKakeraClaimRequest> },
-    TContext
+	Awaited<ReturnType<typeof putApiKakeraClaimsId>>,
+	TError,
+	{ id: string; data: BodyType<UpdateKakeraClaimRequest> },
+	TContext
 > => {
-    const mutationKey = ["putApiKakeraClaimsId"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["putApiKakeraClaimsId"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof putApiKakeraClaimsId>>,
-        { id: string; data: BodyType<UpdateKakeraClaimRequest> }
-    > = (props) => {
-        const { id, data } = props ?? {};
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof putApiKakeraClaimsId>>,
+		{ id: string; data: BodyType<UpdateKakeraClaimRequest> }
+	> = (props) => {
+		const { id, data } = props ?? {};
 
-        return putApiKakeraClaimsId(id, data, requestOptions);
-    };
+		return putApiKakeraClaimsId(id, data, requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type PutApiKakeraClaimsIdMutationResult = NonNullable<
-    Awaited<ReturnType<typeof putApiKakeraClaimsId>>
+	Awaited<ReturnType<typeof putApiKakeraClaimsId>>
 >;
 export type PutApiKakeraClaimsIdMutationBody =
-    BodyType<UpdateKakeraClaimRequest>;
+	BodyType<UpdateKakeraClaimRequest>;
 export type PutApiKakeraClaimsIdMutationError = ErrorType<void>;
 
 export const usePutApiKakeraClaimsId = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof putApiKakeraClaimsId>>,
-            TError,
-            { id: string; data: BodyType<UpdateKakeraClaimRequest> },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof putApiKakeraClaimsId>>,
+			TError,
+			{ id: string; data: BodyType<UpdateKakeraClaimRequest> },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof putApiKakeraClaimsId>>,
-    TError,
-    { id: string; data: BodyType<UpdateKakeraClaimRequest> },
-    TContext
+	Awaited<ReturnType<typeof putApiKakeraClaimsId>>,
+	TError,
+	{ id: string; data: BodyType<UpdateKakeraClaimRequest> },
+	TContext
 > => {
-    return useMutation(
-        getPutApiKakeraClaimsIdMutationOptions(options),
-        queryClient
-    );
+	return useMutation(
+		getPutApiKakeraClaimsIdMutationOptions(options),
+		queryClient,
+	);
 };
 export const getApiKakeraExport = (
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<KakeraExportItemDto[]>(
-        { url: `/api/kakera/export`, method: "GET", signal },
-        options
-    );
+	return customInstance<KakeraExportItemDto[]>(
+		{ url: `/api/kakera/export`, method: "GET", signal },
+		options,
+	);
 };
 
 export const getGetApiKakeraExportQueryKey = () => {
-    return [`/api/kakera/export`] as const;
+	return [`/api/kakera/export`] as const;
 };
 
 export const getGetApiKakeraExportQueryOptions = <
-    TData = Awaited<ReturnType<typeof getApiKakeraExport>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraExport>>,
+	TError = ErrorType<void>,
 >(options?: {
-    query?: Partial<
-        UseQueryOptions<
-            Awaited<ReturnType<typeof getApiKakeraExport>>,
-            TError,
-            TData
-        >
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	query?: Partial<
+		UseQueryOptions<
+			Awaited<ReturnType<typeof getApiKakeraExport>>,
+			TError,
+			TData
+		>
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
+	const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getGetApiKakeraExportQueryKey();
+	const queryKey = queryOptions?.queryKey ?? getGetApiKakeraExportQueryKey();
 
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof getApiKakeraExport>>
-    > = ({ signal }) => getApiKakeraExport(requestOptions, signal);
+	const queryFn: QueryFunction<
+		Awaited<ReturnType<typeof getApiKakeraExport>>
+	> = ({ signal }) => getApiKakeraExport(requestOptions, signal);
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getApiKakeraExport>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+		Awaited<ReturnType<typeof getApiKakeraExport>>,
+		TError,
+		TData
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
 export type GetApiKakeraExportQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getApiKakeraExport>>
+	Awaited<ReturnType<typeof getApiKakeraExport>>
 >;
 export type GetApiKakeraExportQueryError = ErrorType<void>;
 
 export function useGetApiKakeraExport<
-    TData = Awaited<ReturnType<typeof getApiKakeraExport>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraExport>>,
+	TError = ErrorType<void>,
 >(
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiKakeraExport>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiKakeraExport>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiKakeraExport>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options: {
+		query: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiKakeraExport>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				DefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiKakeraExport>>,
+					TError,
+					Awaited<ReturnType<typeof getApiKakeraExport>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiKakeraExport<
-    TData = Awaited<ReturnType<typeof getApiKakeraExport>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraExport>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiKakeraExport>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getApiKakeraExport>>,
-                    TError,
-                    Awaited<ReturnType<typeof getApiKakeraExport>>
-                >,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiKakeraExport>>,
+				TError,
+				TData
+			>
+		> &
+			Pick<
+				UndefinedInitialDataOptions<
+					Awaited<ReturnType<typeof getApiKakeraExport>>,
+					TError,
+					Awaited<ReturnType<typeof getApiKakeraExport>>
+				>,
+				"initialData"
+			>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 export function useGetApiKakeraExport<
-    TData = Awaited<ReturnType<typeof getApiKakeraExport>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraExport>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiKakeraExport>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiKakeraExport>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 };
 
 export function useGetApiKakeraExport<
-    TData = Awaited<ReturnType<typeof getApiKakeraExport>>,
-    TError = ErrorType<void>
+	TData = Awaited<ReturnType<typeof getApiKakeraExport>>,
+	TError = ErrorType<void>,
 >(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getApiKakeraExport>>,
-                TError,
-                TData
-            >
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		query?: Partial<
+			UseQueryOptions<
+				Awaited<ReturnType<typeof getApiKakeraExport>>,
+				TError,
+				TData
+			>
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
+	queryKey: DataTag<QueryKey, TData, TError>;
 } {
-    const queryOptions = getGetApiKakeraExportQueryOptions(options);
+	const queryOptions = getGetApiKakeraExportQueryOptions(options);
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-        TData,
-        TError
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+	const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+		TData,
+		TError
+	> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return { ...query, queryKey: queryOptions.queryKey };
+	return { ...query, queryKey: queryOptions.queryKey };
 }
 
 export const postApiKakeraImport = (
-    importKakeraClaimItem: BodyType<ImportKakeraClaimItem[]>,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	importKakeraClaimItem: BodyType<ImportKakeraClaimItem[]>,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<ImportClaimsResponse>(
-        {
-            url: `/api/kakera/import`,
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            data: importKakeraClaimItem,
-            signal,
-        },
-        options
-    );
+	return customInstance<ImportClaimsResponse>(
+		{
+			url: `/api/kakera/import`,
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			data: importKakeraClaimItem,
+			signal,
+		},
+		options,
+	);
 };
 
 export const getPostApiKakeraImportMutationOptions = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof postApiKakeraImport>>,
-        TError,
-        { data: BodyType<ImportKakeraClaimItem[]> },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof postApiKakeraImport>>,
+		TError,
+		{ data: BodyType<ImportKakeraClaimItem[]> },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof postApiKakeraImport>>,
-    TError,
-    { data: BodyType<ImportKakeraClaimItem[]> },
-    TContext
+	Awaited<ReturnType<typeof postApiKakeraImport>>,
+	TError,
+	{ data: BodyType<ImportKakeraClaimItem[]> },
+	TContext
 > => {
-    const mutationKey = ["postApiKakeraImport"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["postApiKakeraImport"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof postApiKakeraImport>>,
-        { data: BodyType<ImportKakeraClaimItem[]> }
-    > = (props) => {
-        const { data } = props ?? {};
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof postApiKakeraImport>>,
+		{ data: BodyType<ImportKakeraClaimItem[]> }
+	> = (props) => {
+		const { data } = props ?? {};
 
-        return postApiKakeraImport(data, requestOptions);
-    };
+		return postApiKakeraImport(data, requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type PostApiKakeraImportMutationResult = NonNullable<
-    Awaited<ReturnType<typeof postApiKakeraImport>>
+	Awaited<ReturnType<typeof postApiKakeraImport>>
 >;
 export type PostApiKakeraImportMutationBody = BodyType<ImportKakeraClaimItem[]>;
 export type PostApiKakeraImportMutationError = ErrorType<void>;
 
 export const usePostApiKakeraImport = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof postApiKakeraImport>>,
-            TError,
-            { data: BodyType<ImportKakeraClaimItem[]> },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof postApiKakeraImport>>,
+			TError,
+			{ data: BodyType<ImportKakeraClaimItem[]> },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof postApiKakeraImport>>,
-    TError,
-    { data: BodyType<ImportKakeraClaimItem[]> },
-    TContext
+	Awaited<ReturnType<typeof postApiKakeraImport>>,
+	TError,
+	{ data: BodyType<ImportKakeraClaimItem[]> },
+	TContext
 > => {
-    return useMutation(
-        getPostApiKakeraImportMutationOptions(options),
-        queryClient
-    );
+	return useMutation(
+		getPostApiKakeraImportMutationOptions(options),
+		queryClient,
+	);
 };
 export const postApiKakeraBulkImport = (
-    bulkKakeraImportRequest: BodyType<BulkKakeraImportRequest>,
-    options?: SecondParameter<typeof customInstance>,
-    signal?: AbortSignal
+	bulkKakeraImportRequest: BodyType<BulkKakeraImportRequest>,
+	options?: SecondParameter<typeof customInstance>,
+	signal?: AbortSignal,
 ) => {
-    return customInstance<BulkKakeraImportResponse>(
-        {
-            url: `/api/kakera/bulk-import`,
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            data: bulkKakeraImportRequest,
-            signal,
-        },
-        options
-    );
+	return customInstance<BulkKakeraImportResponse>(
+		{
+			url: `/api/kakera/bulk-import`,
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			data: bulkKakeraImportRequest,
+			signal,
+		},
+		options,
+	);
 };
 
 export const getPostApiKakeraBulkImportMutationOptions = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof postApiKakeraBulkImport>>,
-        TError,
-        { data: BodyType<BulkKakeraImportRequest> },
-        TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
+	mutation?: UseMutationOptions<
+		Awaited<ReturnType<typeof postApiKakeraBulkImport>>,
+		TError,
+		{ data: BodyType<BulkKakeraImportRequest> },
+		TContext
+	>;
+	request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof postApiKakeraBulkImport>>,
-    TError,
-    { data: BodyType<BulkKakeraImportRequest> },
-    TContext
+	Awaited<ReturnType<typeof postApiKakeraBulkImport>>,
+	TError,
+	{ data: BodyType<BulkKakeraImportRequest> },
+	TContext
 > => {
-    const mutationKey = ["postApiKakeraBulkImport"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation &&
-          "mutationKey" in options.mutation &&
-          options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
+	const mutationKey = ["postApiKakeraBulkImport"];
+	const { mutation: mutationOptions, request: requestOptions } = options
+		? options.mutation &&
+			"mutationKey" in options.mutation &&
+			options.mutation.mutationKey
+			? options
+			: { ...options, mutation: { ...options.mutation, mutationKey } }
+		: { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof postApiKakeraBulkImport>>,
-        { data: BodyType<BulkKakeraImportRequest> }
-    > = (props) => {
-        const { data } = props ?? {};
+	const mutationFn: MutationFunction<
+		Awaited<ReturnType<typeof postApiKakeraBulkImport>>,
+		{ data: BodyType<BulkKakeraImportRequest> }
+	> = (props) => {
+		const { data } = props ?? {};
 
-        return postApiKakeraBulkImport(data, requestOptions);
-    };
+		return postApiKakeraBulkImport(data, requestOptions);
+	};
 
-    return { mutationFn, ...mutationOptions };
+	return { mutationFn, ...mutationOptions };
 };
 
 export type PostApiKakeraBulkImportMutationResult = NonNullable<
-    Awaited<ReturnType<typeof postApiKakeraBulkImport>>
+	Awaited<ReturnType<typeof postApiKakeraBulkImport>>
 >;
 export type PostApiKakeraBulkImportMutationBody =
-    BodyType<BulkKakeraImportRequest>;
+	BodyType<BulkKakeraImportRequest>;
 export type PostApiKakeraBulkImportMutationError = ErrorType<void>;
 
 export const usePostApiKakeraBulkImport = <
-    TError = ErrorType<void>,
-    TContext = unknown
+	TError = ErrorType<void>,
+	TContext = unknown,
 >(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof postApiKakeraBulkImport>>,
-            TError,
-            { data: BodyType<BulkKakeraImportRequest> },
-            TContext
-        >;
-        request?: SecondParameter<typeof customInstance>;
-    },
-    queryClient?: QueryClient
+	options?: {
+		mutation?: UseMutationOptions<
+			Awaited<ReturnType<typeof postApiKakeraBulkImport>>,
+			TError,
+			{ data: BodyType<BulkKakeraImportRequest> },
+			TContext
+		>;
+		request?: SecondParameter<typeof customInstance>;
+	},
+	queryClient?: QueryClient,
 ): UseMutationResult<
-    Awaited<ReturnType<typeof postApiKakeraBulkImport>>,
-    TError,
-    { data: BodyType<BulkKakeraImportRequest> },
-    TContext
+	Awaited<ReturnType<typeof postApiKakeraBulkImport>>,
+	TError,
+	{ data: BodyType<BulkKakeraImportRequest> },
+	TContext
 > => {
-    return useMutation(
-        getPostApiKakeraBulkImportMutationOptions(options),
-        queryClient
-    );
+	return useMutation(
+		getPostApiKakeraBulkImportMutationOptions(options),
+		queryClient,
+	);
 };
