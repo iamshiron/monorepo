@@ -12,10 +12,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 var pluginRegistry = new PluginRegistry();
-pluginRegistry.RegisterPlugin(new ExamplePlugin());
 builder.Services.AddSingleton<IPluginRegistry>(pluginRegistry);
 
 var app = builder.Build();
+pluginRegistry.RegisterPlugin(new ExamplePlugin(), app.Logger);
+
+pluginRegistry.Initialize();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
@@ -30,3 +32,4 @@ app.UseHttpsRedirection();
 app.MapPluginEndpoints();
 
 app.Run();
+pluginRegistry.Dispose();
