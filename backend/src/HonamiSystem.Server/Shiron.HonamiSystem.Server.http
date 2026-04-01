@@ -1,0 +1,6 @@
+@Shiron.HonamiSystem.Server_HostAddress = http://localhost:5093
+
+GET {{Shiron.HonamiSystem.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
