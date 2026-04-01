@@ -1,6 +1,7 @@
 using Scalar.AspNetCore;
 using Shiron.HonamiSystem.Plugins.ExamplePlugin;
 using Shiron.HonamiSystem.SDK;
+using Shiron.HonamiSystem.Server.Endpoints;
 using Shiron.HonamiSystem.Server.Services;
 using Shiron.HonamiSystem.Services;
 
@@ -26,5 +27,6 @@ if (app.Environment.IsDevelopment()) {
 }
 
 app.UseHttpsRedirection();
-app.MapGet("/api/plugins", (IPluginRegistry registry) => registry.Plugins).Produces<IEnumerable<HonamiPlugin>>();
+app.MapPluginEndpoints();
+
 app.Run();
