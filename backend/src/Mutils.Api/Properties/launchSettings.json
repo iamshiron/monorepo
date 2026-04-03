@@ -1,11 +1,11 @@
 {
-    "profiles": {
-        "Mutils.Api": {
-            "commandName": "Project",
-            "environmentVariables": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "applicationUrl": "http://localhost:1810"
-        }
-    }
+	"profiles": {
+		"Mutils.Api": {
+			"commandName": "Project",
+			"environmentVariables": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+			"applicationUrl": "http://localhost:2010"
+		}
+	}
 }

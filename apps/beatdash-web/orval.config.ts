@@ -12,7 +12,7 @@ export default defineConfig({
             biome: true
         },
         input: {
-            target: 'http://127.0.0.1:1811/openapi/v1.json',
+            target: 'http://127.0.0.1:2011/openapi/v1.json',
         },
     },
 });

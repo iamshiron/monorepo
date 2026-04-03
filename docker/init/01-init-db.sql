@@ -5,6 +5,7 @@ SET client_encoding = 'UTF8';
 CREATE DATABASE beatdash;
 CREATE DATABASE mutils;
 CREATE DATABASE archive;
+CREATE DATABASE honamig;
 
 -- Setup Mutils Database (mutils_default)
 \c mutils
@@ -26,6 +27,12 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 GRANT ALL PRIVILEGES ON SCHEMA public TO current_user;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO current_user;
 
+\c honamig
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+GRANT ALL PRIVILEGES ON SCHEMA public TO current_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO current_user;
+      
 -- Log initialization
 DO $$
 BEGIN
