@@ -25,7 +25,7 @@ declare module "@tanstack/react-router" {
 }
 
 // biome-ignore lint/style/noNonNullAssertion: standard React entry point
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById("app")!).render(
 	<StrictMode>
 		<ThemeProvider
 			attribute="class"

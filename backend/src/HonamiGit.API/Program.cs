@@ -2,6 +2,7 @@ using DotNetEnv;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using Shiron.HonamiGit.API.DTOs;
 using Shiron.HonamiGit.DB;
 using Shiron.HonamiGit.DB.Schema;
 
@@ -53,6 +54,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseHttpsRedirection();
-app.MapGet("/api/health", () => Results.Ok(new { Status = "OK" })).WithName("Health");
+app.MapGet("/api/health", () => Results.Ok(HealthResponseDTO.Ok)).WithName("Health").Produces<HealthResponseDTO>();
 
 app.Run();

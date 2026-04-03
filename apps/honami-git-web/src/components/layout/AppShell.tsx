@@ -8,12 +8,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 			<header className="sticky top-4 z-50 mx-auto max-w-5xl rounded-2xl left-0 right-0 px-4 bg-background/95 backdrop-blur-md shadow-lg border border-border">
 				<div className="flex h-14 items-center justify-between px-6">
 					<Link to="/" className="flex items-center gap-2">
-						<span className="text-xl font-bold text-primary">Archive</span>
+						<span className="text-xl font-bold text-primary">Honami Git</span>
 					</Link>
 					<nav className="flex items-center gap-1">
-						<Link to="/test">
-							<Button variant="ghost">Test</Button>
-						</Link>
+						<Button asChild variant="ghost">
+							<Link to="/">Home</Link>
+						</Button>
+						<Button asChild variant="ghost">
+							<Link to="/about">About</Link>
+						</Button>
 					</nav>
 					<div className="flex items-center gap-2">
 						<ModeToggle />
