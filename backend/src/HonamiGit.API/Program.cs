@@ -9,7 +9,7 @@ Env.TraversePath().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
-builder.Services.AddIdentity<User, IdentityRole>(c => {
+builder.Services.AddIdentity<User, IdentityRole<Guid>>(c => {
     c.Password.RequireDigit = false;
     c.Password.RequiredLength = 4;
     c.Password.RequireNonAlphanumeric = false;

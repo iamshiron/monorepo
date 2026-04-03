@@ -5,7 +5,7 @@ using Shiron.HonamiGit.DB.Schema;
 
 namespace Shiron.HonamiGit.DB;
 
-public class HonamiGitDb : IdentityDbContext<User, IdentityRole<Guid>, Guid> {
+public class HonamiGitDb(DbContextOptions<HonamiGitDb> options) : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options) {
     public DbSet<Repository> Repositories => Set<Repository>();
     public DbSet<RepositoryCollaborator> RepositoryCollaborators => Set<RepositoryCollaborator>();
     public DbSet<LFSObject> LFSObjects => Set<LFSObject>();
