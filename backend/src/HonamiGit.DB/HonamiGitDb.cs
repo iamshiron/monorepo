@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Shiron.TheArchive.DB.Schema;
+using Shiron.HonamiGit.DB.Schema;
 
-namespace Shiron.TheArchive.DB;
+namespace Shiron.HonamiGit.DB;
 
-public class ArchiveDbContext(DbContextOptions options) : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options) {
+public class HonamiGitDb : IdentityDbContext<User, IdentityRole<Guid>, Guid> {
     protected override void OnModelCreating(ModelBuilder builder) {
         base.OnModelCreating(builder);
 

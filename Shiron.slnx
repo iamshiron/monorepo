@@ -7,6 +7,11 @@
   <Folder Name="/Beatdash/">
     <Project Path="backend/src/BeatDash.API/Shiron.BeatDash.API.csproj" />
   </Folder>
+  <Folder Name="/HonamiGit/">
+    <Project Path="backend/src/HonamiGit.API/Shiron.HonamiGit.API.csproj" />
+    <Project Path="backend/src/HonamiGit.Core/Shiron.HonamiGit.Core.csproj" />
+    <Project Path="backend/src/HonamiGit.DB/Shiron.HonamiGit.DB.csproj" />
+  </Folder>
   <Folder Name="/Mutils/">
     <Project Path="backend/src/Mutils.Api/Shiron.Mutils.Api.csproj" />
     <Project Path="backend/src/Mutils.Core/Shiron.Mutils.Core.csproj" />

@@ -1,0 +1,6 @@
+@Shiron.HonamiGit.API_HostAddress = http://localhost:5109
+
+GET {{Shiron.HonamiGit.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
