@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Shiron.Lib.Types.EFCore;
 using Shiron.TheArchive.DB.Schema;
 
 namespace Shiron.TheArchive.DB;
@@ -25,21 +26,31 @@ public class ArchiveDbContext(DbContextOptions options) : IdentityDbContext<User
         builder.Entity<Character>(entity => {
             entity.HasMany(c => c.Medias).WithMany(m => m.Characters);
             entity.HasMany(c => c.Images).WithOne(i => i.Character).HasForeignKey(i => i.CharacterID);
-            entity.OwnsMany(c => c.Tags, t => t.ToJson());
-            entity.OwnsMany(c => c.Alias, a => a.ToJson());
+            entity.PrimitiveCollection(c => c.Tags);
+            entity.PrimitiveCollection(c => c.Alias);
         });
 
         builder.Entity<Media>(entity => {
             entity.HasOne(m => m.WideBanner).WithOne().HasForeignKey<Media>(m => m.WideBannerID);
             entity.HasOne(m => m.SquareBanner).WithOne().HasForeignKey<Media>(m => m.SquareBannerID);
             entity.HasOne(m => m.Studio).WithMany(s => s.Medias).HasForeignKey(m => m.StudioID);
-            entity.OwnsMany(m => m.Tags, t => t.ToJson());
+            entity.PrimitiveCollection(m => m.Tags);
         });
 
         builder.Entity<Image>(entity => {
-            entity.OwnsOne(i => i.PrimaryColor);
-            entity.OwnsOne(i => i.SecondaryColor);
-            entity.OwnsMany(i => i.Palette, t => t.ToJson());
+            entity.OwnsOne(i => i.PrimaryColor, c => {
+                c.Property(p => p.Color).IsColor32();
+                c.OwnsOne(p => p.Lab).OwnLabColor();
+            });
+            entity.OwnsOne(i => i.SecondaryColor, c => {
+                c.Property(p => p.Color).IsColor32();
+                c.OwnsOne(p => p.Lab).OwnLabColor();
+            });
+            entity.OwnsMany(i => i.Palette, c => {
+                c.Property(p => p.Color).IsColor32();
+                c.OwnsOne(p => p.Lab);
+                c.ToJson();
+            });
         });
     }
 }

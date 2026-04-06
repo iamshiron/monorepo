@@ -2,7 +2,10 @@ using Shiron.Lib.Types;
 
 namespace Shiron.TheArchive.DB.Schema;
 
-public record ColorPack(Color32 Color, LabColor Lab);
+public class ColorPack {
+    public Color32 Color { get; set; }
+    public LabColor Lab { get; set; }
+}
 
 public class Image : BaseEntity {
     public required string Bucket { get; set; }

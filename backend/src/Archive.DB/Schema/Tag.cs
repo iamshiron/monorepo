@@ -1,7 +1,7 @@
 namespace Shiron.TheArchive.DB.Schema;
 
 public interface ITaggable {
-    IList<string> Tags { get; set; }
+    List<string> Tags { get; set; }
 }
 
 public interface IOwned {

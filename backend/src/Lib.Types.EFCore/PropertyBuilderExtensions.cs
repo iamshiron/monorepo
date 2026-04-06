@@ -12,10 +12,10 @@ public static class PropertyBuilderExtensions {
         return builder;
     }
 
-    public static PropertyBuilder<LabColor> IsLabColor(this PropertyBuilder<LabColor> builder) {
-        builder.HasConversion(
-            new LabColorValueConverter()
-        );
+    public static OwnedNavigationBuilder<T, LabColor> OwnLabColor<T>(this OwnedNavigationBuilder<T, LabColor> builder) where T : class {
+        builder.Property(l => l.L).HasColumnType("double precision");
+        builder.Property(l => l.A).HasColumnType("double precision");
+        builder.Property(l => l.B).HasColumnType("double precision");
         return builder;
     }
 }

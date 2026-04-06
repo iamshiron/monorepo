@@ -35,7 +35,7 @@ public class Media : BaseEntity, IOwned, ITaggable {
     public User? CreatedBy { get; set; }
     public Guid? CreatedByID { get; set; }
 
-    public IList<string> Tags { get; set; } = [];
+    public List<string> Tags { get; set; } = [];
 
     public IList<Character> Characters { get; set; } = [];
 }
