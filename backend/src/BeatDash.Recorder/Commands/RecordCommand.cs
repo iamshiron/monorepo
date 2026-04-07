@@ -1,11 +1,10 @@
 using System.Collections.Concurrent;
-using System.Net.WebSockets;
-using System.Text;
 using System.Text.Json;
+using Shiron.BeatDash.Data;
+using Shiron.BeatDash.Data.Models;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using Spectre.Console.Rendering;
-using Shiron.BeatDash.Data.Models;
 
 namespace Shiron.BeatDash.Recorder.Commands;
 
@@ -24,15 +23,49 @@ public sealed class RecordCommand : AsyncCommand<RecordCommand.Settings> {
 
         var outFile = Path.Join(settings.Output, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.json");
 
-        var endpoints = new (string Name, string Uri)[] {
-            ("MapData", $"{settings.Host}/BSDataPuller/MapData"),
-            ("LiveData", $"{settings.Host}/BSDataPuller/LiveData")
+        var messages = new ConcurrentBag<RecordedMessage>();
+        var eventLog = new EventLog(20);
+
+        var client = new BeatDashEventClient(settings.Host);
+
+        client.OnMapEvent += (_, raw) => messages.Add(new RecordedMessage(DateTimeOffset.UtcNow, "MapData", raw));
+        client.OnLiveEvent += (_, raw) => messages.Add(new RecordedMessage(DateTimeOffset.UtcNow, "LiveData", raw));
+
+        client.OnConnectionStateChanged += (_, args) => {
+            var color = args.Status switch {
+                ConnectionStatus.Connected => "green",
+                ConnectionStatus.Connecting => "yellow",
+                ConnectionStatus.Reconnecting => "yellow",
+                _ => "red"
+            };
+            eventLog.Add($"[{color}]{args.EndpointName}[/] connection: [{color}]{args.Status}[/]");
         };
 
-        var messages = new ConcurrentBag<RecordedMessage>();
-        var state = new RecordingState();
-        foreach (var (name, _) in endpoints)
-            state.GetOrCreateEndpoint(name);
+        client.OnMapStarted += (_, args) => {
+            var s = args.Session;
+            eventLog.Add($"[green]MapStarted[/] {s.SongName.EscapeMarkup()} ({s.Difficulty.EscapeMarkup()}) by {s.SongAuthor.EscapeMarkup()}");
+        };
+
+        client.OnMapFinished += (_, args) => {
+            var s = args.Session;
+            eventLog.Add($"[green]MapFinished[/] {s.SongName.EscapeMarkup()} | Score: {s.FinalScore:N0} | Acc: {s.FinalAccuracy:F2}% | Rank: {s.FinalRank.EscapeMarkup()}");
+        };
+
+        client.OnMapSuccess += (_, args) => {
+            var s = args.Session;
+            var fc = s.FullCombo ? " | [green]FC[/]" : $" | {s.FinalMisses} miss";
+            eventLog.Add($"[green]MapSuccess[/] {s.SongName.EscapeMarkup()}{fc} | {s.FinalScore:N0}");
+        };
+
+        client.OnMapFailed += (_, args) => {
+            var s = args.Session;
+            eventLog.Add($"[red]MapFailed[/] {s.SongName.EscapeMarkup()} | Score: {s.FinalScore:N0} | Acc: {s.FinalAccuracy:F2}%");
+        };
+
+        client.OnMapEnded += (_, args) => {
+            var s = args.Session;
+            eventLog.Add($"[yellow]MapEnded[/] {s.SongName.EscapeMarkup()} quit at {s.DurationPlayed}s / {s.Duration}s");
+        };
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         Console.CancelKeyPress += (_, e) => {
@@ -40,11 +73,9 @@ public sealed class RecordCommand : AsyncCommand<RecordCommand.Settings> {
             cts.Cancel();
         };
 
-        var receiveTasks = endpoints
-            .Select(ep => ConnectAndReceiveAsync(ep.Name, ep.Uri, messages, state, cts.Token))
-            .ToArray();
+        var connectTask = client.ConnectAsync(cts.Token);
 
-        var display = new RecorderDisplay(state, outFile);
+        var display = new RecorderDisplay(client, eventLog, outFile);
 
         await AnsiConsole.Live(display)
             .StartAsync(async ctx => {
@@ -59,15 +90,11 @@ public sealed class RecordCommand : AsyncCommand<RecordCommand.Settings> {
                 ctx.Refresh();
             });
 
-        await Task.WhenAll(receiveTasks);
+        cts.Cancel();
 
-        foreach (var ws in state.Connections) {
-            try {
-                if (ws.State == WebSocketState.Open)
-                    await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Recording stopped", CancellationToken.None);
-            } catch { }
-            ws.Dispose();
-        }
+        try {
+            await connectTask;
+        } catch (OperationCanceledException) { }
 
         var sorted = messages.OrderBy(m => m.Timestamp).ToList();
         var json = JsonSerializer.Serialize(sorted, new JsonSerializerOptions { WriteIndented = true });
@@ -79,194 +106,29 @@ public sealed class RecordCommand : AsyncCommand<RecordCommand.Settings> {
         return 0;
     }
 
-    private static async Task ConnectAndReceiveAsync(
-        string name,
-        string uri,
-        ConcurrentBag<RecordedMessage> messages,
-        RecordingState state,
-        CancellationToken cancellationToken) {
-
-        while (!cancellationToken.IsCancellationRequested) {
-            var ws = new ClientWebSocket();
-            state.AddConnection(ws);
-            var endpoint = state.GetOrCreateEndpoint(name);
-            endpoint.Status = ConnectionStatus.Connecting;
-
-            try {
-                await ws.ConnectAsync(new Uri(uri), cancellationToken);
-                endpoint.Status = ConnectionStatus.Connected;
-
-                var buffer = new byte[8192];
-
-                while (ws.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested) {
-                    var messageBuilder = new StringBuilder();
-                    WebSocketReceiveResult result;
-
-                    do {
-                        result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
-                        messageBuilder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
-                    } while (!result.EndOfMessage);
-
-                    if (result.MessageType == WebSocketMessageType.Close) {
-                        await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
-                        break;
-                    }
-
-                    if (result.MessageType == WebSocketMessageType.Text) {
-                        var rawMessage = messageBuilder.ToString();
-                        endpoint.MessageCount++;
-                        endpoint.LastMessageTime = DateTimeOffset.UtcNow;
-                        messages.Add(new RecordedMessage(DateTimeOffset.UtcNow, name, rawMessage));
-                        state.ProcessMessage(name, rawMessage);
-                    }
-                }
-            } catch (OperationCanceledException) {
-                endpoint.Status = ConnectionStatus.Disconnected;
-                break;
-            } catch (WebSocketException) {
-                endpoint.Status = ConnectionStatus.Reconnecting;
-                try {
-                    await Task.Delay(5000, cancellationToken);
-                } catch (OperationCanceledException) {
-                    endpoint.Status = ConnectionStatus.Disconnected;
-                    break;
-                }
-            } catch (Exception) {
-                endpoint.Status = ConnectionStatus.Disconnected;
-                break;
-            }
-        }
-    }
-
     private record RecordedMessage(DateTimeOffset Timestamp, string Endpoint, string Message);
 }
 
-public enum ConnectionStatus {
-    Disconnected,
-    Connecting,
-    Connected,
-    Reconnecting
-}
-
-public class EndpointState {
-    public string Name { get; }
-    public ConnectionStatus Status { get; set; } = ConnectionStatus.Disconnected;
-    public int MessageCount { get; set; }
-    public DateTimeOffset? LastMessageTime { get; set; }
-
-    public EndpointState(string name) {
-        Name = name;
-    }
-}
-
-public class MapSession {
-    public string SongName { get; init; } = "";
-    public string SongAuthor { get; init; } = "";
-    public string Mapper { get; init; } = "";
-    public string Difficulty { get; init; } = "";
-    public string MapType { get; init; } = "";
-    public string? BSRKey { get; init; }
-    public int Duration { get; init; }
-    public int BPM { get; init; }
-    public double NJS { get; init; }
-    public bool NoFailEnabled { get; init; }
-    public DateTimeOffset StartedAt { get; init; }
-
-    public int TimeElapsed { get; set; }
-    public int Score { get; set; }
-    public int Combo { get; set; }
-    public int Misses { get; set; }
-    public bool FullCombo { get; set; } = true;
-    public string Rank { get; set; } = "SSS";
-    public double Accuracy { get; set; } = 100;
-    public double PlayerHealth { get; set; } = 50;
-    public bool IsPaused { get; set; }
-}
-
-public class RecordingState {
-    public ConcurrentBag<ClientWebSocket> Connections { get; } = [];
-    public ConcurrentDictionary<string, EndpointState> Endpoints { get; } = new();
+file class EventLog(int maxEntries) {
+    private readonly List<(DateTimeOffset Time, string Markup)> _entries = [];
     private readonly object _lock = new();
-    private MapSession? _currentSession;
 
-    public MapSession? CurrentSession {
-        get { lock (_lock) { return _currentSession; } }
-    }
-
-    public void AddConnection(ClientWebSocket ws) => Connections.Add(ws);
-
-    public EndpointState GetOrCreateEndpoint(string name) =>
-        Endpoints.GetOrAdd(name, n => new EndpointState(n));
-
-    public void ProcessMessage(string endpointName, string rawMessage) {
-        try {
-            if (endpointName == "MapData") {
-                ProcessMapData(rawMessage);
-            } else if (endpointName == "LiveData") {
-                ProcessLiveData(rawMessage);
-            }
-        } catch { }
-    }
-
-    private void ProcessMapData(string rawMessage) {
-        var mapData = JsonSerializer.Deserialize<MapData>(rawMessage);
-        if (mapData?.Hash == null) return;
-
+    public void Add(string markup) {
         lock (_lock) {
-            var isEndSignal = mapData.LevelFinished || mapData.LevelQuit
-                || (mapData.LevelFailed && !mapData.Modifiers.NoFailOn0Energy);
-
-            if (isEndSignal) {
-                _currentSession = null;
-                return;
-            }
-
-            if (mapData.LevelFailed && mapData.Modifiers.NoFailOn0Energy) {
-                return;
-            }
-
-            if (!mapData.LevelFinished && !mapData.LevelFailed && !mapData.LevelQuit) {
-                if (_currentSession == null) {
-                    _currentSession = new MapSession {
-                        SongName = mapData.SongName,
-                        SongAuthor = mapData.SongAuthor,
-                        Mapper = mapData.Mapper,
-                        Difficulty = mapData.Difficulty,
-                        MapType = mapData.MapType,
-                        BSRKey = mapData.BSRKey,
-                        Duration = mapData.Duration,
-                        BPM = mapData.BPM,
-                        NJS = mapData.NJS,
-                        NoFailEnabled = mapData.Modifiers.NoFailOn0Energy,
-                        StartedAt = DateTimeOffset.UtcNow,
-                    };
-                } else {
-                    _currentSession.IsPaused = mapData.LevelPaused;
-                }
-            }
+            _entries.Add((DateTimeOffset.UtcNow, markup));
+            while (_entries.Count > maxEntries)
+                _entries.RemoveAt(0);
         }
     }
 
-    private void ProcessLiveData(string rawMessage) {
-        var liveData = JsonSerializer.Deserialize<LiveData>(rawMessage);
-        if (liveData == null) return;
-
+    public IReadOnlyList<(DateTimeOffset Time, string Markup)> GetEntries() {
         lock (_lock) {
-            if (_currentSession != null) {
-                _currentSession.TimeElapsed = liveData.TimeElapsed;
-                _currentSession.Score = liveData.Score;
-                _currentSession.Combo = liveData.Combo;
-                _currentSession.Misses = liveData.Misses;
-                _currentSession.FullCombo = liveData.FullCombo;
-                _currentSession.Rank = liveData.Rank;
-                _currentSession.Accuracy = liveData.Accuracy;
-                _currentSession.PlayerHealth = liveData.PlayerHealth;
-            }
+            return _entries.ToList().AsReadOnly();
         }
     }
 }
 
-file class RecorderDisplay(RecordingState state, string outFile) : IRenderable {
+file class RecorderDisplay(BeatDashEventClient client, EventLog eventLog, string outFile) : IRenderable {
     public Measurement Measure(RenderOptions options, int maxWidth) {
         return BuildContent().Measure(options, maxWidth);
     }
@@ -280,6 +142,8 @@ file class RecorderDisplay(RecordingState state, string outFile) : IRenderable {
             BuildConnectionsSection(),
             new Rule().DoubleBorder(),
             BuildMapStatusSection(),
+            new Rule().DoubleBorder(),
+            BuildEventLogSection(),
             new Rule().DoubleBorder(),
             new Markup($"  [grey]{outFile.EscapeMarkup()}[/]"),
         };
@@ -296,7 +160,7 @@ file class RecorderDisplay(RecordingState state, string outFile) : IRenderable {
             new Markup("  [bold]Connections[/]"),
         };
 
-        foreach (var ep in state.Endpoints.Values.OrderBy(e => e.Name)) {
+        foreach (var ep in client.Endpoints.Values.OrderBy(e => e.Name)) {
             var (icon, label) = ep.Status switch {
                 ConnectionStatus.Connected => ("[green]●[/]", "Connected"),
                 ConnectionStatus.Connecting => ("[yellow]◐[/]", "Connecting..."),
@@ -317,7 +181,7 @@ file class RecorderDisplay(RecordingState state, string outFile) : IRenderable {
     }
 
     private IRenderable BuildMapStatusSection() {
-        var session = state.CurrentSession;
+        var session = client.CurrentSession;
 
         if (session == null) {
             return new Rows(
@@ -326,19 +190,27 @@ file class RecorderDisplay(RecordingState state, string outFile) : IRenderable {
             );
         }
 
+        var lastSnapshot = session.Snapshots.LastOrDefault();
+
         var statusLabel = session.IsPaused ? "[bold yellow]⏸ Paused[/]" : "[bold green]▶ Playing[/]";
-        var elapsed = FormatDuration(session.TimeElapsed);
+        var elapsed = FormatDuration(lastSnapshot?.TimeElapsed ?? 0);
         var total = FormatDuration(session.Duration);
         var noFail = session.NoFailEnabled ? " | [yellow]NoFail[/]" : "";
         var bsr = !string.IsNullOrEmpty(session.BSRKey) ? $" | BSR: {session.BSRKey.EscapeMarkup()}" : "";
-        var fc = session.FullCombo ? "[green]FC[/]" : $"{session.Misses} miss";
+        var score = lastSnapshot?.Score ?? 0;
+        var rank = lastSnapshot?.Rank ?? "SSS";
+        var combo = lastSnapshot?.Combo ?? 0;
+        var misses = lastSnapshot?.Misses ?? 0;
+        var fullCombo = lastSnapshot?.FullCombo ?? true;
+        var accuracy = lastSnapshot?.Accuracy ?? 100;
+        var fc = fullCombo ? "[green]FC[/]" : $"{misses} miss";
 
         return new Rows(
             new Markup($"  {statusLabel}"),
             new Markup($"  [bold white]{session.SongName.EscapeMarkup()}[/] — [grey]{session.SongAuthor.EscapeMarkup()}[/]"),
             new Markup($"  [grey]{session.Difficulty.EscapeMarkup()} | {session.MapType.EscapeMarkup()} | BPM {session.BPM} | NJS {session.NJS:F1}{noFail}{bsr}[/]"),
             new Markup($"  {elapsed} / {total}"),
-            new Markup($"  Score: [bold]{session.Score:N0}[/] ({session.Rank.EscapeMarkup()}) | Combo: {session.Combo} | {fc} | Acc: {session.Accuracy:F2}%")
+            new Markup($"  Score: [bold]{score:N0}[/] ({rank.EscapeMarkup()}) | Combo: {combo} | {fc} | Acc: {accuracy:F2}%")
         );
     }
 
@@ -351,5 +223,23 @@ file class RecorderDisplay(RecordingState state, string outFile) : IRenderable {
         if (elapsed.TotalSeconds < 1) return "just now";
         if (elapsed.TotalMinutes < 1) return $"{(int) elapsed.TotalSeconds}s ago";
         return $"{(int) elapsed.TotalMinutes}m ago";
+    }
+
+    private IRenderable BuildEventLogSection() {
+        var entries = eventLog.GetEntries();
+        var rows = new List<IRenderable> {
+            new Markup("  [bold]Event Log[/]"),
+        };
+
+        if (entries.Count == 0) {
+            rows.Add(new Markup("  [grey]No events yet...[/]"));
+            return new Rows(rows);
+        }
+
+        foreach (var (time, markup) in entries) {
+            rows.Add(new Markup($"  [grey]{time:HH:mm:ss}[/] {markup}"));
+        }
+
+        return new Rows(rows);
     }
 }
