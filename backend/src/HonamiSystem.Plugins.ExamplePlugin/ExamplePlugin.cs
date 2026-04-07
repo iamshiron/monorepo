@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Shiron.HonamiSystem.SDK;
 
 namespace Shiron.HonamiSystem.Plugins.ExamplePlugin;

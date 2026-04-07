@@ -1,4 +1,4 @@
-﻿using Shiron.HonamiSystem.SDK;
+using Shiron.HonamiSystem.SDK;
 using Shiron.HonamiSystem.Server.DTOs;
 using Shiron.HonamiSystem.Services;
 

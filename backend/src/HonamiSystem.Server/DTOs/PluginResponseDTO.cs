@@ -1,4 +1,4 @@
-﻿namespace Shiron.HonamiSystem.Server.DTOs;
+namespace Shiron.HonamiSystem.Server.DTOs;
 
 public record PluginResponseDTO(
     string Group,

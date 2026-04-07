@@ -1,4 +1,4 @@
-﻿using Shiron.HonamiSystem.SDK;
+using Shiron.HonamiSystem.SDK;
 using Shiron.HonamiSystem.Services;
 
 namespace Shiron.HonamiSystem.Server.Services;
@@ -12,7 +12,7 @@ public class PluginRegistry : IPluginRegistry {
         plugin.Logger = logger;
 
         _plugins.Add(plugin);
-        _pluginSnapshot = [.._plugins];
+        _pluginSnapshot = [.. _plugins];
     }
 
     public void Initialize() {
