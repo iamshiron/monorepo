@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Shiron.Lib.Types.EFCore;
 using Shiron.TheArchive.DB.Schema;
+using Shiron.TheArchive.DB.Schema.Car;
 
 namespace Shiron.TheArchive.DB;
 
@@ -11,6 +12,9 @@ public class ArchiveDbContext(DbContextOptions options) : IdentityDbContext<User
     public DbSet<Media> Medias { get; set; }
     public DbSet<Studio> Studios { get; set; }
     public DbSet<Image> Images { get; set; }
+    public DbSet<Brand> Brands { get; set; }
+    public DbSet<Model> Models { get; set; }
+    public DbSet<Car> Cars { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder) {
         base.OnModelCreating(builder);
@@ -35,6 +39,19 @@ public class ArchiveDbContext(DbContextOptions options) : IdentityDbContext<User
             entity.HasOne(m => m.SquareBanner).WithOne().HasForeignKey<Media>(m => m.SquareBannerID);
             entity.HasOne(m => m.Studio).WithMany(s => s.Medias).HasForeignKey(m => m.StudioID);
             entity.PrimitiveCollection(m => m.Tags);
+        });
+
+        builder.Entity<Brand>(entity => {
+            entity.HasMany(b => b.Models).WithOne(m => m.Brand).HasForeignKey(m => m.BrandID);
+            entity.HasMany(b => b.Cars).WithOne(c => c.Brand).HasForeignKey(c => c.BrandID);
+        });
+
+        builder.Entity<Model>(entity => {
+            entity.HasMany(m => m.Cars).WithOne(c => c.Model).HasForeignKey(c => c.ModelID);
+        });
+
+        builder.Entity<Car>(entity => {
+            entity.HasMany(c => c.Images).WithMany(i => i.Cars);
         });
 
         builder.Entity<Image>(entity => {

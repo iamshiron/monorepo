@@ -2,6 +2,8 @@ using Shiron.Lib.Types;
 
 namespace Shiron.TheArchive.DB.Schema;
 
+using CarEntity = Shiron.TheArchive.DB.Schema.Car.Car;
+
 public class ColorPack {
     public Color32 Color { get; set; }
     public LabColor Lab { get; set; }
@@ -22,4 +24,6 @@ public class Image : BaseEntity {
     // Foreign Keys
     public Character? Character { get; set; }
     public Guid CharacterID { get; set; }
+
+    public IList<CarEntity> Cars { get; set; } = [];
 }
