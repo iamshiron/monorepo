@@ -4,12 +4,12 @@ import { Toaster } from "@shiron/ui/components/ui/sonner";
 import { TooltipProvider } from "@shiron/ui/components/ui/tooltip";
 
 export const Route = createRootRoute({
-    component: () => (
-        <TooltipProvider>
-            <AppShell>
-                <Outlet />
-            </AppShell>
-            <Toaster />
-        </TooltipProvider>
-    ),
+	component: () => (
+		<TooltipProvider>
+			<AppShell>
+				<Outlet />
+			</AppShell>
+			<Toaster />
+		</TooltipProvider>
+	),
 });
