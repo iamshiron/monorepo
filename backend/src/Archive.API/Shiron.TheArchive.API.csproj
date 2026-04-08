@@ -6,16 +6,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="DotNetEnv"/>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design"/>
-        <PackageReference Include="Scalar.AspNetCore"/>
-        <PackageReference Include="SixLabors.ImageSharp"/>
+        <PackageReference Include="BlurHashSharp" />
+        <PackageReference Include="DotNetEnv" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+        <PackageReference Include="Minio" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+        <PackageReference Include="Scalar.AspNetCore" />
+        <PackageReference Include="SixLabors.ImageSharp" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Archive.DB\Shiron.TheArchive.DB.csproj"/>
-        <ProjectReference Include="..\Archive.Services\Shiron.TheArchive.Services.csproj"/>
+        <ProjectReference Include="..\Archive.DB\Shiron.TheArchive.DB.csproj" />
+        <ProjectReference Include="..\Lib.Types.Extension\Shiron.Lib.Types.Extension.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="DTOs\" />
     </ItemGroup>
 </Project>

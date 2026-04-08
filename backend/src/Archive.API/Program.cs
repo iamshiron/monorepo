@@ -1,7 +1,12 @@
 using DotNetEnv;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Minio;
 using Scalar.AspNetCore;
+using Shiron.TheArchive.API.Configuration;
+using Shiron.TheArchive.API.Endpoints;
+using Shiron.TheArchive.API.Services;
 using Shiron.TheArchive.DB;
 using Shiron.TheArchive.DB.Schema;
 
@@ -37,7 +42,27 @@ builder.Services.ConfigureApplicationCookie(c => {
     };
 });
 builder.Services.AddAuthentication();
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options => {
+    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+});
+
+builder.Services.Configure<StorageOptions>(options => {
+    options.Endpoint = builder.Configuration["ARCHIVE_MINIO_ENDPOINT"] ?? "localhost:9000";
+    options.AccessKey = builder.Configuration["ARCHIVE_MINIO_ACCESS_KEY"] ?? "minioadmin";
+    options.SecretKey = builder.Configuration["ARCHIVE_MINIO_SECRET_KEY"] ?? "minioadmin";
+    options.UseSsl = bool.TryParse(builder.Configuration["ARCHIVE_MINIO_USE_SSL"], out var ssl) && ssl;
+    options.BucketImages = builder.Configuration["ARCHIVE_MINIO_BUCKET_IMAGES"] ?? "archive-images";
+});
+
+builder.Services.AddSingleton<IMinioClient>(sp => {
+    var opts = sp.GetRequiredService<IOptions<StorageOptions>>().Value;
+    return new MinioClient()
+        .WithEndpoint(opts.Endpoint)
+        .WithCredentials(opts.AccessKey, opts.SecretKey)
+        .WithSSL(opts.UseSsl)
+        .Build();
+});
+builder.Services.AddScoped<IStorageService, MinioStorageService>();
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope()) {
@@ -82,7 +107,6 @@ using (var scope = app.Services.CreateScope()) {
     }
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
     app.MapScalarApiReference(options => {
@@ -95,5 +119,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/health", () => Results.Ok(new { Status = "OK" }));
+
+var api = app.MapGroup("/api");
+api.MapBrandEndpoints();
+api.MapModelEndpoints();
+api.MapCarEndpoints();
+api.MapImageEndpoints();
+api.MapStatisticsEndpoints();
 
 app.Run();
