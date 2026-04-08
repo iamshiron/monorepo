@@ -15,6 +15,8 @@ public class ArchiveDbContext(DbContextOptions options) : IdentityDbContext<User
     public DbSet<Brand> Brands { get; set; }
     public DbSet<Model> Models { get; set; }
     public DbSet<Car> Cars { get; set; }
+    public DbSet<ApiKey> ApiKeys { get; set; }
+    public DbSet<ApiKeyClaim> ApiKeyClaims { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder) {
         base.OnModelCreating(builder);
@@ -52,6 +54,18 @@ public class ArchiveDbContext(DbContextOptions options) : IdentityDbContext<User
 
         builder.Entity<Car>(entity => {
             entity.HasMany(c => c.Images).WithMany(i => i.Cars);
+        });
+
+        builder.Entity<ApiKey>(entity => {
+            entity.ToTable("ApiKeys");
+            entity.HasOne(a => a.User).WithMany().HasForeignKey(a => a.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(a => a.KeyPrefix);
+            entity.HasIndex(a => a.UserId);
+            entity.HasMany(a => a.Claims).WithOne(c => c.ApiKey).HasForeignKey(c => c.ApiKeyId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<ApiKeyClaim>(entity => {
+            entity.ToTable("ApiKeyClaims");
         });
 
         builder.Entity<Image>(entity => {

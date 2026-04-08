@@ -41,7 +41,8 @@ builder.Services.ConfigureApplicationCookie(c => {
         return Task.CompletedTask;
     };
 });
-builder.Services.AddAuthentication();
+builder.Services.AddAuthentication()
+    .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationOptions.SchemeName, null);
 builder.Services.AddAuthorization(options => {
     options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
 });
@@ -63,6 +64,7 @@ builder.Services.AddSingleton<IMinioClient>(sp => {
         .Build();
 });
 builder.Services.AddScoped<IStorageService, MinioStorageService>();
+builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope()) {
@@ -75,15 +77,15 @@ using (var scope = app.Services.CreateScope()) {
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
         var config = services.GetRequiredService<IConfiguration>();
 
-        var adminEmail = config["ADMIN_EMAIL"] ?? "admin@archive.local";
-        var adminPassword = config["ADMIN_PASSWORD"] ?? "archive_dev";
+        var adminEmail = config["ADMIN_EMAIL"] ?? "admin@shiron.io";
+        var adminPassword = config["ADMIN_PASSWORD"] ?? "admin";
         var adminRole = "Admin";
 
         if (!await roleManager.RoleExistsAsync(adminRole)) {
             await roleManager.CreateAsync(new IdentityRole<Guid>(adminRole));
         }
 
-        var existingAdmin = await userManager.FindByEmailAsync(adminEmail);
+        var existingAdmin = await userManager.FindByNameAsync("admin") ?? await userManager.FindByEmailAsync(adminEmail);
         if (existingAdmin == null) {
             var admin = new User {
                 DisplayName = "Admin",
@@ -115,10 +117,13 @@ if (app.Environment.IsDevelopment()) {
     });
 }
 app.UseHttpsRedirection();
+app.UseMiddleware<ApiKeyMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/health", () => Results.Ok(new { Status = "OK" }));
+
+app.MapIdentityEndpoints();
 
 var api = app.MapGroup("/api");
 api.MapBrandEndpoints();
@@ -126,5 +131,6 @@ api.MapModelEndpoints();
 api.MapCarEndpoints();
 api.MapImageEndpoints();
 api.MapStatisticsEndpoints();
+api.MapApiKeyEndpoints();
 
 app.Run();

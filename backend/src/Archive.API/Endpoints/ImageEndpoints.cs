@@ -30,7 +30,7 @@ public static class ImageEndpoints {
             .Produces<ImageDto>()
             .Produces(404);
 
-        group.MapGet("/{id:guid}/file", GetImageFile)
+        group.MapGet("/{id:guid}.webp", GetImageFile)
             .WithName("GetImageFile")
             .WithDescription("Serve the actual image file from storage")
             .Produces(200)
@@ -269,31 +269,37 @@ public static class ImageEndpoints {
         return Results.NoContent();
     }
 
-    private static ImageDto MapToDto(DBImage image) => new() {
-        ID = image.ID,
-        Bucket = image.Bucket,
-        ObjectKey = image.ObjectKey,
-        Width = image.Width,
-        Height = image.Height,
-        BlurHash = image.BlurHash,
-        PrimaryColor = MapFromColorPack(image.PrimaryColor),
-        SecondaryColor = MapFromColorPack(image.SecondaryColor),
-        Palette = image.Palette.Select(MapFromColorPack).ToList(),
-        CarIDs = image.Cars.Select(c => c.ID).ToList(),
-        CharacterID = image.CharacterID,
-        CreatedAt = image.CreatedAt,
-        UpdatedAt = image.UpdatedAt
-    };
+    private static ImageDto MapToDto(DBImage image) {
+        return new ImageDto {
+            ID = image.ID,
+            Bucket = image.Bucket,
+            ObjectKey = image.ObjectKey,
+            Width = image.Width,
+            Height = image.Height,
+            BlurHash = image.BlurHash,
+            PrimaryColor = MapFromColorPack(image.PrimaryColor),
+            SecondaryColor = MapFromColorPack(image.SecondaryColor),
+            Palette = image.Palette.Select(MapFromColorPack).ToList(),
+            CarIDs = image.Cars.Select(c => c.ID).ToList(),
+            CharacterID = image.CharacterID,
+            CreatedAt = image.CreatedAt,
+            UpdatedAt = image.UpdatedAt
+        };
+    }
 
-    private static ColorPackDto MapFromColorPack(ColorPack pack) => new() {
-        Color = new Color32Dto { R = pack.Color.R, G = pack.Color.G, B = pack.Color.B, A = pack.Color.A },
-        Lab = new LabColorDto { L = pack.Lab.L, A = pack.Lab.A, B = pack.Lab.B }
-    };
+    private static ColorPackDto MapFromColorPack(ColorPack pack) {
+        return new ColorPackDto {
+            Color = new Color32Dto { R = pack.Color.R, G = pack.Color.G, B = pack.Color.B, A = pack.Color.A },
+            Lab = new LabColorDto { L = pack.Lab.L, A = pack.Lab.A, B = pack.Lab.B }
+        };
+    }
 
-    private static ColorPack MapToColorPack(ColorPackDto dto) => new() {
-        Color = new Color32(dto.Color.R, dto.Color.G, dto.Color.B, dto.Color.A),
-        Lab = new LabColor(dto.Lab.L, dto.Lab.A, dto.Lab.B)
-    };
+    private static ColorPack MapToColorPack(ColorPackDto dto) {
+        return new ColorPack {
+            Color = new Color32(dto.Color.R, dto.Color.G, dto.Color.B, dto.Color.A),
+            Lab = new LabColor(dto.Lab.L, dto.Lab.A, dto.Lab.B)
+        };
+    }
 
     private static string EncodeBlurHash(SixLabors.ImageSharp.Image image) {
         using var cloned = image.CloneAs<Rgba32>();
@@ -326,10 +332,12 @@ public static class ImageEndpoints {
             }
         }
 
-        var primary = colorPacks.Count > 0 ? colorPacks[0] : new ColorPack {
-            Color = new Color32(128, 128, 128, 255),
-            Lab = new LabColor(53.39, 0, 0)
-        };
+        var primary = colorPacks.Count > 0
+            ? colorPacks[0]
+            : new ColorPack {
+                Color = new Color32(128, 128, 128, 255),
+                Lab = new LabColor(53.39, 0, 0)
+            };
         var secondary = colorPacks.Count > 1 ? colorPacks[1] : primary;
 
         return (primary, secondary, colorPacks);
