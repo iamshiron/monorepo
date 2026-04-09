@@ -1,6 +1,6 @@
 using Shiron.Lib.Types;
 
-namespace Shiron.TheArchive.API.DTOs;
+namespace Shiron.HonamiGit.API.DTOs;
 
 public record ColorPackDto {
     public required Color32Dto Color { get; init; }

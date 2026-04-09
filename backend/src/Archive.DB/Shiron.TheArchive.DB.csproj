@@ -17,9 +17,4 @@
         <ProjectReference Include="..\Lib.Types.EFCore\Shiron.Lib.Types.EFCore.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Schema\Car\"/>
-        <Folder Include="Schema\Media\"/>
-    </ItemGroup>
-
 </Project>

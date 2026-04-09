@@ -1,4 +1,4 @@
-namespace Shiron.TheArchive.API.DTOs;
+namespace Shiron.HonamiGit.API.DTOs;
 
 public record PaginatedResult<T> {
     public List<T> Items { get; init; } = [];

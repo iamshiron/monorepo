@@ -15,7 +15,10 @@ public class User : IdentityUser<Guid> {
 }
 
 public class UserSSHKey : BaseEntity {
+    [MaxLength(64)] public required string Name { get; set; } = string.Empty;
+    [MaxLength(255)] public string Description { get; set; } = string.Empty;
+    [MaxLength(16384)] public required string Key { get; set; } = string.Empty;
+    public DateTime? ExpiresAt { get; set; }
     public required User User { get; set; }
     public required Guid UserID { get; set; }
-    [MaxLength(16384)] public required string Key { get; set; } = string.Empty;
 }

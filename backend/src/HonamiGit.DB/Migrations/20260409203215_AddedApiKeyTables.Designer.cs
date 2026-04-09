@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Shiron.HonamiGit.DB;
@@ -11,9 +12,11 @@ using Shiron.HonamiGit.DB;
 namespace Shiron.HonamiGit.DB.Migrations
 {
     [DbContext(typeof(HonamiGitDb))]
-    partial class HonamiGitDbModelSnapshot : ModelSnapshot
+    [Migration("20260409203215_AddedApiKeyTables")]
+    partial class AddedApiKeyTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -428,23 +431,10 @@ namespace Shiron.HonamiGit.DB.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<DateTime?>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Key")
                         .IsRequired()
                         .HasMaxLength(16384)
                         .HasColumnType("character varying(16384)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

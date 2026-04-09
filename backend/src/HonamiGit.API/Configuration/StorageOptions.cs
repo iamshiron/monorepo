@@ -5,5 +5,4 @@ public sealed class StorageOptions {
     public string AccessKey { get; set; } = "minioadmin";
     public string SecretKey { get; set; } = "minioadmin";
     public bool UseSsl { get; set; }
-    public string BucketImages { get; set; } = "archive-images";
 }

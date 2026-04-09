@@ -1,6 +1,6 @@
-using Shiron.TheArchive.DB.Schema;
+using Shiron.HonamiGit.DB.Schema;
 
-namespace Shiron.TheArchive.API.DTOs;
+namespace Shiron.HonamiGit.API.DTOs;
 
 public record CarDto {
     public Guid ID { get; init; }

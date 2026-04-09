@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Shiron.TheArchive.DB;
-using Shiron.TheArchive.DB.Schema;
-using Shiron.TheArchive.API.DTOs;
+using Shiron.HonamiGit.DB.Schema;
+using Shiron.HonamiGit.API.DTOs;
 
-namespace Shiron.TheArchive.API.Endpoints;
+namespace Shiron.HonamiGit.API.Endpoints;
 
 public static class StatisticsEndpoints {
     public static void MapStatisticsEndpoints(this IEndpointRouteBuilder endpoints) {

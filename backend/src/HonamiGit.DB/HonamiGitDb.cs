@@ -11,6 +11,8 @@ public class HonamiGitDb(DbContextOptions options) : IdentityDbContext<User, Ide
     public DbSet<OrganizationMember> OrganizationMembers => Set<OrganizationMember>();
     public DbSet<Contributor> Contributors => Set<Contributor>();
     public DbSet<UserSSHKey> UserSSHKeys => Set<UserSSHKey>();
+    public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
+    public DbSet<ApiKeyClaim> ApiKeyClaims => Set<ApiKeyClaim>();
 
     protected override void OnModelCreating(ModelBuilder builder) {
         base.OnModelCreating(builder);
@@ -74,6 +76,13 @@ public class HonamiGitDb(DbContextOptions options) : IdentityDbContext<User, Ide
                 .WithMany()
                 .HasForeignKey(e => e.RepositoryID)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<ApiKey>(e => {
+            e.HasOne(a => a.User).WithMany().HasForeignKey(a => a.UserId).OnDelete(DeleteBehavior.Cascade);
+            e.HasIndex(a => a.KeyPrefix);
+            e.HasIndex(a => a.UserId);
+            e.HasMany(a => a.Claims).WithOne(c => c.ApiKey).HasForeignKey(c => c.ApiKeyId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

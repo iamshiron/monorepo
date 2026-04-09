@@ -2,10 +2,10 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Shiron.TheArchive.DB;
+using Shiron.HonamiGit.DB;
 using Shiron.HonamiGit.DB.Schema;
 
-namespace Shiron.TheArchive.API.Services;
+namespace Shiron.HonamiGit.API.Services;
 
 public interface IApiKeyService {
     Task<(ApiKey ApiKey, string RawKey)> CreateAsync(Guid userId, string name, DateTime? expiresAt, List<string>? roles);
@@ -16,7 +16,7 @@ public interface IApiKeyService {
     Task<ClaimsPrincipal> BuildClaimsPrincipalAsync(ApiKey apiKey);
 }
 
-public class ApiKeyService(ArchiveDbContext db) : IApiKeyService {
+public class ApiKeyService(HonamiGitDb db) : IApiKeyService {
     private const string KeyPrefix = "tar_live_";
     private const int KeyBytes = 32;
 

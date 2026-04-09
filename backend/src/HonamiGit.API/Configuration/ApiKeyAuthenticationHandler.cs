@@ -2,7 +2,7 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
-using Shiron.TheArchive.API.Services;
+using Shiron.HonamiGit.API.Services;
 
 namespace Shiron.HonamiGit.API.Configuration;
 
