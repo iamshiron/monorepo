@@ -9,15 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TestRouteImport } from './routes/test'
+import { Route as RepositoriesRouteImport } from './routes/repositories'
 import { Route as UserRouteRouteImport } from './routes/$user/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UserIndexRouteImport } from './routes/$user/index'
 import { Route as UserRepositoriesRouteImport } from './routes/$user/repositories'
 import { Route as UserProfileRouteImport } from './routes/$user/profile'
+import { Route as UserActivityRouteImport } from './routes/$user/activity'
+import { Route as UserRepoRouteRouteImport } from './routes/$user/$repo/route'
+import { Route as UserRepoIndexRouteImport } from './routes/$user/$repo/index'
+import { Route as UserRepoWikiRouteImport } from './routes/$user/$repo/wiki'
+import { Route as UserRepoSettingsRouteImport } from './routes/$user/$repo/settings'
+import { Route as UserRepoPipelinesRouteImport } from './routes/$user/$repo/pipelines'
+import { Route as UserRepoMergeRequestsRouteImport } from './routes/$user/$repo/merge-requests'
+import { Route as UserRepoIssuesIndexRouteImport } from './routes/$user/$repo/issues/index'
+import { Route as UserRepoIssuesIssueIdRouteImport } from './routes/$user/$repo/issues/$issueId'
 
-const TestRoute = TestRouteImport.update({
-  id: '/test',
-  path: '/test',
+const RepositoriesRoute = RepositoriesRouteImport.update({
+  id: '/repositories',
+  path: '/repositories',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UserRouteRoute = UserRouteRouteImport.update({
@@ -30,6 +40,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UserIndexRoute = UserIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => UserRouteRoute,
+} as any)
 const UserRepositoriesRoute = UserRepositoriesRouteImport.update({
   id: '/repositories',
   path: '/repositories',
@@ -40,56 +55,167 @@ const UserProfileRoute = UserProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => UserRouteRoute,
 } as any)
+const UserActivityRoute = UserActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => UserRouteRoute,
+} as any)
+const UserRepoRouteRoute = UserRepoRouteRouteImport.update({
+  id: '/$repo',
+  path: '/$repo',
+  getParentRoute: () => UserRouteRoute,
+} as any)
+const UserRepoIndexRoute = UserRepoIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => UserRepoRouteRoute,
+} as any)
+const UserRepoWikiRoute = UserRepoWikiRouteImport.update({
+  id: '/wiki',
+  path: '/wiki',
+  getParentRoute: () => UserRepoRouteRoute,
+} as any)
+const UserRepoSettingsRoute = UserRepoSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => UserRepoRouteRoute,
+} as any)
+const UserRepoPipelinesRoute = UserRepoPipelinesRouteImport.update({
+  id: '/pipelines',
+  path: '/pipelines',
+  getParentRoute: () => UserRepoRouteRoute,
+} as any)
+const UserRepoMergeRequestsRoute = UserRepoMergeRequestsRouteImport.update({
+  id: '/merge-requests',
+  path: '/merge-requests',
+  getParentRoute: () => UserRepoRouteRoute,
+} as any)
+const UserRepoIssuesIndexRoute = UserRepoIssuesIndexRouteImport.update({
+  id: '/issues/',
+  path: '/issues/',
+  getParentRoute: () => UserRepoRouteRoute,
+} as any)
+const UserRepoIssuesIssueIdRoute = UserRepoIssuesIssueIdRouteImport.update({
+  id: '/issues/$issueId',
+  path: '/issues/$issueId',
+  getParentRoute: () => UserRepoRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$user': typeof UserRouteRouteWithChildren
-  '/test': typeof TestRoute
+  '/repositories': typeof RepositoriesRoute
+  '/$user/$repo': typeof UserRepoRouteRouteWithChildren
+  '/$user/activity': typeof UserActivityRoute
   '/$user/profile': typeof UserProfileRoute
   '/$user/repositories': typeof UserRepositoriesRoute
+  '/$user/': typeof UserIndexRoute
+  '/$user/$repo/merge-requests': typeof UserRepoMergeRequestsRoute
+  '/$user/$repo/pipelines': typeof UserRepoPipelinesRoute
+  '/$user/$repo/settings': typeof UserRepoSettingsRoute
+  '/$user/$repo/wiki': typeof UserRepoWikiRoute
+  '/$user/$repo/': typeof UserRepoIndexRoute
+  '/$user/$repo/issues/$issueId': typeof UserRepoIssuesIssueIdRoute
+  '/$user/$repo/issues/': typeof UserRepoIssuesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/$user': typeof UserRouteRouteWithChildren
-  '/test': typeof TestRoute
+  '/repositories': typeof RepositoriesRoute
+  '/$user/activity': typeof UserActivityRoute
   '/$user/profile': typeof UserProfileRoute
   '/$user/repositories': typeof UserRepositoriesRoute
+  '/$user': typeof UserIndexRoute
+  '/$user/$repo/merge-requests': typeof UserRepoMergeRequestsRoute
+  '/$user/$repo/pipelines': typeof UserRepoPipelinesRoute
+  '/$user/$repo/settings': typeof UserRepoSettingsRoute
+  '/$user/$repo/wiki': typeof UserRepoWikiRoute
+  '/$user/$repo': typeof UserRepoIndexRoute
+  '/$user/$repo/issues/$issueId': typeof UserRepoIssuesIssueIdRoute
+  '/$user/$repo/issues': typeof UserRepoIssuesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$user': typeof UserRouteRouteWithChildren
-  '/test': typeof TestRoute
+  '/repositories': typeof RepositoriesRoute
+  '/$user/$repo': typeof UserRepoRouteRouteWithChildren
+  '/$user/activity': typeof UserActivityRoute
   '/$user/profile': typeof UserProfileRoute
   '/$user/repositories': typeof UserRepositoriesRoute
+  '/$user/': typeof UserIndexRoute
+  '/$user/$repo/merge-requests': typeof UserRepoMergeRequestsRoute
+  '/$user/$repo/pipelines': typeof UserRepoPipelinesRoute
+  '/$user/$repo/settings': typeof UserRepoSettingsRoute
+  '/$user/$repo/wiki': typeof UserRepoWikiRoute
+  '/$user/$repo/': typeof UserRepoIndexRoute
+  '/$user/$repo/issues/$issueId': typeof UserRepoIssuesIssueIdRoute
+  '/$user/$repo/issues/': typeof UserRepoIssuesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$user' | '/test' | '/$user/profile' | '/$user/repositories'
+  fullPaths:
+    | '/'
+    | '/$user'
+    | '/repositories'
+    | '/$user/$repo'
+    | '/$user/activity'
+    | '/$user/profile'
+    | '/$user/repositories'
+    | '/$user/'
+    | '/$user/$repo/merge-requests'
+    | '/$user/$repo/pipelines'
+    | '/$user/$repo/settings'
+    | '/$user/$repo/wiki'
+    | '/$user/$repo/'
+    | '/$user/$repo/issues/$issueId'
+    | '/$user/$repo/issues/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$user' | '/test' | '/$user/profile' | '/$user/repositories'
+  to:
+    | '/'
+    | '/repositories'
+    | '/$user/activity'
+    | '/$user/profile'
+    | '/$user/repositories'
+    | '/$user'
+    | '/$user/$repo/merge-requests'
+    | '/$user/$repo/pipelines'
+    | '/$user/$repo/settings'
+    | '/$user/$repo/wiki'
+    | '/$user/$repo'
+    | '/$user/$repo/issues/$issueId'
+    | '/$user/$repo/issues'
   id:
     | '__root__'
     | '/'
     | '/$user'
-    | '/test'
+    | '/repositories'
+    | '/$user/$repo'
+    | '/$user/activity'
     | '/$user/profile'
     | '/$user/repositories'
+    | '/$user/'
+    | '/$user/$repo/merge-requests'
+    | '/$user/$repo/pipelines'
+    | '/$user/$repo/settings'
+    | '/$user/$repo/wiki'
+    | '/$user/$repo/'
+    | '/$user/$repo/issues/$issueId'
+    | '/$user/$repo/issues/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   UserRouteRoute: typeof UserRouteRouteWithChildren
-  TestRoute: typeof TestRoute
+  RepositoriesRoute: typeof RepositoriesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/test': {
-      id: '/test'
-      path: '/test'
-      fullPath: '/test'
-      preLoaderRoute: typeof TestRouteImport
+    '/repositories': {
+      id: '/repositories'
+      path: '/repositories'
+      fullPath: '/repositories'
+      preLoaderRoute: typeof RepositoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$user': {
@@ -106,6 +232,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$user/': {
+      id: '/$user/'
+      path: '/'
+      fullPath: '/$user/'
+      preLoaderRoute: typeof UserIndexRouteImport
+      parentRoute: typeof UserRouteRoute
+    }
     '/$user/repositories': {
       id: '/$user/repositories'
       path: '/repositories'
@@ -120,17 +253,110 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserProfileRouteImport
       parentRoute: typeof UserRouteRoute
     }
+    '/$user/activity': {
+      id: '/$user/activity'
+      path: '/activity'
+      fullPath: '/$user/activity'
+      preLoaderRoute: typeof UserActivityRouteImport
+      parentRoute: typeof UserRouteRoute
+    }
+    '/$user/$repo': {
+      id: '/$user/$repo'
+      path: '/$repo'
+      fullPath: '/$user/$repo'
+      preLoaderRoute: typeof UserRepoRouteRouteImport
+      parentRoute: typeof UserRouteRoute
+    }
+    '/$user/$repo/': {
+      id: '/$user/$repo/'
+      path: '/'
+      fullPath: '/$user/$repo/'
+      preLoaderRoute: typeof UserRepoIndexRouteImport
+      parentRoute: typeof UserRepoRouteRoute
+    }
+    '/$user/$repo/wiki': {
+      id: '/$user/$repo/wiki'
+      path: '/wiki'
+      fullPath: '/$user/$repo/wiki'
+      preLoaderRoute: typeof UserRepoWikiRouteImport
+      parentRoute: typeof UserRepoRouteRoute
+    }
+    '/$user/$repo/settings': {
+      id: '/$user/$repo/settings'
+      path: '/settings'
+      fullPath: '/$user/$repo/settings'
+      preLoaderRoute: typeof UserRepoSettingsRouteImport
+      parentRoute: typeof UserRepoRouteRoute
+    }
+    '/$user/$repo/pipelines': {
+      id: '/$user/$repo/pipelines'
+      path: '/pipelines'
+      fullPath: '/$user/$repo/pipelines'
+      preLoaderRoute: typeof UserRepoPipelinesRouteImport
+      parentRoute: typeof UserRepoRouteRoute
+    }
+    '/$user/$repo/merge-requests': {
+      id: '/$user/$repo/merge-requests'
+      path: '/merge-requests'
+      fullPath: '/$user/$repo/merge-requests'
+      preLoaderRoute: typeof UserRepoMergeRequestsRouteImport
+      parentRoute: typeof UserRepoRouteRoute
+    }
+    '/$user/$repo/issues/': {
+      id: '/$user/$repo/issues/'
+      path: '/issues'
+      fullPath: '/$user/$repo/issues/'
+      preLoaderRoute: typeof UserRepoIssuesIndexRouteImport
+      parentRoute: typeof UserRepoRouteRoute
+    }
+    '/$user/$repo/issues/$issueId': {
+      id: '/$user/$repo/issues/$issueId'
+      path: '/issues/$issueId'
+      fullPath: '/$user/$repo/issues/$issueId'
+      preLoaderRoute: typeof UserRepoIssuesIssueIdRouteImport
+      parentRoute: typeof UserRepoRouteRoute
+    }
   }
 }
 
+interface UserRepoRouteRouteChildren {
+  UserRepoMergeRequestsRoute: typeof UserRepoMergeRequestsRoute
+  UserRepoPipelinesRoute: typeof UserRepoPipelinesRoute
+  UserRepoSettingsRoute: typeof UserRepoSettingsRoute
+  UserRepoWikiRoute: typeof UserRepoWikiRoute
+  UserRepoIndexRoute: typeof UserRepoIndexRoute
+  UserRepoIssuesIssueIdRoute: typeof UserRepoIssuesIssueIdRoute
+  UserRepoIssuesIndexRoute: typeof UserRepoIssuesIndexRoute
+}
+
+const UserRepoRouteRouteChildren: UserRepoRouteRouteChildren = {
+  UserRepoMergeRequestsRoute: UserRepoMergeRequestsRoute,
+  UserRepoPipelinesRoute: UserRepoPipelinesRoute,
+  UserRepoSettingsRoute: UserRepoSettingsRoute,
+  UserRepoWikiRoute: UserRepoWikiRoute,
+  UserRepoIndexRoute: UserRepoIndexRoute,
+  UserRepoIssuesIssueIdRoute: UserRepoIssuesIssueIdRoute,
+  UserRepoIssuesIndexRoute: UserRepoIssuesIndexRoute,
+}
+
+const UserRepoRouteRouteWithChildren = UserRepoRouteRoute._addFileChildren(
+  UserRepoRouteRouteChildren,
+)
+
 interface UserRouteRouteChildren {
+  UserRepoRouteRoute: typeof UserRepoRouteRouteWithChildren
+  UserActivityRoute: typeof UserActivityRoute
   UserProfileRoute: typeof UserProfileRoute
   UserRepositoriesRoute: typeof UserRepositoriesRoute
+  UserIndexRoute: typeof UserIndexRoute
 }
 
 const UserRouteRouteChildren: UserRouteRouteChildren = {
+  UserRepoRouteRoute: UserRepoRouteRouteWithChildren,
+  UserActivityRoute: UserActivityRoute,
   UserProfileRoute: UserProfileRoute,
   UserRepositoriesRoute: UserRepositoriesRoute,
+  UserIndexRoute: UserIndexRoute,
 }
 
 const UserRouteRouteWithChildren = UserRouteRoute._addFileChildren(
@@ -140,7 +366,7 @@ const UserRouteRouteWithChildren = UserRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   UserRouteRoute: UserRouteRouteWithChildren,
-  TestRoute: TestRoute,
+  RepositoriesRoute: RepositoriesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

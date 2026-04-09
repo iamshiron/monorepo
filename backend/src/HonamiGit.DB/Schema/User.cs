@@ -6,7 +6,7 @@ namespace Shiron.HonamiGit.DB.Schema;
 
 public class User : IdentityUser<Guid> {
     [MaxLength(32)] public required string DisplayName { get; set; }
-    [MaxLength(32)] public required override string UserName { get; set; }
+    [MaxLength(32)] public required override string? UserName { get; set; }
 
     [InverseProperty(nameof(Organization.Owner))]
     public IList<Organization> Organizations { get; set; } = [];

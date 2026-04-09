@@ -1,14 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Separator } from "@shiron/ui/components/ui/separator";
 import { RepoCard, type RepoCardData } from "@/components/shared/RepoCard";
-import { Input } from "@shiron/ui/components/ui/input";
-import { Button } from "@shiron/ui/components/ui/button";
-import { MagnifyingGlass } from "@phosphor-icons/react";
+import { ContributionMap } from "@/components/dashboard/ContributionMap";
 
-export const Route = createFileRoute("/$user/repositories")({
-	component: UserRepositoriesPage,
-});
-
-const allRepos: RepoCardData[] = [
+const profileRepos: RepoCardData[] = [
 	{
 		name: "honami-git",
 		owner: "shiron",
@@ -53,31 +48,25 @@ const allRepos: RepoCardData[] = [
 	},
 ];
 
-function UserRepositoriesPage() {
-	const { user } = Route.useParams();
+export const Route = createFileRoute("/$user/")({
+	component: UserOverviewPage,
+});
 
+function UserOverviewPage() {
 	return (
-		<div className="space-y-4">
-			<div className="flex items-center gap-3">
-				<div className="relative flex-1 max-w-sm">
-					<MagnifyingGlass
-						size={14}
-						className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-					/>
-					<Input
-						placeholder={`Search ${user}'s repositories...`}
-						className="pl-9 h-8 text-sm"
-					/>
+		<div className="space-y-6">
+			<div>
+				<h3 className="text-sm font-semibold mb-3">Pinned Repositories</h3>
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+					{profileRepos.map((repo) => (
+						<RepoCard key={`profile-${repo.owner}-${repo.name}`} repo={repo} />
+					))}
 				</div>
-				<Button variant="outline" size="sm" className="text-xs">
-					All
-				</Button>
 			</div>
-			<div className="space-y-2">
-				{allRepos.map((repo) => (
-					<RepoCard key={`repos-${repo.owner}-${repo.name}`} repo={repo} />
-				))}
-			</div>
+
+			<Separator />
+
+			<ContributionMap />
 		</div>
 	);
 }

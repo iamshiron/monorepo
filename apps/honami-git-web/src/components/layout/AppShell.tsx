@@ -1,26 +1,31 @@
-import { Link } from "@tanstack/react-router";
-import { ModeToggle } from "@/components/layout/ModeToggle";
-import { Button } from "@shiron/ui/components/ui/button";
+import { useState } from "react";
+import { SidebarProvider } from "@shiron/ui/components/ui/sidebar";
+import { DensityProvider } from "@/components/shared/DensityProvider";
+import { TopBar } from "@/components/layout/TopBar";
+import { LeftRail } from "@/components/layout/LeftRail";
+import { CommandPalette } from "@/components/shared/CommandPalette";
+import { NewRepoDialog } from "@/components/repository/NewRepoDialog";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+	const [, setCommandOpen] = useState(false);
+	const [newRepoOpen, setNewRepoOpen] = useState(false);
+
 	return (
-		<div className="min-h-screen bg-background">
-			<header className="sticky top-4 z-50 mx-auto max-w-5xl rounded-2xl left-0 right-0 px-4 bg-background/95 backdrop-blur-md shadow-lg border border-border">
-				<div className="flex h-14 items-center justify-between px-6">
-					<Link to="/" className="flex items-center gap-2">
-						<span className="text-xl font-bold text-primary">HonamiGit</span>
-					</Link>
-					<nav className="flex items-center gap-1">
-						<Link to="/test">
-							<Button variant="ghost">Test</Button>
-						</Link>
-					</nav>
-					<div className="flex items-center gap-2">
-						<ModeToggle />
+		<DensityProvider>
+			<SidebarProvider>
+				<div className="flex h-screen w-full flex-col bg-background">
+					<TopBar
+						onCommandPalette={() => setCommandOpen(true)}
+						onNewRepo={() => setNewRepoOpen(true)}
+					/>
+					<div className="flex flex-1 overflow-hidden">
+						<LeftRail />
+						<main className="flex-1 overflow-y-auto">{children}</main>
 					</div>
 				</div>
-			</header>
-			<main className="container mx-auto px-4 py-6">{children}</main>
-		</div>
+				<CommandPalette />
+				<NewRepoDialog open={newRepoOpen} onOpenChange={setNewRepoOpen} />
+			</SidebarProvider>
+		</DensityProvider>
 	);
 }
