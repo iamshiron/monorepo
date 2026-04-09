@@ -1,6 +1,6 @@
 using Shiron.Mutils.API.DTOs;
 
-namespace Shiron.Mutils.API.DTos.API.Services;
+namespace Shiron.Mutils.API.Services;
 
 public interface IKakeraLogParser {
     IEnumerable<ParsedKakeraClaim> ParseKakeraLog(string data);

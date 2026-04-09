@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Shiron.Mutils.API.DTos.DB.Migrations {
+namespace Shiron.Mutils.DB.Migrations {
     /// <inheritdoc />
     public partial class AddCalculatorConfig : Migration {
         /// <inheritdoc />

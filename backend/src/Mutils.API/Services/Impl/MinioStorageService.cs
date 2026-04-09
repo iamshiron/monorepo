@@ -2,7 +2,7 @@ using Minio;
 using Minio.DataModel.Args;
 using Microsoft.Extensions.Logging;
 using Shiron.Mutils.DB.Schema;
-using Shiron.Mutils.API.DTos.API.Services;
+using Shiron.Mutils.API.Services;
 
 namespace Shiron.Mutils.API.Services.Impl;
 

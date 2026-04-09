@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shiron.Mutils.API.DTOs;
-using Shiron.Mutils.API.DTos.API.Services;
-using Shiron.Mutils.API.DTos.DB;
+using Shiron.Mutils.API.Services;
+using Shiron.Mutils.DB;
 using Shiron.Mutils.DB.Schema;
 using Shiron.Mutils.API.Helpers;
 

@@ -2,12 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Shiron.Mutils.API.DTos.API.Services;
-using Shiron.Mutils.API.DTos.Core.Configuration;
-using Shiron.Mutils.API.DTos.DB;
+using Shiron.Mutils.API.Services;
+using Shiron.Mutils.API.Configuration;
+using Shiron.Mutils.DB;
 using Shiron.Mutils.DB.Schema;
 
-namespace Shiron.Mutils.API.DTos.Api.Services;
+namespace Shiron.Mutils.API.Services.Impl;
 
 public class ImageProcessingService : BackgroundService {
     private readonly IServiceProvider _serviceProvider;

@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Shiron.Mutils.API.DTos.API.Services;
+using Shiron.Mutils.API.Services;
 using Shiron.Mutils.API.DTOs;
 
 namespace Shiron.Mutils.API.Endpoints;

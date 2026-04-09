@@ -1,4 +1,4 @@
-namespace Shiron.Mutils.API.DTos.API.Services;
+namespace Shiron.Mutils.API.Services;
 
 public interface IExportService {
     string ExportToMudaeFormat(IEnumerable<string> characters);

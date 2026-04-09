@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shiron.Mutils.DB.Schema;
 
-namespace Shiron.Mutils.API.DTos.DB;
+namespace Shiron.Mutils.DB;
 
 public class MutilsDbContext(DbContextOptions<MutilsDbContext> options) : DbContext(options) {
     public DbSet<User> Users => Set<User>();

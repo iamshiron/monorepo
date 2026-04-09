@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using Shiron.Mutils.API.DTos.DB;
+using Shiron.Mutils.DB;
 
 #nullable disable
 
-namespace Shiron.Mutils.API.DTos.DB.Migrations
+namespace Shiron.Mutils.DB.Migrations
 {
     [DbContext(typeof(MutilsDbContext))]
     [Migration("20260219180455_InitialCreate")]

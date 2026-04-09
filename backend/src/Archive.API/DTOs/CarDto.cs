@@ -1,4 +1,4 @@
-using Shiron.TheArchive.DB.Schema.Car;
+using Shiron.TheArchive.DB.Schema;
 
 namespace Shiron.TheArchive.API.DTOs;
 

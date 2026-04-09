@@ -18,7 +18,7 @@ public class Color32(byte r, byte g, byte b, byte a) {
         return $"#{R:X2}{G:X2}{B:X2}{A:X2}";
     }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string ToString() {
+    public override string ToString() {
         return ToHex();
     }
 }

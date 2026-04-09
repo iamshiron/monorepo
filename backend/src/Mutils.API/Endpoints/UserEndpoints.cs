@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Shiron.Mutils.API.DTOs;
-using Shiron.Mutils.API.DTos.DB;
+using Shiron.Mutils.DB;
 
 namespace Shiron.Mutils.API.Endpoints;
 

@@ -1,6 +1,6 @@
 using Shiron.Mutils.API.DTOs;
 
-namespace Shiron.Mutils.API.DTos.API.Services;
+namespace Shiron.Mutils.API.Services;
 
 public interface IOptimizerService {
     Task<OptimizerAnalysisResponse> AnalyzeAsync(Guid userId, OptimizerAnalysisRequest request, CancellationToken cancellationToken = default);

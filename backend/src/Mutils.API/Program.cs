@@ -8,10 +8,9 @@ using Microsoft.IdentityModel.Tokens;
 using Minio;
 using Scalar.AspNetCore;
 using Shiron.Mutils.API.Endpoints;
-using Shiron.Mutils.API.DTos.Api.Services;
-using Shiron.Mutils.API.DTos.Core.Configuration;
-using Shiron.Mutils.API.DTos.API.Services;
-using Shiron.Mutils.API.DTos.DB;
+using Shiron.Mutils.API.Configuration;
+using Shiron.Mutils.API.Services;
+using Shiron.Mutils.DB;
 using Shiron.Mutils.API.Services.Impl;
 
 Env.TraversePath().Load();

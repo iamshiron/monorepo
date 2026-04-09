@@ -1,6 +1,6 @@
 using Shiron.Mutils.DB.Schema;
 
-namespace Shiron.Mutils.API.DTos.API.Services;
+namespace Shiron.Mutils.API.Services;
 
 public interface IStorageService {
     Task<StoredImage?> StoreImageAsync(string url, string bucketName, CancellationToken cancellationToken = default);

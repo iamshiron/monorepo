@@ -6,10 +6,10 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Shiron.Mutils.API.DTos.DB;
+using Shiron.Mutils.DB;
 using Shiron.Mutils.DB.Schema;
 
-namespace Shiron.Mutils.API.DTos.Api.Services;
+namespace Shiron.Mutils.API.Services.Impl;
 
 public interface IAuthService {
     string GenerateAccessToken(User user);

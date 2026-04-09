@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Shiron.Lib.Types.EFCore;
 using Shiron.TheArchive.DB.Schema;
-using Shiron.TheArchive.DB.Schema.Car;
 
 namespace Shiron.TheArchive.DB;
 

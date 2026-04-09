@@ -1,4 +1,4 @@
-namespace Shiron.Mutils.API.DTos.Core.Configuration;
+namespace Shiron.Mutils.API.Configuration;
 
 public sealed class StorageOptions {
     public string Endpoint { get; set; } = "localhost:9000";
