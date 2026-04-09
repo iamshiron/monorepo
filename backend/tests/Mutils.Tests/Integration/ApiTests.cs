@@ -1,4 +1,4 @@
-namespace Shiron.Mutils.Tests.Integration;
+namespace Shiron.Mutils.API.DTos.Tests.Integration;
 
 public class ApiTests {
     // Integration tests would go here using WebApplicationFactory and Testcontainers

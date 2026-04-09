@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Shiron.Mutils.Infrastructure.Services;
+using Shiron.Mutils.API.Services.Impl;
 using Xunit;
 
 namespace Shiron.Mutils.Tests.Unit;

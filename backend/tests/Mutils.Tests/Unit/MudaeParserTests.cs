@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Shiron.Mutils.Infrastructure.Services;
+using Shiron.Mutils.API.Services.Impl;
 using Xunit;
 
 namespace Shiron.Mutils.Tests.Unit;
@@ -10,10 +10,10 @@ public class MudaeParserTests {
     [Fact]
     public void ParseCollection_WithValidData_ReturnsParsedCharacters() {
         var data = """
-            #72 - Gawr Gura => 67 al, 118 img + 12 gif, 14 series · :bronzekey:   (1) 792 ka - https://mudae.net/uploads/test.png
-            #117 - Itsuki Nakano => 4 al, 58 img + 3 gif, 5 series 647 ka - https://mudae.net/uploads/test2.png
-            #144 - Hitori Gotou => 36 al, 54 img + 8 gif, 2 series 589 ka
-            """;
+                   #72 - Gawr Gura => 67 al, 118 img + 12 gif, 14 series · :bronzekey:   (1) 792 ka - https://mudae.net/uploads/test.png
+                   #117 - Itsuki Nakano => 4 al, 58 img + 3 gif, 5 series 647 ka - https://mudae.net/uploads/test2.png
+                   #144 - Hitori Gotou => 36 al, 54 img + 8 gif, 2 series 589 ka
+                   """;
 
         var result = _parser.ParseCollection(data).ToList();
 
@@ -30,11 +30,11 @@ public class MudaeParserTests {
     [Fact]
     public void ParseCollection_WithEmptyLines_SkipsThem() {
         var data = """
-            #72 - Gawr Gura => 67 al, 118 img + 12 gif, 14 series 792 ka
+                   #72 - Gawr Gura => 67 al, 118 img + 12 gif, 14 series 792 ka
 
-            #117 - Itsuki Nakano => 4 al, 58 img + 3 gif, 5 series 647 ka
-            
-            """;
+                   #117 - Itsuki Nakano => 4 al, 58 img + 3 gif, 5 series 647 ka
+
+                   """;
 
         var result = _parser.ParseCollection(data).ToList();
 
@@ -89,9 +89,9 @@ public class MudaeParserTests {
     [Fact]
     public void ParseCollection_WithCommaFormattedNumbers_ParsesCorrectly() {
         var data = """
-            #2,092 - Skirk => 6 al, 29 img + 5 gif · :bronzekey:   (1) 125 ka - https://mudae.net/uploads/test.png
-            #2,508 - Fu Xuan => 10 al, 24 img + 3 gif · :silverkey:   (3) 123 ka - https://mudae.net/uploads/test2.png
-            """;
+                   #2,092 - Skirk => 6 al, 29 img + 5 gif · :bronzekey:   (1) 125 ka - https://mudae.net/uploads/test.png
+                   #2,508 - Fu Xuan => 10 al, 24 img + 3 gif · :silverkey:   (3) 123 ka - https://mudae.net/uploads/test2.png
+                   """;
 
         var result = _parser.ParseCollection(data).ToList();
 
@@ -263,7 +263,7 @@ public class MudaeParserTests {
             (6, "goldkey"),
             (9, "goldkey"),
             (10, "chaoskey"),
-            (500, "chaoskey"),
+            (500, "chaoskey")
         };
 
         foreach (var (keyCount, expectedKeyType) in testData) {

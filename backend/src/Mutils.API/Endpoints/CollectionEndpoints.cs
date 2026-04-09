@@ -1,0 +1,898 @@
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using Shiron.Mutils.API.DTos.API.Services;
+using Shiron.Mutils.API.DTOs;
+using Shiron.Mutils.API.Helpers;
+using Shiron.Mutils.API.DTos.DB;
+using Shiron.Mutils.DB.Schema;
+
+namespace Shiron.Mutils.API.Endpoints;
+
+public static class CollectionEndpoints {
+    private static readonly ILogger Logger = LoggerFactory.Create(builder => builder.AddConsole())
+        .CreateLogger("CollectionEndpoints");
+
+    public static void MapCollectionEndpoints(this IEndpointRouteBuilder app) {
+        var group = app.MapGroup("/api/collection").RequireAuthorization().WithTags("Collection");
+
+        group.MapGet("/", async (
+                ClaimsPrincipal user,
+                MutilsDbContext db,
+                string? search,
+                string? sortBy,
+                string? sortOrder,
+                int? minKeys,
+                int? minKakera,
+                bool? isDisabled,
+                string? keyTypes,
+                string? wishStatus,
+                bool? isFavorite,
+                string? series,
+                int page = 1,
+                int pageSize = 50) => {
+                    var userId = GetUserId(user);
+                    if (userId is null) return Results.Unauthorized();
+
+                    var query = db.CollectionEntries
+                        .Include(e => e.Character)
+                        .ThenInclude(c => c.Series)
+                        .Where(e => e.UserId == userId);
+
+                    if (!string.IsNullOrEmpty(search)) {
+                        query = query.Where(e =>
+                            e.Character.Name.Contains(search) ||
+                            e.Character.Series != null && e.Character.Series.Name.Contains(search));
+                    }
+
+                    if (minKeys.HasValue) {
+                        query = query.Where(e => e.Character.KeyCount >= minKeys.Value);
+                    }
+
+                    if (minKakera.HasValue) {
+                        query = query.Where(e => e.Character.Kakera >= minKakera.Value);
+                    }
+
+                    if (isDisabled.HasValue) {
+                        query = query.Where(e => e.Character.Disabled == isDisabled.Value);
+                    }
+
+                    if (!string.IsNullOrEmpty(keyTypes)) {
+                        var keyTypeList = keyTypes
+                            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+
+                        var hasBronze = keyTypeList.Contains("bronzekey");
+                        var hasSilver = keyTypeList.Contains("silverkey");
+                        var hasGold = keyTypeList.Contains("goldkey");
+                        var hasChaos = keyTypeList.Contains("chaoskey");
+
+                        query = query.Where(e =>
+                            hasBronze && e.Character.KeyCount >= 1 && e.Character.KeyCount < 3 ||
+                            hasSilver && e.Character.KeyCount >= 3 && e.Character.KeyCount < 6 ||
+                            hasGold && e.Character.KeyCount >= 6 && e.Character.KeyCount < 10 ||
+                            hasChaos && e.Character.KeyCount >= 10
+                        );
+                    }
+
+                    if (!string.IsNullOrEmpty(wishStatus)) {
+                        query = wishStatus.ToLower() switch {
+                            "wish" => query.Where(e =>
+                                db.WishlistEntries.Any(w =>
+                                    w.CharacterId == e.CharacterId && w.UserId == userId && !w.IsStarwish)),
+                            "starwish" => query.Where(e =>
+                                db.WishlistEntries.Any(w =>
+                                    w.CharacterId == e.CharacterId && w.UserId == userId && w.IsStarwish)),
+                            "inwishlist" => query.Where(e =>
+                                db.WishlistEntries.Any(w => w.CharacterId == e.CharacterId && w.UserId == userId)),
+                            _ => query
+                        };
+                    }
+
+                    if (isFavorite.HasValue) {
+                        query = query.Where(e => e.IsFavorite == isFavorite.Value);
+                    }
+
+                    if (!string.IsNullOrEmpty(series)) {
+                        var seriesList = series
+                            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+                        query = query.Where(e => e.Character.Series != null && seriesList.Contains(e.Character.Series.Name));
+                    }
+
+                    sortBy ??= "rank";
+                    sortOrder ??= "asc";
+
+                    query = (sortBy.ToLower(), sortOrder.ToLower()) switch {
+                        ("name", "asc") => query.OrderBy(e => e.Character.Name),
+                        ("name", "desc") => query.OrderByDescending(e => e.Character.Name),
+                        ("rank", "asc") => query.OrderBy(e => e.Character.Rank ?? int.MaxValue),
+                        ("rank", "desc") => query.OrderByDescending(e => e.Character.Rank ?? 0),
+                        ("kakera", "asc") => query.OrderBy(e => e.Character.Kakera ?? 0),
+                        ("kakera", "desc") => query.OrderByDescending(e => e.Character.Kakera ?? 0),
+                        ("claims", "asc") => query.OrderBy(e => e.Character.Claims ?? 0),
+                        ("claims", "desc") => query.OrderByDescending(e => e.Character.Claims ?? 0),
+                        ("acquiredat", "asc") => query.OrderBy(e => e.AcquiredAt),
+                        ("keys", "asc") => query.OrderBy(e => e.Character.KeyCount ?? 0),
+                        ("keys", "desc") => query.OrderByDescending(e => e.Character.KeyCount ?? 0),
+                        ("user_kakera", "asc") => query.OrderBy(e => db.KakeraClaims
+                            .Where(c => c.CharacterId == e.CharacterId && c.UserId == userId)
+                            .Sum(c => (int?) c.Value) ?? 0),
+                        ("user_kakera", "desc") => query.OrderByDescending(e => db.KakeraClaims
+                            .Where(c => c.CharacterId == e.CharacterId && c.UserId == userId)
+                            .Sum(c => (int?) c.Value) ?? 0),
+                        ("spheres", "asc") => query.OrderBy(e => e.SpherePerks != null
+                            ? (e.SpherePerks.Perk1 + e.SpherePerks.Perk2 + e.SpherePerks.Perk3 + e.SpherePerks.Perk4 + e.SpherePerks.Perk5) * 200
+                            + (e.SpherePerks.Perk6 ? 1000 : 0)
+                            + (e.SpherePerks.Perk7 ? 1000 : 0)
+                            + (e.SpherePerks.Perk8 ? 1000 : 0)
+                            + (e.SpherePerks.Perk9 ? 1000 : 0)
+                            + (e.SpherePerks.Perk10 ? 1000 : 0)
+                            : 0),
+                        ("spheres", "desc") => query.OrderByDescending(e => e.SpherePerks != null
+                            ? (e.SpherePerks.Perk1 + e.SpherePerks.Perk2 + e.SpherePerks.Perk3 + e.SpherePerks.Perk4 + e.SpherePerks.Perk5) * 200
+                            + (e.SpherePerks.Perk6 ? 1000 : 0)
+                            + (e.SpherePerks.Perk7 ? 1000 : 0)
+                            + (e.SpherePerks.Perk8 ? 1000 : 0)
+                            + (e.SpherePerks.Perk9 ? 1000 : 0)
+                            + (e.SpherePerks.Perk10 ? 1000 : 0)
+                            : 0),
+                        ("acquiredat", _) => query.OrderByDescending(e => e.AcquiredAt),
+                        _ => query.OrderBy(e => e.Character.Rank ?? int.MaxValue)
+                    };
+
+                    var total = await query.CountAsync();
+                    var totalPages = (int) Math.Ceiling(total / (double) pageSize);
+
+                    var entries = await query
+                        .Skip((page - 1) * pageSize)
+                        .Take(pageSize)
+                        .Select(e => new {
+                            e.Id,
+                            e.Character,
+                            e.AcquiredAt,
+                            e.Notes,
+                            e.IsFavorite
+                        })
+                        .ToListAsync();
+
+                    var characterIds = entries.Select(i => i.Character.Id).ToList();
+
+                    var claims = await db.KakeraClaims
+                        .Where(c => c.CharacterId.HasValue && characterIds.Contains(c.CharacterId.Value) && c.UserId == userId)
+                        .ToListAsync();
+
+                    var statsPerCharacter = claims
+                        .GroupBy(c => c.CharacterId)
+                        .ToDictionary(
+                            g => g.Key!.Value,
+                            g => new CharacterKakeraStatsDto(
+                                g.Sum(c => c.Value),
+                                g.Count(),
+                                g.GroupBy(c => c.Type)
+                                    .ToDictionary(
+                                        t => t.Key.ToString().ToLower(),
+                                        t => t.Sum(c => c.Value)
+                                    )
+                            )
+                        );
+
+                    var items = entries.Select(e => new CollectionEntryDto(
+                        e.Id,
+                        new CharacterDto(
+                            e.Character.Id,
+                            e.Character.Name,
+                            e.Character.Rank,
+                            e.Character.Claims,
+                            e.Character.Images,
+                            e.Character.Gifs,
+                            e.Character.SeriesCount,
+                            e.Character.KeyType,
+                            e.Character.KeyCount,
+                            e.Character.Kakera,
+                            e.Character.Sp,
+                            e.Character.OriginalImageUrl,
+                            e.Character.StoredImageId,
+                            e.Character.Series?.Name,
+                            statsPerCharacter.GetValueOrDefault(e.Character.Id)
+                        ),
+                        e.AcquiredAt,
+                        e.Notes,
+                        e.Character.Disabled,
+                        e.IsFavorite
+                    )).ToList();
+
+                    return Results.Ok(new PaginatedResponse<CollectionEntryDto>(
+                        items, total, page, pageSize, totalPages
+                    ));
+                })
+            .Produces<PaginatedResponse<CollectionEntryDto>>()
+            .Produces(401);
+
+        group.MapGet("/stats", async (
+                ClaimsPrincipal user,
+                MutilsDbContext db) => {
+                    var userId = GetUserId(user);
+                    if (userId is null) return Results.Unauthorized();
+
+                    var entries = await db.CollectionEntries
+                        .Include(e => e.Character)
+                        .Where(e => e.UserId == userId)
+                        .Select(e => e.Character)
+                        .ToListAsync();
+
+                    var keyDistribution = entries
+                        .Select(c => new { KeyType = KeyHelper.GetKeyTypeFromCount(c.KeyCount) })
+                        .Where(c => c.KeyType is not null)
+                        .GroupBy(c => c.KeyType!)
+                        .ToDictionary(g => g.Key, g => g.Count());
+
+                    var activeDisableList = await db.DisableLists
+                        .Where(l => l.UserId == userId && l.IsActive)
+                        .Select(l => l.Content)
+                        .FirstOrDefaultAsync();
+
+                    var disabledNames = activeDisableList?
+                        .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                        .ToHashSet(StringComparer.OrdinalIgnoreCase) ?? [];
+
+                    var disabledCount = entries.Count(c => disabledNames.Contains(c.Name));
+
+                    return Results.Ok(new CollectionStatsDto(
+                        entries.Count,
+                        entries.Sum(c => c.Kakera ?? 0),
+                        keyDistribution,
+                        disabledCount
+                    ));
+                })
+            .Produces<CollectionStatsDto>()
+            .Produces(401);
+
+        group.MapGet("/series", async (
+                ClaimsPrincipal user,
+                MutilsDbContext db) => {
+                    var userId = GetUserId(user);
+                    if (userId is null) return Results.Unauthorized();
+
+                    var entriesWithSeries = await db.CollectionEntries
+                        .Include(e => e.Character)
+                        .ThenInclude(c => c.Series)
+                        .Where(e => e.UserId == userId && e.Character.Series != null)
+                        .Select(e => new { e.Character.SeriesId, e.Character.Series!.Name, e.CharacterId })
+                        .ToListAsync();
+
+                    var seriesWithCounts = entriesWithSeries
+                        .GroupBy(e => new { e.SeriesId, e.Name })
+                        .Select(g => new SeriesWithCountDto(
+                            g.Key.SeriesId!.Value,
+                            g.Key.Name,
+                            g.Select(e => e.CharacterId).Distinct().Count()
+                        ))
+                        .OrderBy(s => s.Name)
+                        .ToList();
+
+                    return Results.Ok(seriesWithCounts);
+                })
+            .Produces<List<SeriesWithCountDto>>()
+            .Produces(401);
+
+        group.MapPost("/export", async (
+                ClaimsPrincipal user,
+                CollectionExportRequest request,
+                MutilsDbContext db) => {
+                    var userId = GetUserId(user);
+                    if (userId is null) return Results.Unauthorized();
+
+                    var baseQuery = db.CollectionEntries
+                        .Where(e => e.UserId == userId);
+
+                    var totalCount = await baseQuery.CountAsync();
+
+                    var filteredQuery = db.CollectionEntries
+                        .Include(e => e.Character)
+                        .Where(e => e.UserId == userId);
+
+                    if (request.MinKeys.HasValue) {
+                        filteredQuery = filteredQuery.Where(e => e.Character.KeyCount >= request.MinKeys);
+                    }
+
+                    if (request.ExcludeDisabled == true) {
+                        filteredQuery = filteredQuery.Where(e => !e.Character.Disabled);
+                    }
+
+                    var sortBy = request.SortBy?.ToLower() ?? "kakera";
+                    var sortOrder = request.SortOrder?.ToLower() ?? "desc";
+
+                    var orderedQuery = (sortBy, sortOrder) switch {
+                        ("name", "asc") => filteredQuery.OrderBy(e => e.Character.Name),
+                        ("name", "desc") => filteredQuery.OrderByDescending(e => e.Character.Name),
+                        ("kakera", "asc") => filteredQuery.OrderBy(e => e.Character.Kakera ?? 0),
+                        ("kakera", "desc") => filteredQuery.OrderByDescending(e => e.Character.Kakera ?? 0),
+                        ("keycount", "asc") => filteredQuery.OrderBy(e => e.Character.KeyCount ?? 0),
+                        ("keycount", "desc") => filteredQuery.OrderByDescending(e => e.Character.KeyCount ?? 0),
+                        ("sp", "asc") => filteredQuery.OrderBy(e => e.Character.Sp ?? 0),
+                        ("sp", "desc") => filteredQuery.OrderByDescending(e => e.Character.Sp ?? 0),
+                        _ => filteredQuery.OrderByDescending(e => e.Character.Kakera ?? 0)
+                    };
+
+                    var exportedCount = await orderedQuery.CountAsync();
+
+                    var finalQuery = orderedQuery;
+                    if (request.Limit.HasValue && request.Limit > 0) {
+                        finalQuery = (IOrderedQueryable<CollectionEntry>) orderedQuery.Take(request.Limit.Value);
+                    }
+
+                    var items = await finalQuery
+                        .Select(e => new CollectionExportItemDto(
+                            e.Character.Name,
+                            e.Character.Kakera,
+                            e.Character.KeyCount,
+                            e.Character.Sp,
+                            e.Character.Disabled
+                        ))
+                        .ToListAsync();
+
+                    return Results.Ok(new CollectionExportResponse(totalCount, exportedCount, items));
+                })
+            .Produces<CollectionExportResponse>()
+            .Produces(401);
+
+        group.MapPost("/add", async (
+                ClaimsPrincipal user,
+                AddCharacterRequest request,
+                MutilsDbContext db) => {
+                    var userId = GetUserId(user);
+                    if (userId is null) return Results.Unauthorized();
+
+                    if (string.IsNullOrWhiteSpace(request.Name))
+                        return Results.BadRequest(new ErrorResponse("Character name is required"));
+
+                    var existingCharacter = await db.Characters
+                        .FirstOrDefaultAsync(c => c.Name == request.Name);
+
+                    Series? series = null;
+                    if (!string.IsNullOrWhiteSpace(request.SeriesName)) {
+                        series = await db.Series.FirstOrDefaultAsync(s => s.Name == request.SeriesName);
+                        if (series is null) {
+                            series = new Series { Name = request.SeriesName };
+                            db.Series.Add(series);
+                        }
+                    }
+
+                    Character character;
+                    var isNewCharacter = false;
+
+                    if (existingCharacter is not null) {
+                        character = existingCharacter;
+
+                        if (request.Rank.HasValue && character.Rank != request.Rank)
+                            character.Rank = request.Rank;
+                        if (request.Claims.HasValue && character.Claims != request.Claims)
+                            character.Claims = request.Claims;
+                        if (request.Images.HasValue && character.Images != request.Images)
+                            character.Images = request.Images;
+                        if (request.Gifs.HasValue && character.Gifs != request.Gifs)
+                            character.Gifs = request.Gifs;
+                        if (request.SeriesCount.HasValue && character.SeriesCount != request.SeriesCount)
+                            character.SeriesCount = request.SeriesCount;
+                        if (request.KeyCount.HasValue && character.KeyCount != request.KeyCount) {
+                            character.KeyCount = request.KeyCount;
+                            character.KeyType = KeyHelper.GetKeyTypeFromCount(request.KeyCount);
+                        }
+                        if (request.Kakera.HasValue && character.Kakera != request.Kakera)
+                            character.Kakera = request.Kakera;
+                        if (request.Sp.HasValue && character.Sp != request.Sp)
+                            character.Sp = request.Sp;
+                        if (!string.IsNullOrEmpty(request.ImageUrl) && character.OriginalImageUrl != request.ImageUrl) {
+                            character.OriginalImageUrl = request.ImageUrl;
+                            character.StoredImageId = null;
+                        }
+                        if (series is not null && character.SeriesId != series.Id)
+                            character.Series = series;
+                    } else {
+                        isNewCharacter = true;
+                        character = new Character {
+                            Name = request.Name,
+                            Rank = request.Rank,
+                            Claims = request.Claims,
+                            Images = request.Images,
+                            Gifs = request.Gifs,
+                            SeriesCount = request.SeriesCount,
+                            KeyCount = request.KeyCount,
+                            KeyType = request.KeyCount.HasValue ? KeyHelper.GetKeyTypeFromCount(request.KeyCount) : null,
+                            Kakera = request.Kakera,
+                            Sp = request.Sp,
+                            OriginalImageUrl = request.ImageUrl,
+                            Series = series,
+                            Source = "manual"
+                        };
+                        db.Characters.Add(character);
+                    }
+
+                    var existingEntry = await db.CollectionEntries
+                        .FirstOrDefaultAsync(e => e.UserId == userId && e.Character.Name == request.Name);
+
+                    if (existingEntry is not null)
+                        return Results.BadRequest(new ErrorResponse("Character already in collection"));
+
+                    var entry = new CollectionEntry {
+                        UserId = userId.Value,
+                        Character = character,
+                        AcquiredAt = DateTime.UtcNow
+                    };
+                    db.CollectionEntries.Add(entry);
+
+                    var imagesQueued = 0;
+                    if (!string.IsNullOrEmpty(request.ImageUrl) && character.StoredImageId is null) {
+                        var existingStoredImage = await db.StoredImages
+                            .AnyAsync(s => s.OriginalUrl == request.ImageUrl);
+                        var pendingJob = await db.ImageJobs
+                            .AnyAsync(j => j.OriginalUrl == request.ImageUrl && j.Status == ImageJobStatus.Pending);
+
+                        if (!existingStoredImage && !pendingJob) {
+                            db.ImageJobs.Add(new ImageJob {
+                                Character = character,
+                                OriginalUrl = request.ImageUrl
+                            });
+                            imagesQueued = 1;
+                        }
+                    }
+
+                    await db.SaveChangesAsync();
+
+                    return Results.Ok(new AddCharacterResponse(entry.Id, character.Id, isNewCharacter, imagesQueued));
+                })
+            .Produces<AddCharacterResponse>()
+            .Produces<ErrorResponse>(400)
+            .Produces(401);
+
+        group.MapPost("/import", async (
+                ClaimsPrincipal user,
+                ImportRequest request,
+                MutilsDbContext db,
+                IMudaeParser parser) => {
+                    var userId = GetUserId(user);
+                    if (userId is null) return Results.Unauthorized();
+
+                    var parsed = parser.ParseCollection(request.Data).ToList();
+                    Logger.LogInformation("Parsed {Count} characters from import data", parsed.Count);
+
+                    var imported = 0;
+                    var skipped = 0;
+                    var updated = 0;
+                    var imageJobsCreated = 0;
+                    var disabledImported = 0;
+
+                    var characterNames = parsed.Select(p => p.Name).Distinct().ToList();
+                    var existingCharacters = await db.Characters
+                        .Where(c => characterNames.Contains(c.Name))
+                        .ToDictionaryAsync(c => c.Name);
+
+                    var existingEntries = await db.CollectionEntries
+                        .Where(e => e.UserId == userId && characterNames.Contains(e.Character.Name))
+                        .Select(e => e.Character.Name)
+                        .ToHashSetAsync();
+
+                    var existingImageUrls = await db.StoredImages
+                        .Where(s => parsed.Select(p => p.ImageUrl).Contains(s.OriginalUrl))
+                        .Select(s => s.OriginalUrl)
+                        .ToHashSetAsync();
+
+                    var pendingImageUrls = await db.ImageJobs
+                        .Where(j => parsed.Select(p => p.ImageUrl).Contains(j.OriginalUrl) &&
+                            j.Status == ImageJobStatus.Pending)
+                        .Select(j => j.OriginalUrl)
+                        .ToHashSetAsync();
+
+                    var newCharacters = new List<Character>();
+                    var newEntries = new List<CollectionEntry>();
+                    var newImageJobs = new List<ImageJob>();
+
+                    foreach (var parsedChar in parsed) {
+                        var isExistingEntry = existingEntries.Contains(parsedChar.Name);
+
+                        if (!existingCharacters.TryGetValue(parsedChar.Name, out var character)) {
+                            character = new Character {
+                                Name = parsedChar.Name,
+                                Rank = parsedChar.Rank,
+                                Claims = parsedChar.Claims,
+                                Images = parsedChar.Images,
+                                Gifs = parsedChar.Gifs,
+                                SeriesCount = parsedChar.SeriesCount,
+                                KeyType = parsedChar.KeyType,
+                                KeyCount = parsedChar.KeyCount,
+                                Kakera = parsedChar.Kakera,
+                                Sp = parsedChar.Sp,
+                                OriginalImageUrl = parsedChar.ImageUrl,
+                                Source = "mudae"
+                            };
+                            newCharacters.Add(character);
+                            existingCharacters[parsedChar.Name] = character;
+                        } else {
+                            var needsUpdate = false;
+                            if (character.Rank != parsedChar.Rank) {
+                                character.Rank = parsedChar.Rank;
+                                needsUpdate = true;
+                            }
+                            if (parsedChar.Kakera is not null && character.Kakera != parsedChar.Kakera) {
+                                character.Kakera = parsedChar.Kakera;
+                                needsUpdate = true;
+                            }
+                            if (parsedChar.Sp is not null && character.Sp != parsedChar.Sp) {
+                                character.Sp = parsedChar.Sp;
+                                needsUpdate = true;
+                            }
+                            if (parsedChar.Claims is not null && character.Claims != parsedChar.Claims) {
+                                character.Claims = parsedChar.Claims;
+                                needsUpdate = true;
+                            }
+                            if (parsedChar.KeyCount.HasValue && character.KeyCount != parsedChar.KeyCount) {
+                                character.KeyType = parsedChar.KeyType;
+                                character.KeyCount = parsedChar.KeyCount;
+                                needsUpdate = true;
+                            }
+                            if (!string.IsNullOrEmpty(parsedChar.ImageUrl) &&
+                                character.OriginalImageUrl != parsedChar.ImageUrl) {
+                                character.OriginalImageUrl = parsedChar.ImageUrl;
+                                character.StoredImageId = null;
+                                needsUpdate = true;
+                            }
+                            if (needsUpdate) {
+                                updated++;
+                            }
+                        }
+
+                        if (!string.IsNullOrEmpty(parsedChar.ImageUrl)
+                            && character.StoredImageId is null
+                            && !existingImageUrls.Contains(parsedChar.ImageUrl)
+                            && !pendingImageUrls.Contains(parsedChar.ImageUrl)) {
+                            newImageJobs.Add(new ImageJob {
+                                Character = character,
+                                OriginalUrl = parsedChar.ImageUrl
+                            });
+                            imageJobsCreated++;
+                        }
+
+                        if (isExistingEntry) {
+                            skipped++;
+                            continue;
+                        }
+
+                        newEntries.Add(new CollectionEntry {
+                            UserId = userId.Value,
+                            Character = character,
+                            AcquiredAt = DateTime.UtcNow
+                        });
+
+                        imported++;
+                    }
+
+                    if (newCharacters.Count > 0)
+                        db.Characters.AddRange(newCharacters);
+
+                    if (newImageJobs.Count > 0)
+                        db.ImageJobs.AddRange(newImageJobs);
+
+                    if (newEntries.Count > 0)
+                        db.CollectionEntries.AddRange(newEntries);
+
+                    if (!string.IsNullOrWhiteSpace(request.DisabledCharacters)) {
+                        var disabledNames = parser.ParseDisabledCharacters(request.DisabledCharacters).ToList();
+                        Logger.LogInformation("Parsed {Count} disabled characters from import data", disabledNames.Count);
+                        if (disabledNames.Count > 0) {
+                            var existingDisableList = await db.DisableLists
+                                .FirstOrDefaultAsync(l => l.UserId == userId && l.Name == "Disabled Characters");
+
+                            var content = string.Join("\n", disabledNames);
+
+                            if (existingDisableList is not null) {
+                                var existingNames = existingDisableList.Content
+                                    .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                    .ToHashSet();
+                                var newNames = disabledNames.Where(n => !existingNames.Contains(n)).ToList();
+                                if (newNames.Count > 0) {
+                                    existingDisableList.Content =
+                                        existingDisableList.Content + "\n" + string.Join("\n", newNames);
+                                    disabledImported = newNames.Count;
+                                }
+                            } else {
+                                var newDisableList = new DisableList {
+                                    UserId = userId.Value,
+                                    Name = "Disabled Characters",
+                                    Content = content,
+                                    IsActive = true
+                                };
+                                db.DisableLists.Add(newDisableList);
+                                disabledImported = disabledNames.Count;
+                            }
+
+                            var userCharacterNames = newEntries.Select(e => e.Character.Name)
+                                .Concat(existingEntries)
+                                .ToHashSet();
+
+                            var charactersToDisable = await db.Characters
+                                .Where(c => userCharacterNames.Contains(c.Name) && disabledNames.Contains(c.Name))
+                                .ToListAsync();
+
+                            foreach (var c in charactersToDisable) {
+                                c.Disabled = true;
+                            }
+                            Logger.LogInformation("Marked {Count} characters as disabled", charactersToDisable.Count);
+                        }
+                    }
+
+                    await db.SaveChangesAsync();
+
+                    Logger.LogInformation(
+                        "Import completed: {Imported} imported, {Skipped} skipped, {Updated} updated, {ImagesQueued} images queued, {DisabledImported} disabled",
+                        imported, skipped, updated, imageJobsCreated, disabledImported);
+
+                    return Results.Ok(new ImportResponse(imported, skipped, updated, new List<string>(), imageJobsCreated,
+                        disabledImported > 0 ? disabledImported : null));
+                })
+            .Produces<ImportResponse>()
+            .Produces(401);
+
+        group.MapPost("/import-series", async (
+                ClaimsPrincipal user,
+                ImportSeriesRequest request,
+                MutilsDbContext db) => {
+                    var userId = GetUserId(user);
+                    if (userId is null) return Results.Unauthorized();
+
+                    var lines = request.Data
+                        .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+                    var assignments = new List<(string CharName, string SeriesName)>();
+                    foreach (var line in lines) {
+                        var separatorIndex = line.LastIndexOf(" - ", StringComparison.Ordinal);
+                        if (separatorIndex <= 0) continue;
+
+                        var charName = line[..separatorIndex].Trim();
+                        var seriesName = line[(separatorIndex + 3)..].Trim();
+                        if (!string.IsNullOrEmpty(charName) && !string.IsNullOrEmpty(seriesName))
+                            assignments.Add((charName, seriesName));
+                    }
+
+                    var charNames = assignments.Select(a => a.CharName).Distinct().ToList();
+                    var userCharacters = await db.CollectionEntries
+                        .Include(e => e.Character)
+                        .Where(e => e.UserId == userId && charNames.Contains(e.Character.Name))
+                        .Select(e => e.Character)
+                        .ToDictionaryAsync(c => c.Name);
+
+                    var seriesNames = assignments.Select(a => a.SeriesName).Distinct().ToList();
+                    var existingSeries = await db.Series
+                        .Where(s => seriesNames.Contains(s.Name))
+                        .ToDictionaryAsync(s => s.Name);
+
+                    var updated = 0;
+                    var notFoundNames = new List<string>();
+
+                    foreach (var (charName, seriesName) in assignments) {
+                        if (!userCharacters.TryGetValue(charName, out var character)) {
+                            notFoundNames.Add(charName);
+                            continue;
+                        }
+
+                        if (!existingSeries.TryGetValue(seriesName, out var series)) {
+                            series = new Series { Name = seriesName };
+                            db.Series.Add(series);
+                            existingSeries[seriesName] = series;
+                        }
+
+                        character.Series = series;
+                        updated++;
+                    }
+
+                    await db.SaveChangesAsync();
+
+                    Logger.LogInformation(
+                        "Series import completed: {Updated} updated, {NotFound} not found",
+                        updated, notFoundNames.Count);
+
+                    return Results.Ok(new ImportSeriesResponse(updated, notFoundNames.Count, notFoundNames));
+                })
+            .Produces<ImportSeriesResponse>()
+            .Produces(401);
+
+        group.MapPost("/process-images", async (
+                ClaimsPrincipal user,
+                MutilsDbContext db) => {
+                    var userId = GetUserId(user);
+                    if (userId is null) return Results.Unauthorized();
+
+                    var charactersNeedingImages = await db.CollectionEntries
+                        .Where(e => e.UserId == userId && e.Character.StoredImageId == null &&
+                            e.Character.OriginalImageUrl != null)
+                        .Select(e => e.Character)
+                        .Distinct()
+                        .ToListAsync();
+
+                    if (charactersNeedingImages.Count == 0) {
+                        return Results.Ok(new ImageStatusResponse(0, 0, 0, 0, 0));
+                    }
+
+                    var existingStoredUrls = await db.StoredImages
+                        .Select(s => s.OriginalUrl)
+                        .ToHashSetAsync();
+
+                    var pendingJobUrls = await db.ImageJobs
+                        .Where(j => j.Status == ImageJobStatus.Pending)
+                        .Select(j => j.OriginalUrl)
+                        .ToHashSetAsync();
+
+                    var newJobs = new List<ImageJob>();
+                    foreach (var character in charactersNeedingImages) {
+                        if (character.OriginalImageUrl is null)
+                            continue;
+
+                        if (existingStoredUrls.Contains(character.OriginalImageUrl))
+                            continue;
+
+                        if (pendingJobUrls.Contains(character.OriginalImageUrl))
+                            continue;
+
+                        newJobs.Add(new ImageJob {
+                            CharacterId = character.Id,
+                            OriginalUrl = character.OriginalImageUrl
+                        });
+                    }
+
+                    if (newJobs.Count > 0) {
+                        db.ImageJobs.AddRange(newJobs);
+                        await db.SaveChangesAsync();
+                    }
+
+                    Logger.LogInformation("Queued {Count} images for processing for user {UserId}", newJobs.Count, userId);
+
+                    return Results.Ok(new ImageStatusResponse(newJobs.Count, 0, 0, 0, 0));
+                })
+            .Produces<ImageStatusResponse>()
+            .Produces(401);
+
+        group.MapGet("/image-status", async (
+                ClaimsPrincipal user,
+                MutilsDbContext db) => {
+                    var userId = GetUserId(user);
+                    if (userId is null) return Results.Unauthorized();
+
+                    var total = await db.CollectionEntries
+                        .Where(e => e.UserId == userId && e.Character.OriginalImageUrl != null)
+                        .CountAsync();
+
+                    var stored = await db.CollectionEntries
+                        .Where(e => e.UserId == userId && e.Character.StoredImageId != null)
+                        .CountAsync();
+
+                    var pending = await db.ImageJobs
+                        .Where(j => j.Character.CollectionEntries.Any(e => e.UserId == userId) &&
+                            j.Status == ImageJobStatus.Pending)
+                        .CountAsync();
+
+                    var processing = await db.ImageJobs
+                        .Where(j => j.Character.CollectionEntries.Any(e => e.UserId == userId) &&
+                            j.Status == ImageJobStatus.Processing)
+                        .CountAsync();
+
+                    var failed = await db.ImageJobs
+                        .Where(j => j.Character.CollectionEntries.Any(e => e.UserId == userId) &&
+                            j.Status == ImageJobStatus.Failed)
+                        .CountAsync();
+
+                    return Results.Ok(new ImageStatusResponse(total, stored, pending, processing, failed));
+                })
+            .WithName("GetImageStatus")
+            .Produces<ImageStatusResponse>()
+            .Produces(401);
+
+        group.MapDelete("/clear", async (
+                ClaimsPrincipal user,
+                MutilsDbContext db) => {
+                    var userId = GetUserId(user);
+                    if (userId is null) return Results.Unauthorized();
+
+                    var entries = await db.CollectionEntries
+                        .Where(e => e.UserId == userId)
+                        .ToListAsync();
+
+                    db.CollectionEntries.RemoveRange(entries);
+                    await db.SaveChangesAsync();
+
+                    return Results.Ok(new ClearCollectionResponse(entries.Count));
+                })
+            .Produces<ClearCollectionResponse>()
+            .Produces(401);
+
+        group.MapPut("/{id}", async (
+                Guid id,
+                ClaimsPrincipal user,
+                UpdateCollectionRequest request,
+                MutilsDbContext db) => {
+                    var userId = GetUserId(user);
+                    if (userId is null) return Results.Unauthorized();
+
+                    var entry = await db.CollectionEntries
+                        .Include(e => e.Character)
+                        .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
+
+                    if (entry is null) return Results.NotFound();
+
+                    entry.Notes = request.Notes;
+
+                    if (request.KeyCount.HasValue) {
+                        entry.Character.KeyCount = request.KeyCount;
+                        entry.Character.KeyType = KeyHelper.GetKeyTypeFromCount(request.KeyCount);
+                    }
+
+                    await db.SaveChangesAsync();
+
+                    return Results.Ok(new UpdateResponse("Updated successfully"));
+                })
+            .Produces<UpdateResponse>()
+            .Produces(401)
+            .Produces(404);
+
+        group.MapDelete("/{id}", async (
+                Guid id,
+                ClaimsPrincipal user,
+                MutilsDbContext db) => {
+                    var userId = GetUserId(user);
+                    if (userId is null) return Results.Unauthorized();
+
+                    var entry = await db.CollectionEntries
+                        .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
+
+                    if (entry is null) return Results.NotFound();
+
+                    db.CollectionEntries.Remove(entry);
+                    await db.SaveChangesAsync();
+
+                    return Results.NoContent();
+                })
+            .Produces(204)
+            .Produces(401)
+            .Produces(404);
+
+        group.MapPost("/{id}/toggle-favorite", async (
+                Guid id,
+                ClaimsPrincipal user,
+                MutilsDbContext db) => {
+                    var userId = GetUserId(user);
+                    if (userId is null) return Results.Unauthorized();
+
+                    var entry = await db.CollectionEntries
+                        .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
+
+                    if (entry is null) return Results.NotFound();
+
+                    entry.IsFavorite = !entry.IsFavorite;
+                    await db.SaveChangesAsync();
+
+                    return Results.Ok(new ToggleFavoriteResponse(entry.IsFavorite));
+                })
+            .Produces<ToggleFavoriteResponse>()
+            .Produces(401)
+            .Produces(404);
+
+        group.MapGet("/images/{id}", async (
+                Guid id,
+                MutilsDbContext db,
+                IStorageService storageService) => {
+                    var storedImage = await db.StoredImages.FindAsync(id);
+                    if (storedImage is null) return Results.NotFound();
+
+                    var stream = await storageService.GetImageAsync(storedImage.BucketName, storedImage.ObjectKey);
+                    if (stream is null) return Results.NotFound();
+
+                    return Results.Stream(stream, storedImage.ContentType);
+                })
+            .AllowAnonymous()
+            .Produces<FileStream>(200, "image/png", "image/jpeg", "image/gif", "image/webp")
+            .Produces(404);
+    }
+
+    private static Guid? GetUserId(ClaimsPrincipal user) {
+        var sub = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return sub is not null ? Guid.Parse(sub) : null;
+    }
+}
+
+public record UpdateCollectionRequest(string? Notes, int? KeyCount = null);

@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Shiron.Mutils.Core.Entities;
-using Shiron.Mutils.Infrastructure.Services;
+using Shiron.Mutils.API.Services.Impl;
+using Shiron.Mutils.DB.Schema;
 using Xunit;
 
 namespace Shiron.Mutils.Tests.Unit;
@@ -121,9 +121,9 @@ public class KakeraLogParserTests {
     [Fact]
     public void ParseKakeraLog_WithDarkTransformingToOrange_ParsesAsDark() {
         var data = """
-            :kakeraD:turns into:kakeraO:
-            :kakeraO:iamshiron +800 ($k)
-            """;
+                   :kakeraD:turns into:kakeraO:
+                   :kakeraO:iamshiron +800 ($k)
+                   """;
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
@@ -135,9 +135,9 @@ public class KakeraLogParserTests {
     [Fact]
     public void ParseKakeraLog_WithDarkTransformingToPurple_ParsesAsDark() {
         var data = """
-            :kakeraD:turns into:kakeraP:
-            :kakeraP:(Free) iamshiron +110 ($k)
-            """;
+                   :kakeraD:turns into:kakeraP:
+                   :kakeraP:(Free) iamshiron +110 ($k)
+                   """;
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
@@ -149,10 +149,10 @@ public class KakeraLogParserTests {
     [Fact]
     public void ParseKakeraLog_WithMultipleLines_ParsesAll() {
         var data = """
-            :kakera:iamshiron +121 ($k)
-            :kakeraT:iamshiron +241 ($k)
-            :kakeraG:iamshiron +283 ($k)
-            """;
+                   :kakera:iamshiron +121 ($k)
+                   :kakeraT:iamshiron +241 ($k)
+                   :kakeraG:iamshiron +283 ($k)
+                   """;
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
@@ -189,10 +189,10 @@ public class KakeraLogParserTests {
     [Fact]
     public void ParseKakeraLog_WithInvalidLine_SkipsLine() {
         var data = """
-            :rollstack:
-            :kakera:iamshiron +121 ($k)
-            :kakeraC:+30 :sp:
-            """;
+                   :rollstack:
+                   :kakera:iamshiron +121 ($k)
+                   :kakeraC:+30 :sp:
+                   """;
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
@@ -210,19 +210,19 @@ public class KakeraLogParserTests {
     [Fact]
     public void ParseKakeraLog_WithRealWorldData_ParsesCorrectly() {
         var data = """
-            Mudae
-            APP
-             — 10/22/2025 7:06 PM
-            :kakera:iamshiron +121 ($k)
-            Mudae
-            APP
-             — 10/22/2025 12:28 PM
-            :kakera:iamshiron +142 ($k)
-            Mudae
-            APP
-             — 10/19/2025 6:46 PM
-            :kakera:iamshiron +147 ($k)
-            """;
+                   Mudae
+                   APP
+                    — 10/22/2025 7:06 PM
+                   :kakera:iamshiron +121 ($k)
+                   Mudae
+                   APP
+                    — 10/22/2025 12:28 PM
+                   :kakera:iamshiron +142 ($k)
+                   Mudae
+                   APP
+                    — 10/19/2025 6:46 PM
+                   :kakera:iamshiron +147 ($k)
+                   """;
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
@@ -247,11 +247,11 @@ public class KakeraLogParserTests {
     [Fact]
     public void ParseKakeraLog_WithDateOnPreviousLine_ParsesDateCorrectly() {
         var data = """
-            Mudae
-            APP
-             — 10/22/2025 7:06 PM
-            :kakera:iamshiron +121 ($k)
-            """;
+                   Mudae
+                   APP
+                    — 10/22/2025 7:06 PM
+                   :kakera:iamshiron +121 ($k)
+                   """;
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
@@ -270,11 +270,11 @@ public class KakeraLogParserTests {
     [Fact]
     public void ParseKakeraLog_WithYesterdayFormat_ParsesDateCorrectly() {
         var data = """
-            Mudae
-            APP
-             — Yesterday at 12:04 PM
-            :kakeraL:breaks down into:kakeraP:+:kakera:+:kakeraT:+:kakeraP: => iamshiron +606 ($k)
-            """;
+                   Mudae
+                   APP
+                    — Yesterday at 12:04 PM
+                   :kakeraL:breaks down into:kakeraP:+:kakera:+:kakeraT:+:kakeraP: => iamshiron +606 ($k)
+                   """;
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
@@ -294,11 +294,11 @@ public class KakeraLogParserTests {
     [Fact]
     public void ParseKakeraLog_WithMultipleDates_TracksDatePerClaim() {
         var data = """
-             — 10/22/2025 7:06 PM
-            :kakera:iamshiron +121 ($k)
-             — 10/21/2025 3:30 PM
-            :kakeraT:iamshiron +241 ($k)
-            """;
+                    — 10/22/2025 7:06 PM
+                   :kakera:iamshiron +121 ($k)
+                    — 10/21/2025 3:30 PM
+                   :kakeraT:iamshiron +241 ($k)
+                   """;
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
@@ -310,13 +310,13 @@ public class KakeraLogParserTests {
     [Fact]
     public void ParseKakeraLog_WithIsoDateFormat_ParsesDateCorrectly() {
         var data = """
-             — 2025-10-11 19:08
-            :kakera:iamshiron +163 ($k)
-            Mudae
-            APP
-             — 2025-10-09 16:41
-            :kakeraT:iamshiron +218 ($k)
-            """;
+                    — 2025-10-11 19:08
+                   :kakera:iamshiron +163 ($k)
+                   Mudae
+                   APP
+                    — 2025-10-09 16:41
+                   :kakeraT:iamshiron +218 ($k)
+                   """;
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
