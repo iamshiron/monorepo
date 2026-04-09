@@ -10,11 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestRouteImport } from './routes/test'
+import { Route as UserRouteRouteImport } from './routes/$user/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UserRepositoriesRouteImport } from './routes/$user/repositories'
+import { Route as UserProfileRouteImport } from './routes/$user/profile'
 
 const TestRoute = TestRouteImport.update({
   id: '/test',
   path: '/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UserRouteRoute = UserRouteRouteImport.update({
+  id: '/$user',
+  path: '/$user',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,30 +30,56 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UserRepositoriesRoute = UserRepositoriesRouteImport.update({
+  id: '/repositories',
+  path: '/repositories',
+  getParentRoute: () => UserRouteRoute,
+} as any)
+const UserProfileRoute = UserProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => UserRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$user': typeof UserRouteRouteWithChildren
   '/test': typeof TestRoute
+  '/$user/profile': typeof UserProfileRoute
+  '/$user/repositories': typeof UserRepositoriesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$user': typeof UserRouteRouteWithChildren
   '/test': typeof TestRoute
+  '/$user/profile': typeof UserProfileRoute
+  '/$user/repositories': typeof UserRepositoriesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$user': typeof UserRouteRouteWithChildren
   '/test': typeof TestRoute
+  '/$user/profile': typeof UserProfileRoute
+  '/$user/repositories': typeof UserRepositoriesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/test'
+  fullPaths: '/' | '/$user' | '/test' | '/$user/profile' | '/$user/repositories'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/test'
-  id: '__root__' | '/' | '/test'
+  to: '/' | '/$user' | '/test' | '/$user/profile' | '/$user/repositories'
+  id:
+    | '__root__'
+    | '/'
+    | '/$user'
+    | '/test'
+    | '/$user/profile'
+    | '/$user/repositories'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  UserRouteRoute: typeof UserRouteRouteWithChildren
   TestRoute: typeof TestRoute
 }
 
@@ -58,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$user': {
+      id: '/$user'
+      path: '/$user'
+      fullPath: '/$user'
+      preLoaderRoute: typeof UserRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,11 +106,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$user/repositories': {
+      id: '/$user/repositories'
+      path: '/repositories'
+      fullPath: '/$user/repositories'
+      preLoaderRoute: typeof UserRepositoriesRouteImport
+      parentRoute: typeof UserRouteRoute
+    }
+    '/$user/profile': {
+      id: '/$user/profile'
+      path: '/profile'
+      fullPath: '/$user/profile'
+      preLoaderRoute: typeof UserProfileRouteImport
+      parentRoute: typeof UserRouteRoute
+    }
   }
 }
 
+interface UserRouteRouteChildren {
+  UserProfileRoute: typeof UserProfileRoute
+  UserRepositoriesRoute: typeof UserRepositoriesRoute
+}
+
+const UserRouteRouteChildren: UserRouteRouteChildren = {
+  UserProfileRoute: UserProfileRoute,
+  UserRepositoriesRoute: UserRepositoriesRoute,
+}
+
+const UserRouteRouteWithChildren = UserRouteRoute._addFileChildren(
+  UserRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  UserRouteRoute: UserRouteRouteWithChildren,
   TestRoute: TestRoute,
 }
 export const routeTree = rootRouteImport
