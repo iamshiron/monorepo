@@ -14,7 +14,6 @@ using Shiron.Mutils.DB;
 using Shiron.Mutils.API.Services.Impl;
 
 Env.TraversePath().Load();
-
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MutilsDbContext>(options =>
     options.UseNpgsql(

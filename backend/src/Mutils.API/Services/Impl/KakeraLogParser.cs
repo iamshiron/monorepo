@@ -33,9 +33,11 @@ public partial class KakeraLogParser : IKakeraLogParser {
 
             var dateMatch = DateLineRegex().Match(trimmed);
             if (dateMatch.Success) {
+                var dateStr = dateMatch.Value.Replace(",", "");
+                string[] dateFormats = ["M/d/yy h:mm tt", "M/d/yyyy h:mm tt", "MM/dd/yy h:mm tt", "MM/dd/yyyy h:mm tt"];
                 if (DateTime.TryParseExact(
-                    dateMatch.Value,
-                    "M/d/yyyy h:mm tt",
+                    dateStr,
+                    dateFormats,
                     CultureInfo.InvariantCulture,
                     DateTimeStyles.None,
                     out var parsedDate)) {
@@ -132,7 +134,7 @@ public partial class KakeraLogParser : IKakeraLogParser {
     }
 
     [GeneratedRegex(
-        @"\d{1,2}/\d{1,2}/\d{4}\s+\d{1,2}:\d{2}\s+(?:AM|PM)",
+        @"\d{1,2}/\d{1,2}/\d{2,4},?\s+\d{1,2}:\d{2}\s*(?:AM|PM)",
         RegexOptions.IgnoreCase | RegexOptions.Compiled)]
     private static partial Regex DateLineRegex();
 
@@ -142,12 +144,12 @@ public partial class KakeraLogParser : IKakeraLogParser {
     private static partial Regex IsoDateLineRegex();
 
     [GeneratedRegex(
-        @"Yesterday\s+at\s+(?<time>\d{1,2}:\d{2})(?:\s+(?:AM|PM))?",
+        @"Yesterday\s+at\s+(?<time>\d{1,2}:\d{2}(?:\s*[AP]M)?)",
         RegexOptions.IgnoreCase | RegexOptions.Compiled)]
     private static partial Regex YesterdayRegex();
 
     [GeneratedRegex(
-        @"^—\s*(?<time>\d{1,2}:\d{2})$",
+        @"^—\s*(?<time>\d{1,2}:\d{2}(?:\s*[AP]M)?)$",
         RegexOptions.Compiled)]
     private static partial Regex TodayTimeRegex();
 
