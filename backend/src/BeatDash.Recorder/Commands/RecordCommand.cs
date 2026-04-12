@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using Shiron.BeatDash.Data;
 using Shiron.BeatDash.Data.Models;
+using Shiron.BeatDash.Recorder.Types;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using Spectre.Console.Rendering;
@@ -10,14 +11,12 @@ namespace Shiron.BeatDash.Recorder.Commands;
 
 public sealed class RecordCommand : AsyncCommand<RecordCommand.Settings> {
     public sealed class Settings : CommandSettings {
-        [CommandArgument(0, "[output]")]
-        public string Output { get; set; } = "./.recordings";
+        [CommandArgument(0, "[output]")] public string Output { get; set; } = "./.recordings";
 
-        [CommandOption("-h|--host")]
-        public string Host { get; set; } = "ws://127.0.0.1:2946";
+        [CommandOption("-h|--host")] public string Host { get; set; } = "ws://127.0.0.1:2946";
     }
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken) {
+    protected async override Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken) {
         if (!Directory.Exists(settings.Output))
             Directory.CreateDirectory(settings.Output);
 
@@ -48,7 +47,8 @@ public sealed class RecordCommand : AsyncCommand<RecordCommand.Settings> {
 
         client.OnMapFinished += (_, args) => {
             var s = args.Session;
-            eventLog.Add($"[green]MapFinished[/] {s.SongName.EscapeMarkup()} | Score: {s.FinalScore:N0} | Acc: {s.FinalAccuracy:F2}% | Rank: {s.FinalRank.EscapeMarkup()}");
+            eventLog.Add(
+                $"[green]MapFinished[/] {s.SongName.EscapeMarkup()} | Score: {s.FinalScore:N0} | Acc: {s.FinalAccuracy:F2}% | Rank: {s.FinalRank.EscapeMarkup()}");
         };
 
         client.OnMapSuccess += (_, args) => {
@@ -105,8 +105,6 @@ public sealed class RecordCommand : AsyncCommand<RecordCommand.Settings> {
 
         return 0;
     }
-
-    private record RecordedMessage(DateTimeOffset Timestamp, string Endpoint, string Message);
 }
 
 file class EventLog(int maxEntries) {
@@ -145,7 +143,7 @@ file class RecorderDisplay(BeatDashEventClient client, EventLog eventLog, string
             new Rule().DoubleBorder(),
             BuildEventLogSection(),
             new Rule().DoubleBorder(),
-            new Markup($"  [grey]{outFile.EscapeMarkup()}[/]"),
+            new Markup($"  [grey]{outFile.EscapeMarkup()}[/]")
         };
 
         return new Panel(new Rows(content))
@@ -157,7 +155,7 @@ file class RecorderDisplay(BeatDashEventClient client, EventLog eventLog, string
     private IRenderable BuildConnectionsSection() {
         var now = DateTimeOffset.UtcNow;
         var rows = new List<IRenderable> {
-            new Markup("  [bold]Connections[/]"),
+            new Markup("  [bold]Connections[/]")
         };
 
         foreach (var ep in client.Endpoints.Values.OrderBy(e => e.Name)) {
@@ -208,7 +206,8 @@ file class RecorderDisplay(BeatDashEventClient client, EventLog eventLog, string
         return new Rows(
             new Markup($"  {statusLabel}"),
             new Markup($"  [bold white]{session.SongName.EscapeMarkup()}[/] — [grey]{session.SongAuthor.EscapeMarkup()}[/]"),
-            new Markup($"  [grey]{session.Difficulty.EscapeMarkup()} | {session.MapType.EscapeMarkup()} | BPM {session.BPM} | NJS {session.NJS:F1}{noFail}{bsr}[/]"),
+            new Markup(
+                $"  [grey]{session.Difficulty.EscapeMarkup()} | {session.MapType.EscapeMarkup()} | BPM {session.BPM} | NJS {session.NJS:F1}{noFail}{bsr}[/]"),
             new Markup($"  {elapsed} / {total}"),
             new Markup($"  Score: [bold]{score:N0}[/] ({rank.EscapeMarkup()}) | Combo: {combo} | {fc} | Acc: {accuracy:F2}%")
         );
@@ -228,7 +227,7 @@ file class RecorderDisplay(BeatDashEventClient client, EventLog eventLog, string
     private IRenderable BuildEventLogSection() {
         var entries = eventLog.GetEntries();
         var rows = new List<IRenderable> {
-            new Markup("  [bold]Event Log[/]"),
+            new Markup("  [bold]Event Log[/]")
         };
 
         if (entries.Count == 0) {

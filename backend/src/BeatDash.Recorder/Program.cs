@@ -8,5 +8,6 @@ app.Configure(c => {
 
     c.AddCommand<RecordCommand>("record");
     c.AddCommand<ReplayCommand>("replay");
+    c.AddCommand<AnalyzeCommand>("analyze");
 });
 await app.RunAsync(args);
