@@ -1,6 +1,5 @@
 using System.Text.Json;
 using Shiron.BeatDash.Data.Models;
-using Shiron.BeatDash.Recorder.Types;
 using Spectre.Console;
 using Spectre.Console.Cli;
 

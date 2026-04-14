@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using Shiron.BeatDash.Data;
 using Shiron.BeatDash.Data.Models;
-using Shiron.BeatDash.Recorder.Types;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using Spectre.Console.Rendering;

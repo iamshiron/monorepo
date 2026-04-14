@@ -9,5 +9,6 @@ app.Configure(c => {
     c.AddCommand<RecordCommand>("record");
     c.AddCommand<ReplayCommand>("replay");
     c.AddCommand<AnalyzeCommand>("analyze");
+    c.AddCommand<UploadCommand>("upload");
 });
 await app.RunAsync(args);
