@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using Shiron.HonamiGit.API.DTOs;
+using Shiron.Archive.API.DTOs;
 using Shiron.HonamiGit.API.Services;
 
 namespace Shiron.HonamiGit.API.Endpoints;

@@ -5,7 +5,7 @@ using Shiron.Lib.Types;
 using Shiron.Lib.Types.Extension;
 using Shiron.TheArchive.DB;
 using Shiron.HonamiGit.DB.Schema;
-using Shiron.HonamiGit.API.DTOs;
+using Shiron.Archive.API.DTOs;
 using Shiron.TheArchive.API.Services;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -287,37 +287,44 @@ public static class ImageEndpoints {
         };
     }
 
-    private static ColorPackDto MapFromColorPack(ColorPack pack) {
+    internal static ColorPackDto MapFromColorPack(ColorPack pack) {
         return new ColorPackDto {
             Color = new Color32Dto { R = pack.Color.R, G = pack.Color.G, B = pack.Color.B, A = pack.Color.A },
             Lab = new LabColorDto { L = pack.Lab.L, A = pack.Lab.A, B = pack.Lab.B }
         };
     }
 
-    private static ColorPack MapToColorPack(ColorPackDto dto) {
+    internal static ColorPack MapToColorPack(ColorPackDto dto) {
         return new ColorPack {
             Color = new Color32(dto.Color.R, dto.Color.G, dto.Color.B, dto.Color.A),
             Lab = new LabColor(dto.Lab.L, dto.Lab.A, dto.Lab.B)
         };
     }
 
-    private static string EncodeBlurHash(SixLabors.ImageSharp.Image image) {
+    internal static string EncodeBlurHash(SixLabors.ImageSharp.Image image) {
         using var cloned = image.CloneAs<Rgba32>();
         cloned.Mutate(x => x.Resize(64, 0));
-        using var ms = new MemoryStream();
-        cloned.SaveAsBmp(ms);
-        var pixels = ms.ToArray();
-
-        var bmpHeaderSize = 54;
         var width = cloned.Width;
         var height = cloned.Height;
-        var stride = width * 4;
 
-        var pixelSpan = new ReadOnlySpan<byte>(pixels, bmpHeaderSize, width * height * 4);
+        var pixelData = new byte[width * height * 4];
+        for (var y = 0; y < height; y++) {
+            var row = cloned.Frames.RootFrame.PixelBuffer.DangerousGetRowSpan(y);
+            for (var x = 0; x < width; x++) {
+                var idx = (y * width + x) * 4;
+                pixelData[idx] = row[x].R;
+                pixelData[idx + 1] = row[x].G;
+                pixelData[idx + 2] = row[x].B;
+                pixelData[idx + 3] = row[x].A;
+            }
+        }
+
+        var stride = width * 4;
+        var pixelSpan = new ReadOnlySpan<byte>(pixelData);
         return CoreBlurHashEncoder.Encode(4, 3, width, height, pixelSpan, stride, PixelFormat.RGB888x);
     }
 
-    private static (ColorPack Primary, ColorPack Secondary, List<ColorPack> Palette) ExtractColors(SixLabors.ImageSharp.Image image) {
+    internal static (ColorPack Primary, ColorPack Secondary, List<ColorPack> Palette) ExtractColors(SixLabors.ImageSharp.Image image) {
         using var cloned = image.CloneAs<Rgba32>();
         var quantizer = new OctreeQuantizer(new QuantizerOptions { MaxColors = 8 });
 
@@ -332,13 +339,23 @@ public static class ImageEndpoints {
             }
         }
 
-        var primary = colorPacks.Count > 0
-            ? colorPacks[0]
-            : new ColorPack {
+        ColorPack primary;
+        ColorPack secondary;
+        if (colorPacks.Count > 0) {
+            primary = new ColorPack { Color = colorPacks[0].Color, Lab = new LabColor(colorPacks[0].Lab.L, colorPacks[0].Lab.A, colorPacks[0].Lab.B) };
+            secondary = colorPacks.Count > 1
+                ? new ColorPack { Color = colorPacks[1].Color, Lab = new LabColor(colorPacks[1].Lab.L, colorPacks[1].Lab.A, colorPacks[1].Lab.B) }
+                : new ColorPack { Color = colorPacks[0].Color, Lab = new LabColor(colorPacks[0].Lab.L, colorPacks[0].Lab.A, colorPacks[0].Lab.B) };
+        } else {
+            primary = new ColorPack {
                 Color = new Color32(128, 128, 128, 255),
                 Lab = new LabColor(53.39, 0, 0)
             };
-        var secondary = colorPacks.Count > 1 ? colorPacks[1] : primary;
+            secondary = new ColorPack {
+                Color = new Color32(128, 128, 128, 255),
+                Lab = new LabColor(53.39, 0, 0)
+            };
+        }
 
         return (primary, secondary, colorPacks);
     }

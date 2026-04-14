@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shiron.TheArchive.DB;
 using Shiron.HonamiGit.DB.Schema;
-using Shiron.HonamiGit.API.DTOs;
+using Shiron.Archive.API.DTOs;
 
 namespace Shiron.HonamiGit.API.Endpoints;
 
@@ -42,6 +42,15 @@ public static class BrandEndpoints {
             .WithDescription("Delete a brand")
             .RequireAuthorization("Admin")
             .Produces(204)
+            .Produces(401)
+            .Produces(403)
+            .Produces(404);
+
+        group.MapGet("/{id:guid}/models", GetModelsByBrand)
+            .WithName("GetModelsByBrand")
+            .WithDescription("Get models for a brand")
+            .RequireAuthorization("Admin")
+            .Produces<List<ModelDto>>()
             .Produces(401)
             .Produces(403)
             .Produces(404);
@@ -146,5 +155,26 @@ public static class BrandEndpoints {
         db.Brands.Remove(brand);
         await db.SaveChangesAsync();
         return Results.NoContent();
+    }
+
+    private static async Task<IResult> GetModelsByBrand(Guid id, ArchiveDbContext db) {
+        var brandExists = await db.Brands.AnyAsync(b => b.ID == id);
+        if (!brandExists) return Results.NotFound();
+
+        var models = await db.Models
+            .Where(m => m.BrandID == id)
+            .OrderBy(m => m.Name)
+            .Select(m => new ModelDto {
+                ID = m.ID,
+                Name = m.Name,
+                BrandID = m.BrandID,
+                BrandName = m.Brand.Name,
+                CarCount = m.Cars.Count,
+                CreatedAt = m.CreatedAt,
+                UpdatedAt = m.UpdatedAt
+            })
+            .ToListAsync();
+
+        return Results.Ok(models);
     }
 }

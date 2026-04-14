@@ -24,7 +24,7 @@ public class Image : BaseEntity {
 
     // Foreign Keys
     public Character? Character { get; set; }
-    public Guid CharacterID { get; set; }
+    public Guid? CharacterID { get; set; }
 
     public IList<CarEntity> Cars { get; set; } = [];
 }

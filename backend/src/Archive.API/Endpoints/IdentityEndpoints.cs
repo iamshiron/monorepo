@@ -108,21 +108,21 @@ public static class IdentityEndpoints {
 }
 
 public record RegisterDto {
-    [Required] [MaxLength(32)] public required string DisplayName { get; init; }
-    [Required] [MaxLength(32)] public required string UserName { get; init; }
-    [Required] [EmailAddress] public required string Email { get; init; }
-    [Required] [MinLength(4)] public required string Password { get; init; }
+    [Required][MaxLength(32)] public required string DisplayName { get; init; }
+    [Required][MaxLength(32)] public required string UserName { get; init; }
+    [Required][EmailAddress] public required string Email { get; init; }
+    [Required][MinLength(4)] public required string Password { get; init; }
 }
 
 public record LoginDto {
-    [Required] [EmailAddress] public required string Email { get; init; }
+    [Required][EmailAddress] public required string Email { get; init; }
     [Required] public required string Password { get; init; }
     public bool RememberMe { get; init; }
 }
 
 public record ChangePasswordDto {
     [Required] public required string CurrentPassword { get; init; }
-    [Required] [MinLength(4)] public required string NewPassword { get; init; }
+    [Required][MinLength(4)] public required string NewPassword { get; init; }
 }
 
 public record UserInfoDto {

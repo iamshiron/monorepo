@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Shiron.HonamiGit.API.DTOs;
+namespace Shiron.Archive.API.DTOs;
 
 public record ApiKeyCreateDto {
-    [Required] [MaxLength(64)] public required string Name { get; init; }
+    [Required][MaxLength(64)] public required string Name { get; init; }
     public DateTime? ExpiresAt { get; init; }
     public List<string>? Roles { get; init; }
 }

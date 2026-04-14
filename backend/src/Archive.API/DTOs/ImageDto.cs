@@ -1,6 +1,6 @@
 using Shiron.Lib.Types;
 
-namespace Shiron.HonamiGit.API.DTOs;
+namespace Shiron.Archive.API.DTOs;
 
 public record ColorPackDto {
     public required Color32Dto Color { get; init; }
@@ -20,6 +20,14 @@ public record LabColorDto {
     public double L { get; init; }
     public double A { get; init; }
     public double B { get; init; }
+}
+
+public record SimpleImageDto {
+    public required Guid ID { get; init; }
+    public required string Url { get; init; }
+    public required string BlurHash { get; init; }
+    public required int Width { get; init; }
+    public required int Height { get; init; }
 }
 
 public record ImageDto {

@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Shiron.TheArchive.DB;
 using Shiron.HonamiGit.DB.Schema;
-using Shiron.HonamiGit.API.DTOs;
+using Shiron.Archive.API.DTOs;
+using Shiron.TheArchive.API.Services;
+using DBImage = Shiron.HonamiGit.DB.Schema.Image;
+using SixLabors.ImageSharp;
 
 namespace Shiron.HonamiGit.API.Endpoints;
 
@@ -43,6 +46,16 @@ public static class CarEndpoints {
             .WithDescription("Delete a car")
             .RequireAuthorization("Admin")
             .Produces(204)
+            .Produces(401)
+            .Produces(403)
+            .Produces(404);
+
+        group.MapPost("/{id:guid}/images", UploadCarImage)
+            .WithName("UploadCarImage")
+            .WithDescription("Upload and attach an image to a car, converting to WebP before storage")
+            .RequireAuthorization("Admin")
+            .DisableAntiforgery()
+            .Produces<ImageDto>(201)
             .Produces(401)
             .Produces(403)
             .Produces(404);
@@ -157,7 +170,13 @@ public static class CarEndpoints {
             Color = car.Color,
             InteriorColor = car.InteriorColor,
             InteriorType = car.InteriorType,
-            ImageIDs = car.Images.Select(i => i.ID).ToList(),
+            Images = car.Images.Select(i => new SimpleImageDto {
+                ID = i.ID,
+                Url = $"/api/images/{i.ID}.webp",
+                BlurHash = i.BlurHash,
+                Width = i.Width,
+                Height = i.Height
+            }).ToList(),
             CreatedAt = car.CreatedAt,
             UpdatedAt = car.UpdatedAt
         });
@@ -224,7 +243,13 @@ public static class CarEndpoints {
             Color = car.Color,
             InteriorColor = car.InteriorColor,
             InteriorType = car.InteriorType,
-            ImageIDs = car.Images.Select(i => i.ID).ToList(),
+            Images = car.Images.Select(i => new SimpleImageDto {
+                ID = i.ID,
+                Url = $"/api/images/{i.ID}.webp",
+                BlurHash = i.BlurHash,
+                Width = i.Width,
+                Height = i.Height
+            }).ToList(),
             CreatedAt = car.CreatedAt,
             UpdatedAt = car.UpdatedAt
         });
@@ -304,7 +329,13 @@ public static class CarEndpoints {
             Color = car.Color,
             InteriorColor = car.InteriorColor,
             InteriorType = car.InteriorType,
-            ImageIDs = car.Images.Select(i => i.ID).ToList(),
+            Images = car.Images.Select(i => new SimpleImageDto {
+                ID = i.ID,
+                Url = $"/api/images/{i.ID}.webp",
+                BlurHash = i.BlurHash,
+                Width = i.Width,
+                Height = i.Height
+            }).ToList(),
             CreatedAt = car.CreatedAt,
             UpdatedAt = car.UpdatedAt
         });
@@ -317,6 +348,62 @@ public static class CarEndpoints {
         db.Cars.Remove(car);
         await db.SaveChangesAsync();
         return Results.NoContent();
+    }
+
+    private static async Task<IResult> UploadCarImage(
+        Guid id,
+        IFormFile file,
+        ArchiveDbContext db,
+        IStorageService storage,
+        IConfiguration config) {
+        var car = await db.Cars.Include(c => c.Images).FirstOrDefaultAsync(c => c.ID == id);
+        if (car == null) return Results.NotFound();
+
+        if (file.Length == 0) return Results.BadRequest("No file provided");
+
+        await using var inputStream = file.OpenReadStream();
+        using var sharpImage = SixLabors.ImageSharp.Image.Load(inputStream);
+
+        var objectKey = $"images/{DateTime.UtcNow:yyyy/MM/dd}/{Guid.CreateVersion7()}.webp";
+
+        var blurHash = ImageEndpoints.EncodeBlurHash(sharpImage);
+        var (primaryColor, secondaryColor, palette) = ImageEndpoints.ExtractColors(sharpImage);
+
+        using var uploadStream = new MemoryStream();
+        await sharpImage.SaveAsWebpAsync(uploadStream);
+        uploadStream.Position = 0;
+
+        var bucket = config["ARCHIVE_MINIO_BUCKET_IMAGES"] ?? "archive-images";
+        await storage.StoreAsync(bucket, objectKey, uploadStream, "image/webp");
+
+        var dbImage = new DBImage {
+            Bucket = bucket,
+            ObjectKey = objectKey,
+            Width = sharpImage.Width,
+            Height = sharpImage.Height,
+            BlurHash = blurHash,
+            PrimaryColor = primaryColor,
+            SecondaryColor = secondaryColor,
+            Palette = palette
+        };
+
+        car.Images.Add(dbImage);
+        await db.SaveChangesAsync();
+
+        return Results.Created($"/api/images/{dbImage.ID}", new ImageDto {
+            ID = dbImage.ID,
+            Bucket = dbImage.Bucket,
+            ObjectKey = dbImage.ObjectKey,
+            Width = dbImage.Width,
+            Height = dbImage.Height,
+            BlurHash = dbImage.BlurHash,
+            PrimaryColor = ImageEndpoints.MapFromColorPack(dbImage.PrimaryColor),
+            SecondaryColor = ImageEndpoints.MapFromColorPack(dbImage.SecondaryColor),
+            Palette = dbImage.Palette.Select(ImageEndpoints.MapFromColorPack).ToList(),
+            CarIDs = [car.ID],
+            CreatedAt = dbImage.CreatedAt,
+            UpdatedAt = dbImage.UpdatedAt
+        });
     }
 
     private static IQueryable<Car> ApplySorting(IQueryable<Car> query, string? sortBy, bool descending) {

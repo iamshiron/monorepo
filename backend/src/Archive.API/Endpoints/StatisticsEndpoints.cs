@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shiron.TheArchive.DB;
 using Shiron.HonamiGit.DB.Schema;
-using Shiron.HonamiGit.API.DTOs;
+using Shiron.Archive.API.DTOs;
 
 namespace Shiron.HonamiGit.API.Endpoints;
 

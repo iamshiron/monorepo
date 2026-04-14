@@ -1,4 +1,4 @@
-namespace Shiron.HonamiGit.API.DTOs;
+namespace Shiron.Archive.API.DTOs;
 
 public record BrandDto {
     public Guid ID { get; init; }

@@ -1,6 +1,6 @@
 using Shiron.HonamiGit.DB.Schema;
 
-namespace Shiron.HonamiGit.API.DTOs;
+namespace Shiron.Archive.API.DTOs;
 
 public record CarDto {
     public Guid ID { get; init; }
@@ -24,7 +24,7 @@ public record CarDto {
     public ExteriorColor? Color { get; init; }
     public InteriorColor? InteriorColor { get; init; }
     public InteriorType? InteriorType { get; init; }
-    public List<Guid> ImageIDs { get; init; } = [];
+    public List<SimpleImageDto> Images { get; init; } = [];
     public DateTime CreatedAt { get; init; }
     public DateTime UpdatedAt { get; init; }
 }
