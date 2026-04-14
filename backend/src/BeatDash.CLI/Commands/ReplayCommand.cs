@@ -1,7 +1,7 @@
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-namespace Shiron.BeatDash.Recorder.Commands;
+namespace Shiron.BeatDash.CLI.Commands;
 
 public sealed class ReplayCommand : AsyncCommand<ReplayCommand.Settings> {
     public sealed class Settings : CommandSettings {

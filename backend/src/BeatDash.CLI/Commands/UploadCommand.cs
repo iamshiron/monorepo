@@ -5,7 +5,7 @@ using Shiron.BeatDash.Data.Models;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-namespace Shiron.BeatDash.Recorder.Commands;
+namespace Shiron.BeatDash.CLI.Commands;
 
 public class UploadCommand : AsyncCommand<UploadCommand.Settings> {
     public sealed class Settings : CommandSettings {
@@ -28,7 +28,7 @@ public class UploadCommand : AsyncCommand<UploadCommand.Settings> {
         using var http = new HttpClient { Timeout = TimeSpan.FromMinutes(10) };
         using var fileStream = File.OpenRead(settings.File);
         using var compressed = new MemoryStream();
-        await using (var gzip = new GZipStream(compressed, CompressionLevel.Fastest, leaveOpen: true)) {
+        await using (var gzip = new GZipStream(compressed, CompressionLevel.Fastest, true)) {
             await fileStream.CopyToAsync(gzip, cancellationToken);
         }
         compressed.Position = 0;
@@ -47,7 +47,7 @@ public class UploadCommand : AsyncCommand<UploadCommand.Settings> {
             return 1;
         }
 
-        var result = await response.Content.ReadFromJsonAsync<UploadResult>(cancellationToken: cancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<UploadResult>(cancellationToken);
         if (result != null) {
             AnsiConsole.MarkupLine($"[green]Upload complete[/] — [bold]{result.Sessions}[/] sessions, [bold]{result.Snapshots}[/] snapshots");
         }

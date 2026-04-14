@@ -1,9 +1,9 @@
-using Shiron.BeatDash.Recorder.Commands;
+using Shiron.BeatDash.CLI.Commands;
 using Spectre.Console.Cli;
 
 var app = new CommandApp();
 app.Configure(c => {
-    c.SetApplicationName("bdrecorder");
+    c.SetApplicationName("bdcli");
     c.SetApplicationVersion("0.0.0");
 
     c.AddCommand<RecordCommand>("record");

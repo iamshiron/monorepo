@@ -6,7 +6,7 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using Spectre.Console.Rendering;
 
-namespace Shiron.BeatDash.Recorder.Commands;
+namespace Shiron.BeatDash.CLI.Commands;
 
 public sealed class RecordCommand : AsyncCommand<RecordCommand.Settings> {
     public sealed class Settings : CommandSettings {

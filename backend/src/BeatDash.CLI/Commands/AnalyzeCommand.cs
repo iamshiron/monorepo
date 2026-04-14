@@ -3,7 +3,7 @@ using Shiron.BeatDash.Data.Models;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-namespace Shiron.BeatDash.Recorder.Commands;
+namespace Shiron.BeatDash.CLI.Commands;
 
 public class AnalyzedMapSession {
     public string? Hash { get; set; }
@@ -100,7 +100,7 @@ public class AnalyzedMapSession {
             WasFullComboThroughout = s.WasFullComboThroughout,
             FinalBlockHitScore = s.FinalBlockHitScore,
             DurationPlayed = s.DurationPlayed,
-            Snapshots = s.Snapshots,
+            Snapshots = s.Snapshots
         };
     }
 }
@@ -116,7 +116,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings> {
 
         AnsiConsole.MarkupLine($"[grey]Analyzing file [green]{file}[/][/]...");
         var data = await JsonSerializer.DeserializeAsync<IList<RecordedMessage>>(
-            System.IO.File.OpenRead(file),
+            File.OpenRead(file),
             cancellationToken: cancellationToken
         );
         if (data == null || data.Count == 0) throw new Exception("No data found in file");
@@ -133,7 +133,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings> {
                     if (mapData?.Hash == null) continue;
 
                     var isEndSignal = mapData.LevelFinished || mapData.LevelQuit
-                        || (mapData.LevelFailed && !mapData.Modifiers.NoFailOn0Energy);
+                        || mapData.LevelFailed && !mapData.Modifiers.NoFailOn0Energy;
 
                     if (isEndSignal) {
                         if (current != null) {
@@ -177,7 +177,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings> {
                             PreviousRecord = mapData.PreviousRecord,
                             PreviousBSR = mapData.PreviousBSR,
                             StartedAt = message.Timestamp,
-                            NoFailEnabled = mapData.Modifiers.NoFailOn0Energy,
+                            NoFailEnabled = mapData.Modifiers.NoFailOn0Energy
                         };
                     } else {
                         current.IsPaused = mapData.LevelPaused;
@@ -203,7 +203,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings> {
                         NotesSpawned = liveData.NotesSpawned,
                         FullCombo = liveData.FullCombo,
                         Rank = liveData.Rank,
-                        BlockHitScore = liveData.BlockHitScore,
+                        BlockHitScore = liveData.BlockHitScore
                     });
 
                     continue;
