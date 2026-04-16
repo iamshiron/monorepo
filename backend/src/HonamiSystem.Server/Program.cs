@@ -6,9 +6,6 @@ using Shiron.HonamiSystem.Server.Services;
 using Shiron.HonamiSystem.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var pluginRegistry = new PluginRegistry();
@@ -16,10 +13,13 @@ builder.Services.AddSingleton<IPluginRegistry>(pluginRegistry);
 
 var app = builder.Build();
 pluginRegistry.RegisterPlugin(new ExamplePlugin(), app.Logger);
-
 pluginRegistry.Initialize();
 
-// Configure the HTTP request pipeline.
+app.Logger.LogInformation("Registered plugin components:");
+foreach (var plugin in pluginRegistry.Plugins) {
+    app.Logger.LogInformation($"- {plugin.Name}: {string.Join(", ", plugin.Components.Select(c => $"{c.Value.Name} ({c.Key})"))}");
+}
+
 if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
     app.MapScalarApiReference(options => {

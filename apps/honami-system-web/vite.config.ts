@@ -1,7 +1,7 @@
-import { defineConfig } from "vite";
+import {defineConfig} from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import { TanStackRouterVite } from "@tanstack/router-vite-plugin";
+import {TanStackRouterVite} from "@tanstack/router-vite-plugin";
 import path from "path";
 
 export default defineConfig({
@@ -14,10 +14,10 @@ export default defineConfig({
         },
     },
     server: {
-        port: 1912,
+        port: 1913,
         proxy: {
             "/api": {
-                target: "http://localhost:1812",
+                target: "http://localhost:2013",
                 changeOrigin: true,
             },
         },

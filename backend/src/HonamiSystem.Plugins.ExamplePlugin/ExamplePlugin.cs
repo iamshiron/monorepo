@@ -1,10 +1,13 @@
 using Microsoft.Extensions.Logging;
+using Shiron.HonamiSystem.Plugins.ExamplePlugin.Components;
 using Shiron.HonamiSystem.SDK;
 
 namespace Shiron.HonamiSystem.Plugins.ExamplePlugin;
 
 public class ExamplePlugin() : HonamiPlugin("io.shiron", "example", "0.0.0") {
     public override void Initialize() {
+        RegisterComponent("example", new ExampleComponent());
+
         Logger.LogInformation("Example plugin initialized");
     }
     public override void Dispose() {
