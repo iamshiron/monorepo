@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Shiron.Lib.Types.EFCore;
-using Shiron.HonamiGit.DB.Schema;
+using Shiron.HonamiSystem.Schema;
 
 namespace Shiron.TheArchive.DB;
 

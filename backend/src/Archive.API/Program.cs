@@ -8,7 +8,7 @@ using Shiron.HonamiGit.API.Configuration;
 using Shiron.HonamiGit.API.Endpoints;
 using Shiron.TheArchive.API.Services;
 using Shiron.TheArchive.DB;
-using Shiron.HonamiGit.DB.Schema;
+using Shiron.HonamiSystem.Schema;
 
 Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);

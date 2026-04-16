@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Shiron.HonamiGit.DB.Schema;
+namespace Shiron.HonamiSystem.Schema;
 
 public enum Gender {
     Male,

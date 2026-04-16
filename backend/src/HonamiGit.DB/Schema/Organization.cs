@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Shiron.HonamiGit.DB.Schema;
+namespace Shiron.HonamiSystem.Schema;
 
 public class Organization : BaseEntity {
     [MaxLength(32)] public required string Name { get; set; }

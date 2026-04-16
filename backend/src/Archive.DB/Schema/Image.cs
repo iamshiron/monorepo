@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Shiron.Lib.Types;
 
-namespace Shiron.HonamiGit.DB.Schema;
+namespace Shiron.HonamiSystem.Schema;
 
 using CarEntity = Car;
 

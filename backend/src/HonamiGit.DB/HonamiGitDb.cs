@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Shiron.HonamiGit.DB.Schema;
+using Shiron.HonamiSystem.Schema;
 
 namespace Shiron.HonamiGit.DB;
 

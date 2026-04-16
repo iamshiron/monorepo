@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using Shiron.Lib.Types;
 using Shiron.Lib.Types.Extension;
 using Shiron.TheArchive.DB;
-using Shiron.HonamiGit.DB.Schema;
+using Shiron.HonamiSystem.Schema;
 using Shiron.Archive.API.DTOs;
 using Shiron.TheArchive.API.Services;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Quantization;
-using DBImage = Shiron.HonamiGit.DB.Schema.Image;
+using DBImage = Shiron.HonamiSystem.Schema.Image;
 
 namespace Shiron.HonamiGit.API.Endpoints;
 

@@ -9,6 +9,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Identity"/>
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore"/>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
+        <PackageReference Include="Pgvector.EntityFrameworkCore"/>
         <PackageReference Include="System.Security.Cryptography.Xml"/>
     </ItemGroup>
 

@@ -87,7 +87,7 @@ public static class ApiKeyEndpoints {
         return Guid.Parse(claim);
     }
 
-    private static ApiKeyDto MapToDto(DB.Schema.ApiKey apiKey) {
+    private static ApiKeyDto MapToDto(HonamiSystem.Schema.ApiKey apiKey) {
         return new ApiKeyDto {
             ID = apiKey.ID,
             Name = apiKey.Name,

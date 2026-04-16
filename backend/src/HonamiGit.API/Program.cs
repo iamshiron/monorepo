@@ -8,7 +8,7 @@ using Shiron.HonamiGit.API.Configuration;
 using Shiron.HonamiGit.API.Endpoints;
 using Shiron.HonamiGit.API.Services;
 using Shiron.HonamiGit.DB;
-using Shiron.HonamiGit.DB.Schema;
+using Shiron.HonamiSystem.Schema;
 
 Env.TraversePath().Load();
 

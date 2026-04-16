@@ -1,4 +1,4 @@
-using Shiron.HonamiGit.DB.Schema;
+using Shiron.HonamiSystem.Schema;
 
 namespace Shiron.Archive.API.DTOs;
 
