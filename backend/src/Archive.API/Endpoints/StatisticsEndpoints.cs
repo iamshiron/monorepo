@@ -3,7 +3,7 @@ using Shiron.TheArchive.DB;
 using Shiron.HonamiSystem.Schema;
 using Shiron.Archive.API.DTOs;
 
-namespace Shiron.HonamiGit.API.Endpoints;
+namespace Shiron.HonamiSystem.Server.Endpoints;
 
 public static class StatisticsEndpoints {
     public static void MapStatisticsEndpoints(this IEndpointRouteBuilder endpoints) {

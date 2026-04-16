@@ -4,7 +4,7 @@ using Shiron.Archive.API.DTOs;
 using Shiron.HonamiGit.DB;
 using Shiron.HonamiSystem.Schema;
 
-namespace Shiron.HonamiGit.API.Endpoints;
+namespace Shiron.HonamiSystem.Server.Endpoints;
 
 public static class SshKeyEndpoints {
     public static void MapKeyEndpoints(this IEndpointRouteBuilder endpoints) {

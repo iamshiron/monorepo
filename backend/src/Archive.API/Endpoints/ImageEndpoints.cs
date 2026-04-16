@@ -13,7 +13,7 @@ using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Quantization;
 using DBImage = Shiron.HonamiSystem.Schema.Image;
 
-namespace Shiron.HonamiGit.API.Endpoints;
+namespace Shiron.HonamiSystem.Server.Endpoints;
 
 public static class ImageEndpoints {
     public static void MapImageEndpoints(this IEndpointRouteBuilder endpoints) {

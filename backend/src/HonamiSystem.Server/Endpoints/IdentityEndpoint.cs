@@ -1,8 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Shiron.HonamiSystem.Schema;
+using Shiron.HonamiSystem.DB.Schema;
 
 namespace Shiron.HonamiSystem.Server.Endpoints;
 
@@ -47,7 +46,7 @@ public static class IdentityEndpoints {
         RegisterDto dto,
         UserManager<User> userManager) {
         var user = new User {
-            DisplayName = dto.DisplayName,
+            Name = dto.DisplayName,
             UserName = dto.UserName,
             Email = dto.Email,
             EmailConfirmed = true
@@ -85,7 +84,7 @@ public static class IdentityEndpoints {
         var roles = await userManager.GetRolesAsync(user);
         return Results.Ok(new UserInfoDto {
             ID = user.Id,
-            DisplayName = user.DisplayName,
+            Name = user.Name,
             UserName = user.UserName!,
             Email = user.Email!,
             Roles = roles.ToList()
@@ -126,9 +125,9 @@ public record ChangePasswordDto {
 }
 
 public record UserInfoDto {
-    public Guid ID { get; init; }
-    public string DisplayName { get; init; } = default!;
-    public string UserName { get; init; } = default!;
-    public string Email { get; init; } = default!;
+    public required Guid ID { get; init; }
+    public required string Name { get; init; }
+    public required string UserName { get; init; }
+    public required string Email { get; init; }
     public List<string> Roles { get; init; } = [];
 }

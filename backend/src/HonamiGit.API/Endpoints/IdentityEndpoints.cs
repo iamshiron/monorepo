@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Shiron.HonamiSystem.Schema;
 
-namespace Shiron.HonamiGit.API.Endpoints;
+namespace Shiron.HonamiSystem.Server.Endpoints;
 
 public static class IdentityEndpoints {
     public static void MapIdentityEndpoints(this IEndpointRouteBuilder endpoints) {

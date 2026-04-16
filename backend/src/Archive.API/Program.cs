@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using Minio;
 using Scalar.AspNetCore;
 using Shiron.HonamiGit.API.Configuration;
-using Shiron.HonamiGit.API.Endpoints;
+using Shiron.HonamiSystem.Server.Endpoints;
 using Shiron.TheArchive.API.Services;
 using Shiron.TheArchive.DB;
 using Shiron.HonamiSystem.Schema;

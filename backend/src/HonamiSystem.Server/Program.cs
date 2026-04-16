@@ -111,5 +111,7 @@ using (var scope = app.Services.CreateScope()) {
     }
 }
 
+app.MapIdentityEndpoints();
+
 app.Run();
 pluginRegistry.Dispose();

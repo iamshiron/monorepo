@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Shiron.Archive.API.DTOs;
 using Shiron.HonamiGit.API.Services;
 
-namespace Shiron.HonamiGit.API.Endpoints;
+namespace Shiron.HonamiSystem.Server.Endpoints;
 
 public static class ApiKeyEndpoints {
     public static void MapApiKeyEndpoints(this IEndpointRouteBuilder endpoints) {

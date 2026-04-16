@@ -6,7 +6,7 @@ using Shiron.TheArchive.API.Services;
 using DBImage = Shiron.HonamiSystem.Schema.Image;
 using SixLabors.ImageSharp;
 
-namespace Shiron.HonamiGit.API.Endpoints;
+namespace Shiron.HonamiSystem.Server.Endpoints;
 
 public static class CarEndpoints {
     public static void MapCarEndpoints(this IEndpointRouteBuilder endpoints) {
