@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Shiron.Archive.API.DTOs;
+namespace Shiron.TheArchive.API.DTOs;
 
 public record ApiKeyCreateDto {
     [Required][MaxLength(64)] public required string Name { get; init; }

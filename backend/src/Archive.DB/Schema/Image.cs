@@ -1,14 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using Shiron.Lib.Types;
 
-namespace Shiron.HonamiSystem.Schema;
+namespace Shiron.TheArchive.DB.Schema;
 
 using CarEntity = Car;
-
-public class ColorPack {
-    public required Color32 Color { get; set; }
-    public required LabColor Lab { get; set; }
-}
 
 public class Image : BaseEntity {
     [MaxLength(63)] public required string Bucket { get; set; }

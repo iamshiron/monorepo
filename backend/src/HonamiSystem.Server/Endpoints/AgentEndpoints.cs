@@ -88,7 +88,7 @@ public static class AgentEndpoints {
             PersonaID = req.PersonaId,
             RequiredTools = req.RequiredTools,
             SuggestedTools = req.SuggestedTools,
-            CreatedByID = user.Id,
+            CreatedByID = user.Id
         };
 
         if (req.PersonaId.HasValue) {

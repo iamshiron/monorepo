@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Shiron.HonamiSystem.Schema;
+namespace Shiron.TheArchive.DB.Schema;
 
 public class Studio : BaseEntity, IOwned {
     [MaxLength(255)] public required string Name { get; set; }

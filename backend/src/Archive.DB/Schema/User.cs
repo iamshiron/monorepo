@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
-namespace Shiron.HonamiSystem.Schema;
+namespace Shiron.TheArchive.DB.Schema;
 
 public class User : IdentityUser<Guid> {
     [MaxLength(32)] public required string DisplayName { get; set; }

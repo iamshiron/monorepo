@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Shiron.HonamiSystem.Schema;
+using Shiron.HonamiGit.DB.Schema;
 
-namespace Shiron.HonamiSystem.Server.Endpoints;
+namespace Shiron.HonamiGit.API.Endpoints;
 
 public static class IdentityEndpoints {
     public static void MapIdentityEndpoints(this IEndpointRouteBuilder endpoints) {

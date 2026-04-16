@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
-namespace Shiron.HonamiSystem.Schema;
+namespace Shiron.HonamiGit.DB.Schema;
 
 public class ApiKey {
     public Guid ID { get; set; } = Guid.CreateVersion7();

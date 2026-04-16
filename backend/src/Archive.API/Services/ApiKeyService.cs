@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Shiron.TheArchive.DB;
-using Shiron.HonamiSystem.Schema;
+using Shiron.TheArchive.DB.Schema;
 
 namespace Shiron.TheArchive.API.Services;
 

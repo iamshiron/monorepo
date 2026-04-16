@@ -1,4 +1,4 @@
-namespace Shiron.HonamiGit.API.Configuration;
+namespace Shiron.TheArchive.API.Configuration;
 
 public sealed class StorageOptions {
     public string Endpoint { get; set; } = "localhost:9000";

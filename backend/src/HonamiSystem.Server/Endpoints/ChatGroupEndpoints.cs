@@ -72,7 +72,7 @@ public static class ChatGroupEndpoints {
 
         var chatGroup = new ChatGroup {
             Name = req.Name,
-            CreatedByID = user.Id,
+            CreatedByID = user.Id
         };
 
         db.ChatGroups.Add(chatGroup);

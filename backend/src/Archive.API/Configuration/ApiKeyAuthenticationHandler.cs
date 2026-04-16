@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using Shiron.TheArchive.API.Services;
 
-namespace Shiron.HonamiGit.API.Configuration;
+namespace Shiron.TheArchive.API.Configuration;
 
 public class ApiKeyAuthenticationOptions : AuthenticationSchemeOptions {
     public const string SchemeName = "ApiKey";

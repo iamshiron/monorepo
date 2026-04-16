@@ -65,7 +65,7 @@ public static class PersonaEndpoints {
             Instruction = req.Instruction,
             Traits = req.Traits,
             SpeakingStyle = req.SpeakingStyle,
-            CreatedByID = user.Id,
+            CreatedByID = user.Id
         };
 
         db.Personas.Add(persona);
@@ -148,9 +148,11 @@ public static class PersonaEndpoints {
         return Results.Ok(new { Message = "Persona deleted successfully" });
     }
 
-    private static PersonaResponse MapToResponse(Persona p) => new(
-        p.ID, p.Name, p.Brief, p.Instruction,
-        p.Traits.ToList(), p.SpeakingStyle,
-        p.CreatedAt, p.UpdatedAt
-    );
+    private static PersonaResponse MapToResponse(Persona p) {
+        return new PersonaResponse(
+            p.ID, p.Name, p.Brief, p.Instruction,
+            p.Traits.ToList(), p.SpeakingStyle,
+            p.CreatedAt, p.UpdatedAt
+        );
+    }
 }

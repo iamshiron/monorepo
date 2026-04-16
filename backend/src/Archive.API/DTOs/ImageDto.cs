@@ -1,6 +1,6 @@
 using Shiron.Lib.Types;
 
-namespace Shiron.Archive.API.DTOs;
+namespace Shiron.TheArchive.API.DTOs;
 
 public record ColorPackDto {
     public required Color32Dto Color { get; init; }

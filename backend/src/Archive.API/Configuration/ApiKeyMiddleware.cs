@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 
-namespace Shiron.HonamiGit.API.Configuration;
+namespace Shiron.TheArchive.API.Configuration;
 
 public class ApiKeyMiddleware(RequestDelegate next) {
     public async Task InvokeAsync(HttpContext context) {

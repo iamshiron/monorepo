@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Minio;
 using Scalar.AspNetCore;
-using Shiron.HonamiGit.API.Configuration;
-using Shiron.HonamiSystem.Server.Endpoints;
+using Shiron.TheArchive.API.Configuration;
+using Shiron.TheArchive.API.Endpoints;
 using Shiron.TheArchive.API.Services;
 using Shiron.TheArchive.DB;
-using Shiron.HonamiSystem.Schema;
+using Shiron.TheArchive.DB.Schema;
 
 Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);

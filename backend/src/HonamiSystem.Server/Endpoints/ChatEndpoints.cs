@@ -120,14 +120,14 @@ public static class ChatEndpoints {
             Title = req.Title,
             Description = req.Description,
             ChatGroupID = req.GroupId,
-            CreatedByID = user.Id,
+            CreatedByID = user.Id
         };
 
         chat.UserParticipants.Add(new ChatParticipantUser {
             UserID = user.Id,
             User = user,
             ChatID = chat.ID,
-            Chat = chat,
+            Chat = chat
         });
 
         db.Chats.Add(chat);
@@ -293,7 +293,7 @@ public static class ChatEndpoints {
             UserID = req.UserId,
             User = targetUser,
             ChatID = chatId,
-            Chat = chat,
+            Chat = chat
         });
         await db.SaveChangesAsync();
 
@@ -323,7 +323,7 @@ public static class ChatEndpoints {
             Agent = agent,
             ChatID = chatId,
             Chat = chat,
-            AllowedTools = req.AllowedTools,
+            AllowedTools = req.AllowedTools
         });
         await db.SaveChangesAsync();
 
@@ -372,10 +372,12 @@ public static class ChatEndpoints {
         return Results.Ok(new { Message = "Agent removed from chat" });
     }
 
-    private static ChatDetailResponse MapToDetailResponse(Chat chat) => new(
-        chat.ID, chat.Title, chat.Description,
-        chat.ChatGroupID, chat.CreatedAt, chat.UpdatedAt,
-        chat.UserParticipants.Select(p => new ParticipantUserResponse(p.UserID, p.User.Name)).ToList(),
-        chat.AgentParticipants.Select(p => new ParticipantAgentResponse(p.AgentID, p.Agent.Name, p.AllowedTools.ToList())).ToList()
-    );
+    private static ChatDetailResponse MapToDetailResponse(Chat chat) {
+        return new ChatDetailResponse(
+            chat.ID, chat.Title, chat.Description,
+            chat.ChatGroupID, chat.CreatedAt, chat.UpdatedAt,
+            chat.UserParticipants.Select(p => new ParticipantUserResponse(p.UserID, p.User.Name)).ToList(),
+            chat.AgentParticipants.Select(p => new ParticipantAgentResponse(p.AgentID, p.Agent.Name, p.AllowedTools.ToList())).ToList()
+        );
+    }
 }

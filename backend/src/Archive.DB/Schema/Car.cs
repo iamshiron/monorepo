@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Shiron.HonamiSystem.Schema;
+namespace Shiron.TheArchive.DB.Schema;
 
 public enum Condition {
     New,
