@@ -114,6 +114,8 @@ using (var scope = app.Services.CreateScope()) {
 app.MapGroup("/api/account").WithTags("Account").MapIdentityEndpoints();
 app.MapGroup("/api/chat").WithTags("Chat").MapChatEndpoints();
 app.MapGroup("/api/chat").WithTags("Chat").MapChatGroupEndpoints();
+app.MapGroup("/api/personas").WithTags("Personas").MapPersonaEndpoints();
+app.MapGroup("/api/agents").WithTags("Agents").MapAgentEndpoints();
 
 app.Run();
 pluginRegistry.Dispose();
