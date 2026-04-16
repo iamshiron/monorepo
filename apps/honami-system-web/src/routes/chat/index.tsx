@@ -1,13 +1,6 @@
-import {createFileRoute} from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
+import { ChatEmptyState } from "@/components/chat/ChatEmptyState";
 
-export const Route = createFileRoute('/chat/')({
-    component: RouteComponent,
-})
-
-function RouteComponent() {
-    return (
-        <div>
-            Empty Chat
-        </div>
-    )
-}
+export const Route = createFileRoute("/chat/")({
+	component: ChatEmptyState,
+});

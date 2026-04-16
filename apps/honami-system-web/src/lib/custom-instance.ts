@@ -1,7 +1,8 @@
 import Axios, { type AxiosRequestConfig, type AxiosError } from "axios";
 
 export const AXIOS_INSTANCE = Axios.create({
-	baseURL: import.meta.env.VITE_ARCHIVE_API_URL || "/api",
+	baseURL: import.meta.env.VITE_ARCHIVE_API_URL || "",
+	withCredentials: true,
 	headers: { "Content-Type": "application/json" },
 });
 
