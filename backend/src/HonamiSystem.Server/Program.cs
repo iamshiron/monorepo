@@ -111,7 +111,9 @@ using (var scope = app.Services.CreateScope()) {
     }
 }
 
-app.MapIdentityEndpoints();
+app.MapGroup("/api/account").WithTags("Account").MapIdentityEndpoints();
+app.MapGroup("/api/chat").WithTags("Chat").MapChatEndpoints();
+app.MapGroup("/api/chat").WithTags("Chat").MapChatGroupEndpoints();
 
 app.Run();
 pluginRegistry.Dispose();

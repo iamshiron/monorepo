@@ -6,3 +6,8 @@
 @import "@shiron/ui/styles/globals.css";
 
 @source "../../../../packages/ui/src/components";
+
+#root {
+    margin: 0;
+    padding: 0;
+}

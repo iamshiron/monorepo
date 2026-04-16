@@ -7,34 +7,32 @@ namespace Shiron.HonamiSystem.Server.Endpoints;
 
 public static class IdentityEndpoints {
     public static void MapIdentityEndpoints(this IEndpointRouteBuilder endpoints) {
-        var group = endpoints.MapGroup("/api/account").WithTags("Account");
-
-        group.MapPost("/register", Register)
+        endpoints.MapPost("/register", Register)
             .WithName("Register")
             .WithDescription("Register a new user account")
             .Produces(200)
             .ProducesValidationProblem();
 
-        group.MapPost("/login", Login)
+        endpoints.MapPost("/login", Login)
             .WithName("Login")
             .WithDescription("Log in with credentials")
             .Produces(200)
             .Produces(401);
 
-        group.MapPost("/logout", Logout)
+        endpoints.MapPost("/logout", Logout)
             .WithName("Logout")
             .WithDescription("Log out the current session")
             .RequireAuthorization()
             .Produces(200);
 
-        group.MapGet("/me", Me)
+        endpoints.MapGet("/me", Me)
             .WithName("GetMe")
             .WithDescription("Get the current authenticated user info")
             .RequireAuthorization()
             .Produces<UserInfoDto>()
             .Produces(401);
 
-        group.MapPost("/change-password", ChangePassword)
+        endpoints.MapPost("/change-password", ChangePassword)
             .WithName("ChangePassword")
             .WithDescription("Change the current user's password")
             .RequireAuthorization()
