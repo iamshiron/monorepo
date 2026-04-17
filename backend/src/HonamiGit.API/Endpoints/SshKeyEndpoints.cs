@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using Shiron.Archive.API.DTOs;
+using Shiron.HonamiGit.API.DTOs;
 using Shiron.HonamiGit.DB;
-using Shiron.HonamiSystem.Schema;
+using Shiron.HonamiGit.DB.Schema;
 
-namespace Shiron.HonamiSystem.Server.Endpoints;
+namespace Shiron.HonamiGit.API.Endpoints;
 
 public static class SshKeyEndpoints {
     public static void MapKeyEndpoints(this IEndpointRouteBuilder endpoints) {

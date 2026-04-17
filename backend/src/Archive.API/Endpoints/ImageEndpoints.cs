@@ -4,16 +4,16 @@ using Microsoft.EntityFrameworkCore;
 using Shiron.Lib.Types;
 using Shiron.Lib.Types.Extension;
 using Shiron.TheArchive.DB;
-using Shiron.HonamiSystem.Schema;
-using Shiron.Archive.API.DTOs;
+using Shiron.TheArchive.DB.Schema;
+using Shiron.TheArchive.API.DTOs;
 using Shiron.TheArchive.API.Services;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Quantization;
-using DBImage = Shiron.HonamiSystem.Schema.Image;
+using DBImage = Shiron.TheArchive.DB.Schema.Image;
 
-namespace Shiron.HonamiSystem.Server.Endpoints;
+namespace Shiron.TheArchive.API.Endpoints;
 
 public static class ImageEndpoints {
     public static void MapImageEndpoints(this IEndpointRouteBuilder endpoints) {

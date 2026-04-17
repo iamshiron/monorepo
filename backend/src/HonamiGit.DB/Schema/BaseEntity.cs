@@ -1,4 +1,4 @@
-namespace Shiron.HonamiSystem.Schema;
+namespace Shiron.HonamiGit.DB.Schema;
 
 public class BaseEntity {
     public Guid ID { get; set; } = Guid.CreateVersion7();

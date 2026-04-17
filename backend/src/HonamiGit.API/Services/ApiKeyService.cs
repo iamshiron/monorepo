@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Shiron.HonamiGit.DB;
-using Shiron.HonamiSystem.Schema;
+using Shiron.HonamiGit.DB.Schema;
 
 namespace Shiron.HonamiGit.API.Services;
 

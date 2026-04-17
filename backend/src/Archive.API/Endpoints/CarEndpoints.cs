@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Shiron.TheArchive.DB;
-using Shiron.HonamiSystem.Schema;
-using Shiron.Archive.API.DTOs;
+using Shiron.TheArchive.DB.Schema;
+using Shiron.TheArchive.API.DTOs;
 using Shiron.TheArchive.API.Services;
-using DBImage = Shiron.HonamiSystem.Schema.Image;
+using DBImage = Shiron.TheArchive.DB.Schema.Image;
 using SixLabors.ImageSharp;
 
-namespace Shiron.HonamiSystem.Server.Endpoints;
+namespace Shiron.TheArchive.API.Endpoints;
 
 public static class CarEndpoints {
     public static void MapCarEndpoints(this IEndpointRouteBuilder endpoints) {

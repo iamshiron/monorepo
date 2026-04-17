@@ -1,9 +1,10 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using Shiron.Archive.API.DTOs;
+using Shiron.TheArchive.API.DTOs;
+using Shiron.TheArchive.DB.Schema;
 using Shiron.TheArchive.API.Services;
 
-namespace Shiron.HonamiSystem.Server.Endpoints;
+namespace Shiron.TheArchive.API.Endpoints;
 
 public static class ApiKeyEndpoints {
     public static void MapApiKeyEndpoints(this IEndpointRouteBuilder endpoints) {
@@ -87,7 +88,7 @@ public static class ApiKeyEndpoints {
         return Guid.Parse(claim);
     }
 
-    private static ApiKeyDto MapToDto(Schema.ApiKey apiKey) {
+    private static ApiKeyDto MapToDto(ApiKey apiKey) {
         return new ApiKeyDto {
             ID = apiKey.ID,
             Name = apiKey.Name,

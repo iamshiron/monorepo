@@ -1,4 +1,4 @@
-namespace Shiron.Archive.API.DTOs;
+namespace Shiron.HonamiGit.API.DTOs;
 
 public record ResponseSSHKeyDTO(
     Guid ID,

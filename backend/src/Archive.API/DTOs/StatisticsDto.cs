@@ -1,4 +1,4 @@
-namespace Shiron.Archive.API.DTOs;
+namespace Shiron.TheArchive.API.DTOs;
 
 public record CarStatisticsDto {
     public int TotalCars { get; init; }

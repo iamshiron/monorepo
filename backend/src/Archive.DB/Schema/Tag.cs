@@ -1,4 +1,4 @@
-namespace Shiron.HonamiSystem.Schema;
+namespace Shiron.TheArchive.DB.Schema;
 
 public interface ITaggable {
     List<string> Tags { get; set; }
