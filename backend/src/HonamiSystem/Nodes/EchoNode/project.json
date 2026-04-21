@@ -1,0 +1,39 @@
+{
+    "$schema": "https://raw.githubusercontent.com/nrwl/nx/refs/heads/master/packages/nx/schemas/project-schema.json",
+    "name": "Honami/EchoNode",
+    "targets": {
+        "cmake": {
+            "cache": true,
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "cmake -S . -B build",
+                "cwd": "{projectRoot}"
+            }
+        },
+        "build": {
+            "cache": true,
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "cmake --build build",
+                "cwd": "{projectRoot}"
+            },
+            "outputs": [
+                "{projectRoot}/build"
+            ],
+            "dependsOn": [
+                "cmake"
+            ]
+        },
+        "run": {
+            "cache": false,
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "./EchoNode",
+                "cwd": "{projectRoot}/build"
+            },
+            "dependsOn": [
+                "build"
+            ]
+        }
+    }
+}
