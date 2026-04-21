@@ -39,4 +39,10 @@ jobs:
             nx-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
             nx-${{ runner.os }}-
 
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - run: dotnet restore
+
       - run: pnpm nx run-many --target=build --all
