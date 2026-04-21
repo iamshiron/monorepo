@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\HonamiSystem.SDK\Shiron.HonamiSystem.SDK.csproj"/>
+        <ProjectReference Include="../SDK/Shiron.HonamiSystem.SDK.csproj"/>
     </ItemGroup>
 
 </Project>

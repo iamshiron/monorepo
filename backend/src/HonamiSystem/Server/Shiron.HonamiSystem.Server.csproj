@@ -16,10 +16,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\HonamiSystem.DB\Shiron.HonamiSystem.DB.csproj"/>
-        <ProjectReference Include="..\HonamiSystem.Plugins.ExamplePlugin\Shiron.HonamiSystem.Plugins.ExamplePlugin.csproj"/>
-        <ProjectReference Include="..\HonamiSystem.SDK\Shiron.HonamiSystem.SDK.csproj"/>
-        <ProjectReference Include="..\HonamiSystem.Services\Shiron.HonamiSystem.Services.csproj"/>
+        <ProjectReference Include="../DB/Shiron.HonamiSystem.DB.csproj"/>
+        <ProjectReference Include="../Plugins/ExamplePlugin/Shiron.HonamiSystem.Plugins.ExamplePlugin.csproj"/>
+        <ProjectReference Include="../SDK/Shiron.HonamiSystem.SDK.csproj"/>
+        <ProjectReference Include="../Services/Shiron.HonamiSystem.Services.csproj"/>
     </ItemGroup>
 
 </Project>
