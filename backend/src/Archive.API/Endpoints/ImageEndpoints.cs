@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Shiron.Lib.Types;
 using Shiron.Lib.Types.Extension;
 using Shiron.TheArchive.DB;
-using Shiron.TheArchive.DB.Schema;
 using Shiron.TheArchive.API.DTOs;
 using Shiron.TheArchive.API.Services;
 using SixLabors.ImageSharp;
@@ -169,7 +168,7 @@ public static class ImageEndpoints {
         if (file.Length == 0) return Results.BadRequest("No file provided");
 
         await using var inputStream = file.OpenReadStream();
-        using var sharpImage = SixLabors.ImageSharp.Image.Load(inputStream);
+        using var sharpImage = Image.Load(inputStream);
 
         var objectKey = $"images/{DateTime.UtcNow:yyyy/MM/dd}/{Guid.CreateVersion7()}.webp";
 
@@ -301,7 +300,7 @@ public static class ImageEndpoints {
         };
     }
 
-    internal static string EncodeBlurHash(SixLabors.ImageSharp.Image image) {
+    internal static string EncodeBlurHash(Image image) {
         using var cloned = image.CloneAs<Rgba32>();
         cloned.Mutate(x => x.Resize(64, 0));
         var width = cloned.Width;
@@ -324,7 +323,7 @@ public static class ImageEndpoints {
         return CoreBlurHashEncoder.Encode(4, 3, width, height, pixelSpan, stride, PixelFormat.RGB888x);
     }
 
-    internal static (ColorPack Primary, ColorPack Secondary, List<ColorPack> Palette) ExtractColors(SixLabors.ImageSharp.Image image) {
+    internal static (ColorPack Primary, ColorPack Secondary, List<ColorPack> Palette) ExtractColors(Image image) {
         using var cloned = image.CloneAs<Rgba32>();
         var quantizer = new OctreeQuantizer(new QuantizerOptions { MaxColors = 8 });
 
