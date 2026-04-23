@@ -8,203 +8,203 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as StatisticsRouteImport } from './routes/statistics'
-import { Route as RollsRouteImport } from './routes/rolls'
-import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as CollectionRouteImport } from './routes/collection'
-import { Route as CalculatorRouteImport } from './routes/calculator'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as StatisticsRouteImport } from "./routes/statistics";
+import { Route as RollsRouteImport } from "./routes/rolls";
+import { Route as ProfileRouteImport } from "./routes/profile";
+import { Route as DashboardRouteImport } from "./routes/dashboard";
+import { Route as CollectionRouteImport } from "./routes/collection";
+import { Route as CalculatorRouteImport } from "./routes/calculator";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as AuthCallbackRouteImport } from "./routes/auth/callback";
 
 const StatisticsRoute = StatisticsRouteImport.update({
-  id: '/statistics',
-  path: '/statistics',
-  getParentRoute: () => rootRouteImport,
-} as any)
+	id: "/statistics",
+	path: "/statistics",
+	getParentRoute: () => rootRouteImport,
+} as any);
 const RollsRoute = RollsRouteImport.update({
-  id: '/rolls',
-  path: '/rolls',
-  getParentRoute: () => rootRouteImport,
-} as any)
+	id: "/rolls",
+	path: "/rolls",
+	getParentRoute: () => rootRouteImport,
+} as any);
 const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
+	id: "/profile",
+	path: "/profile",
+	getParentRoute: () => rootRouteImport,
+} as any);
 const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
+	id: "/dashboard",
+	path: "/dashboard",
+	getParentRoute: () => rootRouteImport,
+} as any);
 const CollectionRoute = CollectionRouteImport.update({
-  id: '/collection',
-  path: '/collection',
-  getParentRoute: () => rootRouteImport,
-} as any)
+	id: "/collection",
+	path: "/collection",
+	getParentRoute: () => rootRouteImport,
+} as any);
 const CalculatorRoute = CalculatorRouteImport.update({
-  id: '/calculator',
-  path: '/calculator',
-  getParentRoute: () => rootRouteImport,
-} as any)
+	id: "/calculator",
+	path: "/calculator",
+	getParentRoute: () => rootRouteImport,
+} as any);
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
+	id: "/",
+	path: "/",
+	getParentRoute: () => rootRouteImport,
+} as any);
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: '/auth/callback',
-  path: '/auth/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
+	id: "/auth/callback",
+	path: "/auth/callback",
+	getParentRoute: () => rootRouteImport,
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/calculator': typeof CalculatorRoute
-  '/collection': typeof CollectionRoute
-  '/dashboard': typeof DashboardRoute
-  '/profile': typeof ProfileRoute
-  '/rolls': typeof RollsRoute
-  '/statistics': typeof StatisticsRoute
-  '/auth/callback': typeof AuthCallbackRoute
+	"/": typeof IndexRoute;
+	"/calculator": typeof CalculatorRoute;
+	"/collection": typeof CollectionRoute;
+	"/dashboard": typeof DashboardRoute;
+	"/profile": typeof ProfileRoute;
+	"/rolls": typeof RollsRoute;
+	"/statistics": typeof StatisticsRoute;
+	"/auth/callback": typeof AuthCallbackRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/calculator': typeof CalculatorRoute
-  '/collection': typeof CollectionRoute
-  '/dashboard': typeof DashboardRoute
-  '/profile': typeof ProfileRoute
-  '/rolls': typeof RollsRoute
-  '/statistics': typeof StatisticsRoute
-  '/auth/callback': typeof AuthCallbackRoute
+	"/": typeof IndexRoute;
+	"/calculator": typeof CalculatorRoute;
+	"/collection": typeof CollectionRoute;
+	"/dashboard": typeof DashboardRoute;
+	"/profile": typeof ProfileRoute;
+	"/rolls": typeof RollsRoute;
+	"/statistics": typeof StatisticsRoute;
+	"/auth/callback": typeof AuthCallbackRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/calculator': typeof CalculatorRoute
-  '/collection': typeof CollectionRoute
-  '/dashboard': typeof DashboardRoute
-  '/profile': typeof ProfileRoute
-  '/rolls': typeof RollsRoute
-  '/statistics': typeof StatisticsRoute
-  '/auth/callback': typeof AuthCallbackRoute
+	__root__: typeof rootRouteImport;
+	"/": typeof IndexRoute;
+	"/calculator": typeof CalculatorRoute;
+	"/collection": typeof CollectionRoute;
+	"/dashboard": typeof DashboardRoute;
+	"/profile": typeof ProfileRoute;
+	"/rolls": typeof RollsRoute;
+	"/statistics": typeof StatisticsRoute;
+	"/auth/callback": typeof AuthCallbackRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/calculator'
-    | '/collection'
-    | '/dashboard'
-    | '/profile'
-    | '/rolls'
-    | '/statistics'
-    | '/auth/callback'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/calculator'
-    | '/collection'
-    | '/dashboard'
-    | '/profile'
-    | '/rolls'
-    | '/statistics'
-    | '/auth/callback'
-  id:
-    | '__root__'
-    | '/'
-    | '/calculator'
-    | '/collection'
-    | '/dashboard'
-    | '/profile'
-    | '/rolls'
-    | '/statistics'
-    | '/auth/callback'
-  fileRoutesById: FileRoutesById
+	fileRoutesByFullPath: FileRoutesByFullPath;
+	fullPaths:
+		| "/"
+		| "/calculator"
+		| "/collection"
+		| "/dashboard"
+		| "/profile"
+		| "/rolls"
+		| "/statistics"
+		| "/auth/callback";
+	fileRoutesByTo: FileRoutesByTo;
+	to:
+		| "/"
+		| "/calculator"
+		| "/collection"
+		| "/dashboard"
+		| "/profile"
+		| "/rolls"
+		| "/statistics"
+		| "/auth/callback";
+	id:
+		| "__root__"
+		| "/"
+		| "/calculator"
+		| "/collection"
+		| "/dashboard"
+		| "/profile"
+		| "/rolls"
+		| "/statistics"
+		| "/auth/callback";
+	fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  CalculatorRoute: typeof CalculatorRoute
-  CollectionRoute: typeof CollectionRoute
-  DashboardRoute: typeof DashboardRoute
-  ProfileRoute: typeof ProfileRoute
-  RollsRoute: typeof RollsRoute
-  StatisticsRoute: typeof StatisticsRoute
-  AuthCallbackRoute: typeof AuthCallbackRoute
+	IndexRoute: typeof IndexRoute;
+	CalculatorRoute: typeof CalculatorRoute;
+	CollectionRoute: typeof CollectionRoute;
+	DashboardRoute: typeof DashboardRoute;
+	ProfileRoute: typeof ProfileRoute;
+	RollsRoute: typeof RollsRoute;
+	StatisticsRoute: typeof StatisticsRoute;
+	AuthCallbackRoute: typeof AuthCallbackRoute;
 }
 
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/statistics': {
-      id: '/statistics'
-      path: '/statistics'
-      fullPath: '/statistics'
-      preLoaderRoute: typeof StatisticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rolls': {
-      id: '/rolls'
-      path: '/rolls'
-      fullPath: '/rolls'
-      preLoaderRoute: typeof RollsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/collection': {
-      id: '/collection'
-      path: '/collection'
-      fullPath: '/collection'
-      preLoaderRoute: typeof CollectionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/calculator': {
-      id: '/calculator'
-      path: '/calculator'
-      fullPath: '/calculator'
-      preLoaderRoute: typeof CalculatorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/callback': {
-      id: '/auth/callback'
-      path: '/auth/callback'
-      fullPath: '/auth/callback'
-      preLoaderRoute: typeof AuthCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-  }
+declare module "@tanstack/react-router" {
+	interface FileRoutesByPath {
+		"/statistics": {
+			id: "/statistics";
+			path: "/statistics";
+			fullPath: "/statistics";
+			preLoaderRoute: typeof StatisticsRouteImport;
+			parentRoute: typeof rootRouteImport;
+		};
+		"/rolls": {
+			id: "/rolls";
+			path: "/rolls";
+			fullPath: "/rolls";
+			preLoaderRoute: typeof RollsRouteImport;
+			parentRoute: typeof rootRouteImport;
+		};
+		"/profile": {
+			id: "/profile";
+			path: "/profile";
+			fullPath: "/profile";
+			preLoaderRoute: typeof ProfileRouteImport;
+			parentRoute: typeof rootRouteImport;
+		};
+		"/dashboard": {
+			id: "/dashboard";
+			path: "/dashboard";
+			fullPath: "/dashboard";
+			preLoaderRoute: typeof DashboardRouteImport;
+			parentRoute: typeof rootRouteImport;
+		};
+		"/collection": {
+			id: "/collection";
+			path: "/collection";
+			fullPath: "/collection";
+			preLoaderRoute: typeof CollectionRouteImport;
+			parentRoute: typeof rootRouteImport;
+		};
+		"/calculator": {
+			id: "/calculator";
+			path: "/calculator";
+			fullPath: "/calculator";
+			preLoaderRoute: typeof CalculatorRouteImport;
+			parentRoute: typeof rootRouteImport;
+		};
+		"/": {
+			id: "/";
+			path: "/";
+			fullPath: "/";
+			preLoaderRoute: typeof IndexRouteImport;
+			parentRoute: typeof rootRouteImport;
+		};
+		"/auth/callback": {
+			id: "/auth/callback";
+			path: "/auth/callback";
+			fullPath: "/auth/callback";
+			preLoaderRoute: typeof AuthCallbackRouteImport;
+			parentRoute: typeof rootRouteImport;
+		};
+	}
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  CalculatorRoute: CalculatorRoute,
-  CollectionRoute: CollectionRoute,
-  DashboardRoute: DashboardRoute,
-  ProfileRoute: ProfileRoute,
-  RollsRoute: RollsRoute,
-  StatisticsRoute: StatisticsRoute,
-  AuthCallbackRoute: AuthCallbackRoute,
-}
+	IndexRoute: IndexRoute,
+	CalculatorRoute: CalculatorRoute,
+	CollectionRoute: CollectionRoute,
+	DashboardRoute: DashboardRoute,
+	ProfileRoute: ProfileRoute,
+	RollsRoute: RollsRoute,
+	StatisticsRoute: StatisticsRoute,
+	AuthCallbackRoute: AuthCallbackRoute,
+};
 export const routeTree = rootRouteImport
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+	._addFileChildren(rootRouteChildren)
+	._addFileTypes<FileRouteTypes>();
