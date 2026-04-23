@@ -1,0 +1,45 @@
+{
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "name": "external/grpc",
+    "targets": {
+        "cmake": {
+            "cache": false,
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "cmake -S . -B build -G \"Ninja\" -DCMAKE_BUILD_TYPE=Release -DgRPC_BUILD_GRPC_CSHARP_PLUGIN=OFF -DgRPC_BUILD_GRPC_NODE_PLUGIN=OFF -DgRPC_BUILD_GRPC_OBJECTIVE_C_PLUGIN=OFF -DgRPC_BUILD_GRPC_PHP_PLUGIN=OFF -DgRPC_BUILD_GRPC_PYTHON_PLUGIN=OFF -DgRPC_BUILD_GRPC_RUBY_PLUGIN=OFF -DCMAKE_INSTALL_PREFIX=\"dist\"",
+                "cwd": "{projectRoot}/../grpc"
+            },
+            "outputs": [
+                "{projectRoot}/../grpc/build"
+            ]
+        },
+        "build": {
+            "cache": false,
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "cmake --build build --parallel",
+                "cwd": "{projectRoot}/../grpc"
+            },
+            "dependsOn": [
+                "cmake"
+            ],
+            "outputs": [
+                "{projectRoot}/../grpc/build"
+            ]
+        },
+        "install": {
+            "cache": false,
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "cmake --install build",
+                "cwd": "{projectRoot}/../grpc"
+            },
+            "dependsOn": [
+                "build"
+            ],
+            "outputs": [
+                "{projectRoot}/../grpc/dist"
+            ]
+        }
+    }
+}
