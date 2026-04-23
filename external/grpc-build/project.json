@@ -2,19 +2,40 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "name": "external/grpc",
     "targets": {
-        "cmake": {
+        "clean": {
             "cache": false,
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "rm -rf build && rm -rf dist",
+                "cwd": "{projectRoot}/../grpc"
+            }
+        },
+        "cmake": {
+            "cache": true,
             "executor": "nx:run-commands",
             "options": {
                 "command": "cmake -S . -B build -G \"Ninja\" -DCMAKE_BUILD_TYPE=Release -DgRPC_BUILD_GRPC_CSHARP_PLUGIN=OFF -DgRPC_BUILD_GRPC_NODE_PLUGIN=OFF -DgRPC_BUILD_GRPC_OBJECTIVE_C_PLUGIN=OFF -DgRPC_BUILD_GRPC_PHP_PLUGIN=OFF -DgRPC_BUILD_GRPC_PYTHON_PLUGIN=OFF -DgRPC_BUILD_GRPC_RUBY_PLUGIN=OFF -DCMAKE_INSTALL_PREFIX=\"dist\"",
                 "cwd": "{projectRoot}/../grpc"
             },
+            "inputs": [
+                "{projectRoot}/../grpc/**/*",
+                "!{projectRoot}/../grpc/test/**/*",
+                "!{projectRoot}/../grpc/examples/**/*",
+                "!{projectRoot}/../grpc/doc/**/*",
+                "!{projectRoot}/../grpc/tools/**/*",
+                "!{projectRoot}/../grpc/templates/**/*",
+                "!{projectRoot}/../grpc/summerofcode/**/*",
+                "!{projectRoot}/../grpc/**/*.md",
+                "!{projectRoot}/../grpc/**/*.podspec",
+                "!{projectRoot}/../grpc/third_party/**/test/**/*",
+                "!{projectRoot}/../grpc/third_party/**/docs/**/*"
+            ],
             "outputs": [
                 "{projectRoot}/../grpc/build"
             ]
         },
         "build": {
-            "cache": false,
+            "cache": true,
             "executor": "nx:run-commands",
             "options": {
                 "command": "cmake --build build --parallel",
@@ -28,7 +49,7 @@
             ]
         },
         "install": {
-            "cache": false,
+            "cache": true,
             "executor": "nx:run-commands",
             "options": {
                 "command": "cmake --install build",

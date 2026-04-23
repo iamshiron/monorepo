@@ -2,13 +2,34 @@
     "$schema": "https://raw.githubusercontent.com/nrwl/nx/refs/heads/master/packages/nx/schemas/project-schema.json",
     "name": "Honami/EchoNode",
     "targets": {
+        "clean": {
+            "cache": false,
+            "executor": "nx:run-commands",
+            "options": {
+                "command": "rm -rf build",
+                "cwd": "{projectRoot}"
+            }
+        },
         "cmake": {
             "cache": true,
             "executor": "nx:run-commands",
             "options": {
-                "command": "cmake -S . -B build",
+                "command": "cmake -S . -B build -G \"Ninja\"",
                 "cwd": "{projectRoot}"
-            }
+            },
+            "dependsOn": [
+                {
+                    "target": "install",
+                    "projects": "external/grpc"
+                }
+            ],
+            "inputs": [
+                "{projectRoot}/CMakeLists.txt",
+                "{projectRoot}/src"
+            ],
+            "outputs": [
+                "{projectRoot}/build"
+            ]
         },
         "build": {
             "cache": true,
