@@ -41,7 +41,8 @@ public record ImportKakeraClaimItem(
 
 public record BulkKakeraImportRequest(
     string Data,
-    string? CharacterName
+    string? CharacterName,
+    int? TimezoneOffset
 );
 
 public record ParsedKakeraClaim(

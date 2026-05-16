@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@shiron/ui/components/ui/button";
 import { Checkbox } from "@shiron/ui/components/ui/checkbox";
 import {
@@ -63,12 +63,20 @@ export function KakeraClaimModal({
 	const [type, setType] = useState<KakeraType>("Purple");
 	const [value, setValue] = useState(120);
 	const [isClaimed, setIsClaimed] = useState(true);
-	const [claimedAt, setClaimedAt] = useState(
-		new Date().toISOString().slice(0, 10),
-	);
+	const [claimedAt, setClaimedAt] = useState(() => {
+		const d = new Date();
+		return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+	});
 	const [isLoading, setIsLoading] = useState(false);
 
 	const isEditMode = !!editClaim;
+
+	const resetClaimedAt = useCallback(() => {
+		const d = new Date();
+		setClaimedAt(
+			`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`,
+		);
+	}, []);
 
 	useEffect(() => {
 		if (editClaim) {
@@ -76,15 +84,18 @@ export function KakeraClaimModal({
 			setType(editClaim.type);
 			setValue(Number(editClaim.value));
 			setIsClaimed(editClaim.isClaimed);
-			setClaimedAt(editClaim.claimedAt.slice(0, 10));
+			const d = new Date(editClaim.claimedAt);
+			setClaimedAt(
+				`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`,
+			);
 		} else {
 			setCharacterName("");
 			setType("Purple");
 			setValue(120);
 			setIsClaimed(true);
-			setClaimedAt(new Date().toISOString().slice(0, 10));
+			resetClaimedAt();
 		}
-	}, [editClaim]);
+	}, [editClaim, resetClaimedAt]);
 
 	const handleTypeChange = (newType: KakeraType) => {
 		setType(newType);
@@ -97,12 +108,13 @@ export function KakeraClaimModal({
 	const handleSubmit = async () => {
 		setIsLoading(true);
 		try {
+			const [y, m, d] = claimedAt.split("-").map(Number);
 			const request = {
 				characterName: characterName.trim() || null,
 				type,
 				value,
 				isClaimed,
-				claimedAt: new Date(claimedAt).toISOString(),
+				claimedAt: new Date(y, m - 1, d).toISOString(),
 			};
 
 			if (isEditMode && editClaim && onUpdate) {
@@ -123,7 +135,7 @@ export function KakeraClaimModal({
 		setType("Purple");
 		setValue(120);
 		setIsClaimed(true);
-		setClaimedAt(new Date().toISOString().slice(0, 10));
+		resetClaimedAt();
 		onClose();
 	};
 

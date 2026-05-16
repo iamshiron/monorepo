@@ -2327,6 +2327,7 @@ APP
 									data: {
 										data: bulkImportData,
 										characterName: bulkImportCharacterName || null,
+										timezoneOffset: new Date().getTimezoneOffset(),
 									},
 								})
 							}

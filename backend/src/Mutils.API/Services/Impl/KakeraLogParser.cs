@@ -21,10 +21,14 @@ public partial class KakeraLogParser : IKakeraLogParser {
         { "W", KakeraType.Rainbow }
     };
 
-    public IEnumerable<ParsedKakeraClaim> ParseKakeraLog(string data) {
+    public IEnumerable<ParsedKakeraClaim> ParseKakeraLog(string data, int? timezoneOffsetMinutes = null) {
         var lines = data.Split('\n', StringSplitOptions.RemoveEmptyEntries);
         KakeraType? darkTransformedTo = null;
         DateTime? currentDate = null;
+
+        var userToday = timezoneOffsetMinutes.HasValue
+            ? DateTime.UtcNow.AddMinutes(-timezoneOffsetMinutes.Value).Date
+            : DateTime.UtcNow.Date;
 
         foreach (var line in lines) {
             var trimmed = line.Trim();
@@ -41,7 +45,7 @@ public partial class KakeraLogParser : IKakeraLogParser {
                     CultureInfo.InvariantCulture,
                     DateTimeStyles.None,
                     out var parsedDate)) {
-                    currentDate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc);
+                    currentDate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Unspecified);
                 }
                 continue;
             }
@@ -54,7 +58,7 @@ public partial class KakeraLogParser : IKakeraLogParser {
                     CultureInfo.InvariantCulture,
                     DateTimeStyles.None,
                     out var parsedDate)) {
-                    currentDate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Utc);
+                    currentDate = DateTime.SpecifyKind(parsedDate, DateTimeKind.Unspecified);
                 }
                 continue;
             }
@@ -62,14 +66,14 @@ public partial class KakeraLogParser : IKakeraLogParser {
             var yesterdayMatch = YesterdayRegex().Match(trimmed);
             if (yesterdayMatch.Success) {
                 var timeStr = yesterdayMatch.Groups["time"].Value;
-                currentDate = ParseTimeWithHourOnly(timeStr, DateTime.UtcNow.Date.AddDays(-1));
+                currentDate = ParseTimeWithHourOnly(timeStr, userToday.AddDays(-1));
                 continue;
             }
 
             var todayTimeMatch = TodayTimeRegex().Match(trimmed);
             if (todayTimeMatch.Success) {
                 var timeStr = todayTimeMatch.Groups["time"].Value;
-                currentDate = ParseTimeWithHourOnly(timeStr, DateTime.UtcNow.Date);
+                currentDate = ParseTimeWithHourOnly(timeStr, userToday);
                 continue;
             }
 
@@ -127,7 +131,7 @@ public partial class KakeraLogParser : IKakeraLogParser {
             if (DateTime.TryParseExact(timeStr.Trim(), format, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedTime)) {
                 return DateTime.SpecifyKind(
                     new DateTime(dateBase.Year, dateBase.Month, dateBase.Day, parsedTime.Hour, parsedTime.Minute, 0),
-                    DateTimeKind.Utc);
+                    DateTimeKind.Unspecified);
             }
         }
         return null;

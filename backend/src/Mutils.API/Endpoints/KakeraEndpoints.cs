@@ -284,7 +284,8 @@ public static class KakeraEndpoints {
                     }
 
                     try {
-                        var parsedClaims = parser.ParseKakeraLog(request.Data).ToList();
+                        var offset = request.TimezoneOffset ?? 0;
+                        var parsedClaims = parser.ParseKakeraLog(request.Data, offset).ToList();
                         var imported = 0;
                         var skipped = 0;
 
@@ -307,13 +308,23 @@ public static class KakeraEndpoints {
                                 continue;
                             }
 
+                            DateTime claimedAtUtc;
+                            if (parsed.ClaimedAt.HasValue) {
+                                var local = parsed.ClaimedAt.Value;
+                                claimedAtUtc = local.Kind == DateTimeKind.Unspecified
+                                    ? DateTime.SpecifyKind(local.AddMinutes(offset), DateTimeKind.Utc)
+                                    : local.ToUniversalTime();
+                            } else {
+                                claimedAtUtc = DateTime.UtcNow;
+                            }
+
                             var claim = new KakeraClaim {
                                 UserId = userId.Value,
                                 CharacterId = characterId,
                                 Type = parsed.Type,
                                 Value = parsed.Value,
                                 IsClaimed = true,
-                                ClaimedAt = parsed.ClaimedAt ?? DateTime.UtcNow
+                                ClaimedAt = claimedAtUtc
                             };
                             db.KakeraClaims.Add(claim);
                             imported++;
