@@ -521,10 +521,13 @@ function StatisticsPage() {
 		type: String(type) as KakeraType,
 	}));
 
+	const timeframeTotal = dailyData.reduce((sum, d) => sum + d.value, 0);
+	const cumulativeStart = stats.totalValue - timeframeTotal;
+
 	const cumulativeData = dailyData.reduce(
 		// biome-ignore lint/suspicious/noExplicitAny: complex reduce accumulator type
 		(acc: any[], day, i) => {
-			const prevValue = i > 0 ? acc[i - 1].cumulativeValue : 0;
+			const prevValue = i > 0 ? acc[i - 1].cumulativeValue : cumulativeStart;
 			acc.push({
 				...day,
 				cumulativeValue: prevValue + day.value,
@@ -684,7 +687,10 @@ function StatisticsPage() {
 				}, 0);
 				const rSquared = Math.max(0, 1 - ssResidual / ssTotal);
 
-				const currentBaseline = Number(stats.totalValue);
+				const currentBaseline =
+					cumulativeData.length > 0
+						? cumulativeData[cumulativeData.length - 1].cumulativeValue
+						: 0;
 				const lastDayInData = Math.max(...dataPoints.map((p) => p.x));
 
 				const futureDays = [7, 14, 30, 60, 90];
