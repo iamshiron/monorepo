@@ -29,8 +29,8 @@ export function ActiveFilters({
 		minKakera > 0 ||
 		disabledFilter !== "all" ||
 		selectedKeyTypes.length > 0 ||
-		wishStatus !== null ||
-		isFavoriteFilter !== null ||
+		wishStatus.length > 0 ||
+		isFavoriteFilter ||
 		selectedSeries.length > 0;
 
 	if (!hasActiveFilters) return null;
@@ -97,26 +97,32 @@ export function ActiveFilters({
 					</button>
 				);
 			})}
-			{wishStatus && (
+			{wishStatus.map((status) => (
 				<button
 					type="button"
-					onClick={() => onFiltersChange({ ...filters, wishStatus: null })}
+					key={status}
+					onClick={() =>
+						onFiltersChange({
+							...filters,
+							wishStatus: wishStatus.filter((w) => w !== status),
+						})
+					}
 					className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-secondary text-secondary-foreground hover:bg-secondary/80"
 				>
 					<StarIcon
 						size={10}
-						weight={wishStatus === "starwish" ? "fill" : "regular"}
-						className={wishStatus === "starwish" ? "text-warning" : ""}
+						weight={status === "starwish" ? "fill" : "regular"}
+						className={status === "starwish" ? "text-warning" : ""}
 					/>
-					{wishStatus === "starwish" ? "Starwish" : "Wish"}
+					{status === "starwish" ? "Starwish" : "Wish"}
 					<XIcon size={10} />
 				</button>
-			)}
-			{isFavoriteFilter !== null && (
+			))}
+			{isFavoriteFilter && (
 				<button
 					type="button"
 					onClick={() =>
-						onFiltersChange({ ...filters, isFavoriteFilter: null })
+						onFiltersChange({ ...filters, isFavoriteFilter: false })
 					}
 					className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-secondary text-secondary-foreground hover:bg-secondary/80"
 				>

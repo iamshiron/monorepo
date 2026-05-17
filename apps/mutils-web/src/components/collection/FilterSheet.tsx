@@ -31,8 +31,8 @@ export interface CollectionFilters {
 	minKakera: number;
 	disabledFilter: "all" | "disabled" | "enabled";
 	selectedKeyTypes: string[];
-	wishStatus: "wish" | "starwish" | "inwishlist" | null;
-	isFavoriteFilter: boolean | null;
+	wishStatus: ("wish" | "starwish")[];
+	isFavoriteFilter: boolean;
 	selectedSeries: string[];
 }
 
@@ -41,8 +41,8 @@ export const DEFAULT_FILTERS: CollectionFilters = {
 	minKakera: 0,
 	disabledFilter: "all",
 	selectedKeyTypes: [],
-	wishStatus: null,
-	isFavoriteFilter: null,
+	wishStatus: [],
+	isFavoriteFilter: false,
 	selectedSeries: [],
 };
 
@@ -111,8 +111,8 @@ export function FilterSheet({
 		filters.minKakera > 0 ||
 		filters.disabledFilter !== "all" ||
 		filters.selectedKeyTypes.length > 0 ||
-		filters.wishStatus !== null ||
-		filters.isFavoriteFilter !== null ||
+		filters.wishStatus.length > 0 ||
+		filters.isFavoriteFilter ||
 		filters.selectedSeries.length > 0;
 
 	const toggleKeyType = (keyType: string) => {
@@ -297,12 +297,13 @@ export function FilterSheet({
 										onClick={() =>
 											onFiltersChange({
 												...filters,
-												wishStatus:
-													filters.wishStatus === "starwish" ? null : "starwish",
+												wishStatus: filters.wishStatus.includes("starwish")
+													? filters.wishStatus.filter((w) => w !== "starwish")
+													: [...filters.wishStatus, "starwish"],
 											})
 										}
 										className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-											filters.wishStatus === "starwish"
+											filters.wishStatus.includes("starwish")
 												? "bg-warning/10 text-warning ring-1 ring-warning/20"
 												: "bg-muted/30 text-muted-foreground hover:bg-muted/50"
 										}`}
@@ -322,12 +323,13 @@ export function FilterSheet({
 										onClick={() =>
 											onFiltersChange({
 												...filters,
-												wishStatus:
-													filters.wishStatus === "wish" ? null : "wish",
+												wishStatus: filters.wishStatus.includes("wish")
+													? filters.wishStatus.filter((w) => w !== "wish")
+													: [...filters.wishStatus, "wish"],
 											})
 										}
 										className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-											filters.wishStatus === "wish"
+											filters.wishStatus.includes("wish")
 												? "bg-muted-foreground/10 text-muted-foreground ring-1 ring-muted-foreground/20"
 												: "bg-muted/30 text-muted-foreground hover:bg-muted/50"
 										}`}
@@ -356,12 +358,11 @@ export function FilterSheet({
 								onClick={() =>
 									onFiltersChange({
 										...filters,
-										isFavoriteFilter:
-											filters.isFavoriteFilter === true ? null : true,
+										isFavoriteFilter: !filters.isFavoriteFilter,
 									})
 								}
 								className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-									filters.isFavoriteFilter === true
+									filters.isFavoriteFilter
 										? "bg-destructive/10 text-destructive ring-1 ring-destructive/20"
 										: "bg-muted/30 text-muted-foreground hover:bg-muted/50"
 								}`}

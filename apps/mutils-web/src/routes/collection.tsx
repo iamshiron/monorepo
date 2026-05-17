@@ -15,8 +15,12 @@ import {
 	useMutation,
 	useQueryClient,
 } from "@tanstack/react-query";
+import {
+	useDebouncedCallback,
+	useDebouncedValue,
+} from "@tanstack/react-pacer/debouncer";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
 	useGetApiCollection,
@@ -60,6 +64,15 @@ import { SpherePerksModal } from "@/components/collection/SpherePerksModal";
 import { Button } from "@shiron/ui/components/ui/button";
 import { Input } from "@shiron/ui/components/ui/input";
 import {
+	Pagination,
+	PaginationContent,
+	PaginationEllipsis,
+	PaginationItem,
+	PaginationLink,
+	PaginationNext,
+	PaginationPrevious,
+} from "@shiron/ui/components/ui/pagination";
+import {
 	Select,
 	SelectContent,
 	SelectItem,
@@ -70,49 +83,171 @@ import { Spinner } from "@shiron/ui/components/ui/spinner";
 import { useAuth } from "@/hooks/useAuth";
 import type { CollectionEntry } from "@/types";
 
-export const Route = createFileRoute("/collection")({
-	component: CollectionPage,
-});
-
-function useDebouncedValue<T>(value: T, delay: number): T {
-	const [debouncedValue, setDebouncedValue] = useState(value);
-
-	useEffect(() => {
-		const timer = setTimeout(() => setDebouncedValue(value), delay);
-		return () => clearTimeout(timer);
-	}, [value, delay]);
-
-	return debouncedValue;
+interface CollectionSearchInput {
+	search?: string;
+	page?: number;
+	sortBy?: string;
+	sortOrder?: "asc" | "desc";
+	minKeys?: number;
+	minKakera?: number;
+	disabledFilter?: "all" | "disabled" | "enabled";
+	keyTypes?: string;
+	wishStatus?: string;
+	isFavorite?: boolean;
+	series?: string;
 }
 
-const FILTERS_STORAGE_KEY = "mutils-collection-filters";
+interface ResolvedSearchParams {
+	search: string;
+	page: number;
+	sortBy: string;
+	sortOrder: "asc" | "desc";
+	minKeys: number;
+	minKakera: number;
+	disabledFilter: "all" | "disabled" | "enabled";
+	keyTypes: string;
+	wishStatus: string;
+	isFavorite: boolean;
+	series: string;
+}
 
-function usePersistedFilters(): [
-	CollectionFilters,
-	(filters: CollectionFilters) => void,
-] {
-	const [filters, setFilters] = useState<CollectionFilters>(() => {
-		try {
-			const stored = localStorage.getItem(FILTERS_STORAGE_KEY);
-			if (stored) {
-				const parsed = JSON.parse(stored);
-				return { ...DEFAULT_FILTERS, ...parsed };
-			}
-		} catch (e) {
-			console.error("Failed to parse stored filters:", e);
+const DEFAULT_SEARCH_PARAMS: ResolvedSearchParams = {
+	search: "",
+	page: 1,
+	sortBy: "rank",
+	sortOrder: "asc",
+	minKeys: 0,
+	minKakera: 0,
+	disabledFilter: "all",
+	keyTypes: "",
+	wishStatus: "",
+	isFavorite: false,
+	series: "",
+};
+
+export const Route = createFileRoute("/collection")({
+	component: CollectionPage,
+	validateSearch: (search: Record<string, unknown>): CollectionSearchInput => {
+		const result: CollectionSearchInput = {};
+		if (typeof search.search === "string") result.search = search.search;
+		if (search.page != null) result.page = Number(search.page) || 1;
+		if (typeof search.sortBy === "string") result.sortBy = search.sortBy;
+		if (search.sortOrder === "asc" || search.sortOrder === "desc")
+			result.sortOrder = search.sortOrder;
+		if (search.minKeys != null) result.minKeys = Number(search.minKeys) || 0;
+		if (search.minKakera != null)
+			result.minKakera = Number(search.minKakera) || 0;
+		if (
+			search.disabledFilter === "all" ||
+			search.disabledFilter === "disabled" ||
+			search.disabledFilter === "enabled"
+		)
+			result.disabledFilter = search.disabledFilter;
+		if (typeof search.keyTypes === "string") result.keyTypes = search.keyTypes;
+		if (typeof search.wishStatus === "string")
+			result.wishStatus = search.wishStatus;
+		if (search.isFavorite === "true") result.isFavorite = true;
+		if (typeof search.series === "string") result.series = search.series;
+		return result;
+	},
+});
+
+function resolveSearchParams(raw: CollectionSearchInput): ResolvedSearchParams {
+	return { ...DEFAULT_SEARCH_PARAMS, ...raw };
+}
+
+function stripDefaults(params: ResolvedSearchParams): CollectionSearchInput {
+	const result: CollectionSearchInput = {};
+	for (const key of Object.keys(
+		DEFAULT_SEARCH_PARAMS,
+	) as (keyof ResolvedSearchParams)[]) {
+		if (params[key] !== DEFAULT_SEARCH_PARAMS[key]) {
+			(result as Record<string, unknown>)[key] = params[key];
 		}
-		return DEFAULT_FILTERS;
-	});
+	}
+	return result;
+}
 
-	const setPersistedFilters = (newFilters: CollectionFilters) => {
-		localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(newFilters));
-		setFilters(newFilters);
+function parseWishStatus(value: string): ("wish" | "starwish")[] {
+	if (!value) return [];
+	return value
+		.split(",")
+		.filter((v): v is "wish" | "starwish" => v === "wish" || v === "starwish");
+}
+
+function serializeWishStatus(arr: ("wish" | "starwish")[]): string {
+	return arr.join(",");
+}
+
+function toWishStatusApiParam(
+	arr: ("wish" | "starwish")[],
+): string | undefined {
+	if (arr.length === 0) return undefined;
+	if (arr.includes("wish") && arr.includes("starwish")) return "inwishlist";
+	return arr[0];
+}
+
+function generatePageNumbers(
+	current: number,
+	total: number,
+	maxVisible = 5,
+): (number | null)[] {
+	if (total <= 1) return [1];
+
+	const pages: (number | null)[] = [];
+
+	if (total <= maxVisible + 2) {
+		for (let i = 1; i <= total; i++) pages.push(i);
+		return pages;
+	}
+
+	pages.push(1);
+
+	const halfVisible = Math.floor(maxVisible / 2);
+	let start = Math.max(2, current - halfVisible);
+	const end = Math.min(total - 1, current + halfVisible);
+
+	if (current <= halfVisible + 1) {
+		const adjustedEnd = Math.min(total - 1, maxVisible);
+		for (let i = 2; i <= adjustedEnd; i++) pages.push(i);
+	} else if (current >= total - halfVisible) {
+		const adjustedStart = Math.max(2, total - maxVisible + 1);
+		if (adjustedStart > 2) pages.push(null);
+		for (let i = adjustedStart; i <= total - 1; i++) pages.push(i);
+	} else {
+		if (start > 2) pages.push(null);
+		for (let i = start; i <= end; i++) pages.push(i);
+		if (end < total - 1) pages.push(null);
+	}
+
+	pages.push(total);
+
+	return pages;
+}
+
+function urlParamsToFilters(params: ResolvedSearchParams): CollectionFilters {
+	return {
+		minKeys: params.minKeys,
+		minKakera: params.minKakera,
+		disabledFilter: params.disabledFilter as "all" | "disabled" | "enabled",
+		selectedKeyTypes: params.keyTypes
+			? params.keyTypes.split(",").filter(Boolean)
+			: [],
+		wishStatus: parseWishStatus(params.wishStatus),
+		isFavoriteFilter: params.isFavorite,
+		selectedSeries: params.series
+			? params.series.split(",").filter(Boolean)
+			: [],
 	};
-
-	return [filters, setPersistedFilters];
 }
 
 function CollectionPage() {
+	const rawParams = Route.useSearch();
+	const urlParams = useMemo(() => resolveSearchParams(rawParams), [rawParams]);
+	const navigate = useNavigate();
+	const gridRef = useRef<HTMLDivElement>(null);
+
+	const [searchInput, setSearchInput] = useState(urlParams.search);
 	const [showImport, setShowImport] = useState(false);
 	const [showExport, setShowExport] = useState(false);
 	const [showSeriesImport, setShowSeriesImport] = useState(false);
@@ -125,12 +260,14 @@ function CollectionPage() {
 	);
 	const [editingSpherePerks, setEditingSpherePerks] =
 		useState<CollectionEntry | null>(null);
-	const [search, setSearch] = useState("");
-	const [sortBy, setSortBy] = useState("rank");
-	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-	const [page, setPage] = useState(1);
 	const [filterSheetOpen, setFilterSheetOpen] = useState(false);
-	const [filters, setFilters] = usePersistedFilters();
+
+	const filters = useMemo(() => urlParamsToFilters(urlParams), [urlParams]);
+
+	const [debouncedSearch] = useDebouncedValue(urlParams.search, {
+		wait: 300,
+	});
+
 	const {
 		minKeys,
 		minKakera,
@@ -140,45 +277,78 @@ function CollectionPage() {
 		isFavoriteFilter,
 		selectedSeries,
 	} = filters;
+
 	const queryClient = useQueryClient();
 	const { isAuthenticated, isLoading: authLoading } = useAuth();
-	const navigate = useNavigate();
 
-	const debouncedSearch = useDebouncedValue(search, 300);
+	const navigateWith = useCallback(
+		(updater: (current: ResolvedSearchParams) => ResolvedSearchParams) => {
+			navigate({
+				search: (current) => {
+					const resolved = resolveSearchParams(
+						current as CollectionSearchInput,
+					);
+					const next = updater(resolved);
+					return stripDefaults(next) as never;
+				},
+				replace: true,
+			});
+		},
+		[navigate],
+	);
+
+	const updateSearchUrl = useDebouncedCallback(
+		(value: string) => {
+			navigateWith((prev) => ({ ...prev, page: 1, search: value }));
+		},
+		{ wait: 300 },
+	);
+
+	const setParam = useCallback(
+		(key: keyof ResolvedSearchParams, value: unknown) => {
+			navigateWith((prev) => ({ ...prev, page: 1, [key]: value }));
+		},
+		[navigateWith],
+	);
+
+	const setFilters = useCallback(
+		(newFilters: CollectionFilters) => {
+			navigateWith((prev) => ({
+				...prev,
+				page: 1,
+				minKeys: newFilters.minKeys,
+				minKakera: newFilters.minKakera,
+				disabledFilter: newFilters.disabledFilter,
+				keyTypes: newFilters.selectedKeyTypes.join(","),
+				wishStatus: serializeWishStatus(newFilters.wishStatus),
+				isFavorite: newFilters.isFavoriteFilter,
+				series: newFilters.selectedSeries.join(","),
+			}));
+		},
+		[navigateWith],
+	);
 
 	const hasActiveFilters =
 		minKeys > 0 ||
 		minKakera > 0 ||
 		disabledFilter !== "all" ||
 		selectedKeyTypes.length > 0 ||
-		wishStatus !== null ||
-		isFavoriteFilter !== null ||
+		wishStatus.length > 0 ||
+		isFavoriteFilter ||
 		selectedSeries.length > 0;
 
 	const clearAllFilters = () => {
 		setFilters(DEFAULT_FILTERS);
 	};
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional - reset page on filter change
-	useEffect(() => {
-		setPage(1);
-	}, [
-		debouncedSearch,
-		minKeys,
-		minKakera,
-		disabledFilter,
-		selectedKeyTypes,
-		wishStatus,
-		isFavoriteFilter,
-		selectedSeries,
-	]);
+	const wishStatusApiParam = toWishStatusApiParam(wishStatus);
 
 	const { data, isLoading, error } = useGetApiCollection(
 		{
 			search: debouncedSearch,
-			sortBy,
-			sortOrder,
-			page,
+			sortBy: urlParams.sortBy,
+			sortOrder: urlParams.sortOrder,
+			page: urlParams.page,
 			pageSize: 60,
 			minKeys: minKeys || undefined,
 			minKakera: minKakera || undefined,
@@ -186,8 +356,8 @@ function CollectionPage() {
 				disabledFilter === "all" ? undefined : disabledFilter === "disabled",
 			keyTypes:
 				selectedKeyTypes.length > 0 ? selectedKeyTypes.join(",") : undefined,
-			wishStatus: wishStatus ?? undefined,
-			isFavorite: isFavoriteFilter ?? undefined,
+			wishStatus: wishStatusApiParam,
+			isFavorite: isFavoriteFilter || undefined,
 			series: selectedSeries.length > 0 ? selectedSeries.join(",") : undefined,
 		},
 		{
@@ -417,6 +587,18 @@ function CollectionPage() {
 		}
 	};
 
+	const handlePageChange = (newPage: number) => {
+		navigateWith((prev) => ({ ...prev, page: newPage }));
+		gridRef.current?.scrollIntoView({ behavior: "smooth" });
+	};
+
+	const totalPages = data ? Number(data.totalPages) : 0;
+	const currentPage = urlParams.page;
+	const pageNumbers = useMemo(
+		() => generatePageNumbers(currentPage, totalPages),
+		[currentPage, totalPages],
+	);
+
 	if (authLoading) {
 		return (
 			<div className="flex items-center justify-center min-h-[60vh]">
@@ -470,11 +652,11 @@ function CollectionPage() {
 						{stats && (
 							<div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
 								<span>{stats.totalCharacters.toLocaleString()} characters</span>
-								<span className="text-border">·</span>
+								<span className="text-border">&middot;</span>
 								<span>
 									{stats.disabledCount?.toLocaleString() ?? 0} disabled
 								</span>
-								<span className="text-border">·</span>
+								<span className="text-border">&middot;</span>
 								<span className="text-primary font-medium">
 									{stats.totalKakera.toLocaleString()} ka
 								</span>
@@ -537,7 +719,7 @@ function CollectionPage() {
 						<span className="text-sm">
 							Processing images: {imageStatus.stored}/{imageStatus.total} cached
 							{Number(imageStatus.pending) > 0 &&
-								` · ${imageStatus.pending} pending`}
+								` \u00b7 ${imageStatus.pending} pending`}
 						</span>
 					</div>
 				)}
@@ -556,8 +738,11 @@ function CollectionPage() {
 					/>
 					<Input
 						type="text"
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
+						value={searchInput}
+						onChange={(e) => {
+							setSearchInput(e.target.value);
+							updateSearchUrl(e.target.value);
+						}}
 						placeholder="Search by name or series..."
 						className="h-10 pl-10 pr-4"
 					/>
@@ -575,7 +760,10 @@ function CollectionPage() {
 					)}
 				</Button>
 
-				<Select value={sortBy} onValueChange={setSortBy}>
+				<Select
+					value={urlParams.sortBy}
+					onValueChange={(v) => setParam("sortBy", v)}
+				>
 					<SelectTrigger className="h-10! w-[160px]">
 						<SelectValue />
 					</SelectTrigger>
@@ -594,12 +782,17 @@ function CollectionPage() {
 					variant="outline"
 					size="icon"
 					className="h-10 w-10"
-					onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+					onClick={() =>
+						setParam(
+							"sortOrder",
+							urlParams.sortOrder === "asc" ? "desc" : "asc",
+						)
+					}
 				>
 					<SortAscendingIcon
 						size={18}
 						className={`transition-transform ${
-							sortOrder === "desc" ? "rotate-180" : ""
+							urlParams.sortOrder === "desc" ? "rotate-180" : ""
 						}`}
 					/>
 				</Button>
@@ -642,7 +835,10 @@ function CollectionPage() {
 				</div>
 			) : (
 				<>
-					<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-2">
+					<div
+						ref={gridRef}
+						className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-2"
+					>
 						{data.items.map((entry) => (
 							<CharacterCard
 								key={entry.id}
@@ -658,34 +854,54 @@ function CollectionPage() {
 						))}
 					</div>
 
-					{Number(data.totalPages) > 1 && (
-						<div className="flex items-center justify-center gap-2 pt-4">
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={() => setPage((p) => Math.max(1, p - 1))}
-								disabled={page === 1}
-							>
-								Previous
-							</Button>
-							<div className="flex items-center gap-1.5 px-3">
-								<span className="text-sm font-medium">{page}</span>
-								<span className="text-muted-foreground">/</span>
-								<span className="text-sm text-muted-foreground">
-									{data.totalPages}
-								</span>
-							</div>
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={() =>
-									setPage((p) => Math.min(Number(data.totalPages), p + 1))
-								}
-								disabled={page === data.totalPages}
-							>
-								Next
-							</Button>
-						</div>
+					{totalPages > 1 && (
+						<Pagination className="pt-4">
+							<PaginationContent>
+								<PaginationItem>
+									<PaginationPrevious
+										onClick={() =>
+											handlePageChange(Math.max(1, currentPage - 1))
+										}
+										className={
+											currentPage === 1
+												? "pointer-events-none opacity-50"
+												: "cursor-pointer"
+										}
+									/>
+								</PaginationItem>
+
+								{pageNumbers.map((page, i) =>
+									page === null ? (
+										<PaginationItem key={`ellipsis-${i}`}>
+											<PaginationEllipsis />
+										</PaginationItem>
+									) : (
+										<PaginationItem key={page}>
+											<PaginationLink
+												onClick={() => handlePageChange(page)}
+												isActive={page === currentPage}
+												className="cursor-pointer"
+											>
+												{page}
+											</PaginationLink>
+										</PaginationItem>
+									),
+								)}
+
+								<PaginationItem>
+									<PaginationNext
+										onClick={() =>
+											handlePageChange(Math.min(totalPages, currentPage + 1))
+										}
+										className={
+											currentPage === totalPages
+												? "pointer-events-none opacity-50"
+												: "cursor-pointer"
+										}
+									/>
+								</PaginationItem>
+							</PaginationContent>
+						</Pagination>
 					)}
 				</>
 			)}
