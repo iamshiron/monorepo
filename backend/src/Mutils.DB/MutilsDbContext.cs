@@ -202,7 +202,7 @@ public class MutilsDbContext(DbContextOptions<MutilsDbContext> options) : DbCont
             entity.HasIndex(e => e.CollectionEntryId);
             entity.HasOne(e => e.CollectionEntry)
                 .WithOne(e => e.SpherePerks)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 

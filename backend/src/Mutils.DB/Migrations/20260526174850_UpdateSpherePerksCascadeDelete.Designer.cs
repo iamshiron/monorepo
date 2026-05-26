@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Shiron.Mutils.DB;
@@ -11,9 +12,11 @@ using Shiron.Mutils.DB;
 namespace Shiron.Mutils.DB.Migrations
 {
     [DbContext(typeof(MutilsDbContext))]
-    partial class MutilsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260526174850_UpdateSpherePerksCascadeDelete")]
+    partial class UpdateSpherePerksCascadeDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
