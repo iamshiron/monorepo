@@ -17,5 +17,5 @@ public class OwnedCharacter {
     public int Forte3Level { get; set; }
     public int Forte4Level { get; set; }
 
-    public IList<OwnedEcho> Echos { get; set; } = [];
+    public IList<OwnedEcho> Echoes { get; set; } = [];
 }

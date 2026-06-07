@@ -433,7 +433,7 @@ namespace Shiron.ResonanceSystem.DB.Migrations
             modelBuilder.Entity("Shiron.ResonanceSystem.DB.Schema.OwnedEcho", b =>
                 {
                     b.HasOne("Shiron.ResonanceSystem.DB.Schema.OwnedCharacter", "Character")
-                        .WithMany("Echos")
+                        .WithMany("Echoes")
                         .HasForeignKey("CharacterID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -443,7 +443,7 @@ namespace Shiron.ResonanceSystem.DB.Migrations
 
             modelBuilder.Entity("Shiron.ResonanceSystem.DB.Schema.OwnedCharacter", b =>
                 {
-                    b.Navigation("Echos");
+                    b.Navigation("Echoes");
                 });
 
             modelBuilder.Entity("Shiron.ResonanceSystem.DB.Schema.OwnedEcho", b =>

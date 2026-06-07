@@ -16,4 +16,12 @@ public static class EchoSubStatDTOExtensions {
             Index = dto.Index
         };
     }
+
+    public static EchoSubStatDTO ToDTO(this EchoSubStat data) {
+        return new EchoSubStatDTO {
+            Type = data.Type,
+            Value = data.Value,
+            Index = data.Index
+        };
+    }
 }
