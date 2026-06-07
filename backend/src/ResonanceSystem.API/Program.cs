@@ -128,5 +128,6 @@ app.MapIdentityEndpoints();
 
 var api = app.MapGroup("/api");
 api.MapContentEndpoints();
+api.MapInventoryEndpoints();
 
 app.Run();

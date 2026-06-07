@@ -7,6 +7,9 @@ namespace Shiron.ResonanceSystem.DB;
 
 public class ResSystemDbContext(DbContextOptions<ResSystemDbContext> options) : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options) {
     public DbSet<Character> Characters => Set<Character>();
+    public DbSet<OwnedCharacter> OwnedCharacters => Set<OwnedCharacter>();
+    public DbSet<OwnedEcho> OwnedEchos => Set<OwnedEcho>();
+    public DbSet<EchoSubStat> EchoSubStats => Set<EchoSubStat>();
 
     protected override void OnModelCreating(ModelBuilder builder) {
         base.OnModelCreating(builder);

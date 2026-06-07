@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Shiron.ResonanceSystem.Core.DTOs;
 using Shiron.ResonanceSystem.DB;
 using Shiron.ResonanceSystem.DB.Schema;
-using Sprache;
 using Attribute = Shiron.ResonanceSystem.DB.Schema.Attribute;
 
 namespace Shiron.ResonanceSystem.API.Endpoints;
