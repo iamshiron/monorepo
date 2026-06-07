@@ -6,8 +6,16 @@ using Shiron.ResonanceSystem.DB.Schema;
 namespace Shiron.ResonanceSystem.DB;
 
 public class ResSystemDbContext(DbContextOptions<ResSystemDbContext> options) : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options) {
+    public DbSet<Character> Characters => Set<Character>();
+
     protected override void OnModelCreating(ModelBuilder builder) {
         base.OnModelCreating(builder);
+
+        builder.Entity<Character>(entity => {
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.Id).ValueGeneratedNever();
+            entity.ToTable("Characters");
+        });
 
         builder.Entity<User>().ToTable("Users");
         builder.Entity<IdentityRole<Guid>>().ToTable("Roles");

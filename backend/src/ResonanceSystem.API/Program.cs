@@ -9,6 +9,7 @@ using Shiron.ResonanceSystem.DB.Schema;
 using Shiron.ResonanceSystem.Services;
 using Shiron.ResonanceSystem.API.Configuration;
 using Shiron.ResonanceSystem.API.Endpoints;
+using Shiron.ResonanceSystem.API.Seeders;
 
 Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
@@ -106,6 +107,9 @@ using (var scope = app.Services.CreateScope()) {
         logger.LogError(e, "A fatal error occurred applying DB migrations or seeding the admin user.");
         throw;
     }
+}
+using (var scope = app.Services.CreateScope()) {
+    scope.ServiceProvider.SeedCharacters();
 }
 
 if (app.Environment.IsDevelopment()) {
