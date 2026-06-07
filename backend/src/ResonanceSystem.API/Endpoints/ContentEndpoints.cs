@@ -37,8 +37,8 @@ public static class ContentEndpoints {
                 return Results.Ok(resonators);
             }).Produces<IList<ResonatorDTO>>();
 
-        group.MapGet("/resonators/{id}", (ulong id, ResSystemDbContext db) => {
-            var c = db.Characters.FirstOrDefault(c => c.Id == id);
+        group.MapGet("/resonators/{id}", (string id, ResSystemDbContext db) => {
+            var c = db.Characters.FirstOrDefault(c => c.Id == ulong.Parse(id));
 
             if (c == null) {
                 return Results.NotFound(new {

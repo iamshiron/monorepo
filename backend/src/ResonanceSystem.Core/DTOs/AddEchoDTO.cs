@@ -2,7 +2,7 @@ using Shiron.ResonanceSystem.DB.Schema;
 
 namespace Shiron.ResonanceSystem.Core.DTOs;
 
-public record EchoDTO {
+public record AddEchoDTO {
     public required string Name { get; set; }
     public required int Level { get; set; }
     public required EchoCost Cost { get; set; }
@@ -15,7 +15,7 @@ public record EchoDTO {
 }
 
 public static class EchoDTOExtensions {
-    public static OwnedEcho ToDatabase(this EchoDTO dto) {
+    public static OwnedEcho ToDatabase(this AddEchoDTO dto) {
         return new OwnedEcho {
             Name = dto.Name,
             Level = dto.Level,
@@ -27,8 +27,8 @@ public static class EchoDTOExtensions {
         };
     }
 
-    public static EchoDTO ToDTO(this OwnedEcho data) {
-        return new EchoDTO {
+    public static AddEchoDTO ToDTO(this OwnedEcho data) {
+        return new AddEchoDTO {
             Name = data.Name,
             Level = data.Level,
             Cost = data.Cost,

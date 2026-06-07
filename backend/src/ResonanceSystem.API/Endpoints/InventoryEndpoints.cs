@@ -45,6 +45,7 @@ public static class InventoryEndpoints {
             if (userID is null) return Results.Unauthorized();
 
             var characters = db.OwnedCharacters.Where(c => c.UserID == userID.Value)
+                .Include(c => c.Character)
                 .Include(c => c.Echoes)
                 .ThenInclude(e => e.SubStats)
                 .Select(c => c.ToDTO());
@@ -57,6 +58,7 @@ public static class InventoryEndpoints {
             if (userID is null) return Results.Unauthorized();
 
             var character = db.OwnedCharacters
+                .Include(c => c.Character)
                 .Include(c => c.Echoes)
                 .ThenInclude(e => e.SubStats)
                 .FirstOrDefault(c => c.UserID == userID.Value && c.ID == id);

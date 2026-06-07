@@ -16,17 +16,19 @@ public record AddOwnedResonatorDTO {
     public required int Forte3Level { get; set; }
     public required int Forte4Level { get; set; }
 
-    public IList<EchoDTO> Echoes { get; set; } = [];
+    public IList<AddEchoDTO> Echoes { get; set; } = [];
 }
 
 public record OwnedResonatorDTO : AddOwnedResonatorDTO {
     public Guid ID { get; set; } = Guid.CreateVersion7();
+    public required ResonatorDTO Resonator { get; set; }
 }
 
 public static class OwnedResonatorDTOExtensions {
     public static OwnedResonatorDTO ToDTO(this OwnedCharacter data) {
         return new OwnedResonatorDTO {
             ID = data.ID,
+            Resonator = data.Character.ToDTO(),
             ResonatorID = data.CharacterID,
             SequenceChain = data.SequenceChain,
             Level = data.Level,
