@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BlurHashSharp"/>
+        <PackageReference Include="DotNetEnv"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
+        <PackageReference Include="Minio"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design"/>
+        <PackageReference Include="Scalar.AspNetCore"/>
+        <PackageReference Include="SixLabors.ImageSharp"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ResonanceSystem.Core\Shiron.ResonanceSystem.Core.csproj"/>
+        <ProjectReference Include="..\ResonanceSystem.DB\Shiron.ResonanceSystem.DB.csproj"/>
+        <ProjectReference Include="..\ResonanceSystem.Services\Shiron.ResonanceSystem.Services.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="DotNetEnv">
+            <HintPath>..\..\..\..\..\..\.nuget\packages\dotnetenv\3.1.1\lib\netstandard1.3\DotNetEnv.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+</Project>

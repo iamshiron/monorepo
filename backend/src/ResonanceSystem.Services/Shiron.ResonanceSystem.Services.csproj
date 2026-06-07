@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ResonanceSystem.Core\Shiron.ResonanceSystem.Core.csproj"/>
+        <ProjectReference Include="..\ResonanceSystem.DB\Shiron.ResonanceSystem.DB.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Minio"/>
+    </ItemGroup>
+</Project>
