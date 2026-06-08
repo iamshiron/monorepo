@@ -1,6 +1,7 @@
 using DotNetEnv;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.ObjectPool;
 using Microsoft.Extensions.Options;
 using Minio;
 using Scalar.AspNetCore;
@@ -10,9 +11,19 @@ using Shiron.ResonanceSystem.Services;
 using Shiron.ResonanceSystem.API.Configuration;
 using Shiron.ResonanceSystem.API.Endpoints;
 using Shiron.ResonanceSystem.API.Seeders;
+using Tesseract;
 
 Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
+
+// Services
+builder.Services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
+builder.Services.AddSingleton<ObjectPool<TesseractEngine>>(sp => {
+    var provider = sp.GetRequiredService<ObjectPoolProvider>();
+    var policy = new TesseractEnginePolicy("eng");
+    return provider.Create(policy);
+});
+builder.Services.AddSingleton<IOCRService, OCRService>();
 
 builder.Services.AddOpenApi();
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(c => {
@@ -129,5 +140,6 @@ app.MapIdentityEndpoints();
 var api = app.MapGroup("/api");
 api.MapContentEndpoints();
 api.MapInventoryEndpoints();
+api.MapScanEndpoints();
 
 app.Run();

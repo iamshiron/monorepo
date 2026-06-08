@@ -12,5 +12,6 @@
 
     <ItemGroup>
         <PackageReference Include="Minio"/>
+        <PackageReference Include="Tesseract" />
     </ItemGroup>
 </Project>
