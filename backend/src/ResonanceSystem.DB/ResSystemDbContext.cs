@@ -20,6 +20,20 @@ public class ResSystemDbContext(DbContextOptions<ResSystemDbContext> options) : 
             entity.ToTable("Characters");
         });
 
+        builder.Entity<OwnedCharacter>(entity => {
+            entity.HasMany(c => c.Echoes)
+                .WithOne(e => e.Character)
+                .HasForeignKey(e => e.CharacterID)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<OwnedEcho>(entity => {
+            entity.HasMany(e => e.SubStats)
+                .WithOne(s => s.Echo)
+                .HasForeignKey(s => s.EchoID)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
         builder.Entity<User>().ToTable("Users");
         builder.Entity<IdentityRole<Guid>>().ToTable("Roles");
         builder.Entity<IdentityUserRole<Guid>>().ToTable("UserRoles");

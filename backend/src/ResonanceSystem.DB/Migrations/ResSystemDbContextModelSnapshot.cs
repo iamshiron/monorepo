@@ -198,7 +198,7 @@ namespace Shiron.ResonanceSystem.DB.Migrations
 
                     b.HasIndex("EchoID");
 
-                    b.ToTable("EchoSubStats");
+                    b.ToTable("EchoSubStats", (string)null);
                 });
 
             modelBuilder.Entity("Shiron.ResonanceSystem.DB.Schema.OwnedCharacter", b =>
@@ -240,7 +240,7 @@ namespace Shiron.ResonanceSystem.DB.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("OwnedCharacters");
+                    b.ToTable("OwnedCharacters", (string)null);
                 });
 
             modelBuilder.Entity("Shiron.ResonanceSystem.DB.Schema.OwnedEcho", b =>
@@ -276,7 +276,7 @@ namespace Shiron.ResonanceSystem.DB.Migrations
 
                     b.HasIndex("CharacterID");
 
-                    b.ToTable("OwnedEchos");
+                    b.ToTable("OwnedEchos", (string)null);
                 });
 
             modelBuilder.Entity("Shiron.ResonanceSystem.DB.Schema.User", b =>

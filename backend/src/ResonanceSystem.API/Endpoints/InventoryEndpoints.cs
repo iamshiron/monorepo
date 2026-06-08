@@ -67,6 +67,32 @@ public static class InventoryEndpoints {
 
             return Results.Ok(character.ToDTO());
         }).Produces<OwnedResonatorDTO>();
+
+        group.MapPost("/resonators/{id}/echoes", async (Guid id, IList<AddEchoDTO> data, ClaimsPrincipal user, ResSystemDbContext db) => {
+            var userID = GetUserID(user);
+            if (userID is null) return Results.Unauthorized();
+
+            var character = db.OwnedCharacters
+                .Include(c => c.Echoes)
+                .ThenInclude(e => e.SubStats)
+                .FirstOrDefault(c => c.UserID == userID.Value && c.ID == id);
+            if (character is null) return Results.NotFound();
+
+            character.Echoes.Clear();
+            foreach (var dto in data) {
+                var newEcho = dto.ToDatabase();
+                newEcho.ID = Guid.Empty;
+
+                foreach (var subStat in newEcho.SubStats) {
+                    subStat.ID = Guid.Empty;
+                }
+
+                character.Echoes.Add(newEcho);
+            }
+
+            await db.SaveChangesAsync();
+            return Results.NoContent();
+        });
     }
 
     private static Guid? GetUserID(ClaimsPrincipal principal) {
