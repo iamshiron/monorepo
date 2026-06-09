@@ -43,7 +43,8 @@ public static partial class ScanEndpoints {
         var res = ocr.Process(image);
         if (res == null) return Results.BadRequest("Failed to process image");
         return Results.Ok(new {
-            ResonatorName = ExtractResonatorName(image, ocr)
+            ResonatorName = ExtractResonatorName(image, ocr),
+            EchoSubStatLines = ExtractEchoSubStatLines(image, ocr, 0)
         });
     }
 
@@ -53,6 +54,19 @@ public static partial class ScanEndpoints {
         var name = NameRegex().Match(res.Text);
         if (!name.Success) return null;
         return name.Value;
+    }
+
+    private static List<string[]> ExtractEchoSubStatLines(SKBitmap image, IOCRService ocr, int echoIndex) {
+        var result = new List<string[]>(5);
+
+        int[] xValues = [64, 443, 815, 1190, 1565];
+        foreach (var xValue in xValues) {
+            var area = new Rect(xValue, 845, 310, 200);
+            var res = ocr.Process(image, area, PageSegMode.SingleBlock);
+            result.Add(res == null ? Array.Empty<string>() : res.Text.Split('\n'));
+        }
+
+        return result;
     }
 
     /// <summary>
