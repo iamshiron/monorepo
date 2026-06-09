@@ -3,6 +3,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,7 +13,9 @@
 
     <ItemGroup>
         <PackageReference Include="Minio"/>
-        <PackageReference Include="Tesseract" />
+        <PackageReference Include="SkiaSharp"/>
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux"/>
+        <PackageReference Include="Tesseract"/>
     </ItemGroup>
 
     <ItemGroup>

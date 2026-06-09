@@ -1,12 +1,18 @@
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Shiron.ResonanceSystem.Core.DTOs;
 using Shiron.ResonanceSystem.DB;
 using Shiron.ResonanceSystem.Services;
+using SkiaSharp;
+using Tesseract;
 
 namespace Shiron.ResonanceSystem.API.Endpoints;
 
-public static class ScanEndpoints {
+public static partial class ScanEndpoints {
+    [GeneratedRegex("[\\w\\s]+\\w", RegexOptions.IgnoreCase)]
+    private static partial Regex NameRegex();
+
     public static void MapScanEndpoints(this IEndpointRouteBuilder endpoints) {
         var group = endpoints.MapGroup("/scan").WithTags("Scan");
 
@@ -16,27 +22,37 @@ public static class ScanEndpoints {
     private static async Task<IResult> ScanWuWaBotImage(
         IFormFile file,
         IOCRService ocr,
+        IImageProcessingService imageProcessing,
         ResSystemDbContext db,
         ClaimsPrincipal principal,
         CancellationToken ct,
-        [FromQuery] string id) {
+        [FromQuery] byte threshold = 80) {
         var userID = IdentityUtils.GetUserID(principal);
         if (userID == null) return Results.Unauthorized();
         if (file == null || file.Length == 0) return Results.BadRequest("No file provided");
         if (file.Length > 10 * 1024 * 1024) return Results.BadRequest("File too large");
 
-        if (!ulong.TryParse(id, out var resonatorID)) return Results.BadRequest("Invalid resonator ID");
-        var resonator = db.Characters.FirstOrDefault(c => c.Id == resonatorID);
-        if (resonator == null) return Results.BadRequest("Resonator not found");
-
         using var stream = new MemoryStream();
-        await file.CopyToAsync(stream);
+        await file.CopyToAsync(stream, ct);
         var buffer = stream.ToArray();
-        if (!IsValidImageSignature(buffer)) return Results.BadRequest("Invalid image file. Allowed formats: JPEG, PNG");
+        if (!IsValidImageSignature(buffer)) return Results.BadRequest("Invalid image file.");
 
-        var res = ocr.Process(buffer);
+        using var image = imageProcessing.BinarizeFromBytes(buffer, threshold);
+        if (image == null) return Results.BadRequest("Invalid image file.");
+
+        var res = ocr.Process(image);
         if (res == null) return Results.BadRequest("Failed to process image");
-        return Results.Ok(res);
+        return Results.Ok(new {
+            ResonatorName = ExtractResonatorName(image, ocr)
+        });
+    }
+
+    private static string? ExtractResonatorName(SKBitmap image, IOCRService ocr) {
+        var res = ocr.Process(image, Rect.FromCoords(70, 26, 1000, 86));
+        if (res == null) return null;
+        var name = NameRegex().Match(res.Text);
+        if (!name.Success) return null;
+        return name.Value;
     }
 
     /// <summary>

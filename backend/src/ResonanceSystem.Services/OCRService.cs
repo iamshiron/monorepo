@@ -1,5 +1,6 @@
 using Microsoft.Extensions.ObjectPool;
 using Shiron.ResonanceSystem.Core.DTOs;
+using SkiaSharp;
 using Tesseract;
 
 namespace Shiron.ResonanceSystem.Services;
@@ -17,25 +18,16 @@ public class TesseractEnginePolicy(string language) : IPooledObjectPolicy<Tesser
 }
 
 public interface IOCRService {
-    OCRResultDTO? Process(in byte[] data);
+    OCRResultDTO? Process(in SKBitmap data, in Rect? area = null, in PageSegMode? pageSegMode = null);
 }
 
 public class OCRService(ObjectPool<TesseractEngine> enginePool) : IOCRService {
-    // public static async Task DownloadModel(string url, HttpClient? client = null) {
-    //     client ??= new HttpClient();
-    //     var outDir = Path.Combine(Directory.GetCurrentDirectory(), TESSDATA_DIR);
-    //     if (!Directory.Exists(outDir)) Directory.CreateDirectory(outDir);
-    //     var filePath = Path.Combine(outDir, Path.GetFileName(url));
-    //     await using var stream = await client.GetStreamAsync(url);
-    //     await using var fileStream = File.Create(filePath);
-    //     await stream.CopyToAsync(fileStream);
-    // }
-
-    public OCRResultDTO? Process(in byte[] data) {
+    public OCRResultDTO? Process(in SKBitmap data, in Rect? area = null, in PageSegMode? pageSegMode = null) {
         var engine = enginePool.Get();
         try {
-            using var pix = Pix.LoadFromMemory(data);
-            using var page = engine.Process(pix);
+            using var pix = SkiaToPixConverter.ConvertBitmapToPix(data);
+
+            using var page = area.HasValue ? engine.Process(pix, area.Value, pageSegMode) : engine.Process(pix, null, pageSegMode);
             if (page is null) return null;
 
             return new OCRResultDTO {

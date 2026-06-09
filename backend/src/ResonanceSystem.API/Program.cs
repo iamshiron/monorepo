@@ -24,6 +24,7 @@ builder.Services.AddSingleton<ObjectPool<TesseractEngine>>(sp => {
     return provider.Create(policy);
 });
 builder.Services.AddSingleton<IOCRService, OCRService>();
+builder.Services.AddSingleton<IImageProcessingService, ImageProcessingService>();
 
 builder.Services.AddOpenApi();
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(c => {
