@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
+using Shiron.ResonanceSystem.Core;
 using Shiron.ResonanceSystem.Core.DTOs;
 using Shiron.ResonanceSystem.DB;
 using Shiron.ResonanceSystem.DB.Schema;
@@ -16,6 +17,9 @@ public static partial class ScanEndpoints {
 
     [GeneratedRegex("([\\w \\.]+) (\\d+(?:\\.\\d)?%?)", RegexOptions.IgnoreCase)]
     private static partial Regex SubStatRegex();
+
+    [GeneratedRegex("(\\d+(?:\\.\\d)?)%?")]
+    private static partial Regex SubStatValueRegex();
 
     public static void MapScanEndpoints(this IEndpointRouteBuilder endpoints) {
         var group = endpoints.MapGroup("/scan").WithTags("Scan");
@@ -69,14 +73,30 @@ public static partial class ScanEndpoints {
             var res = ocr.Process(image, area, PageSegMode.SingleBlock);
             if (res == null) continue;
 
-            var echoSubStats = new List<Tuple<string, string>>(5);
+            var echoSubStats = new List<EchoSubStatDTO>(5);
             var lines = res.Text.Split("\n");
             foreach (var line in lines) {
                 Console.WriteLine($"Trying to match {line}");
 
                 var match = SubStatRegex().Match(line);
                 if (match.Success) {
-                    echoSubStats.Add(Tuple.Create(match.Groups[1].Value, match.Groups[2].Value));
+                    var statName = match.Groups[1].Value.Trim();
+                    var statValueString = match.Groups[2].Value.Trim();
+
+                    var statType = EchoSubStatHelper.SubStatFromString(statName, statValueString.Contains('%'));
+                    if (statType == null) {
+                        Console.WriteLine($"Unable to parse stat: {statName} {statValueString}");
+                        continue;
+                    }
+
+                    var statValue = decimal.Parse(SubStatValueRegex().Match(statValueString).Groups[1].Value);
+                    var stat = new EchoSubStatDTO {
+                        Type = statType.Value,
+                        Value = statValue,
+                        Index = 0
+                    };
+
+                    echoSubStats.Add(stat);
                 }
             }
 
