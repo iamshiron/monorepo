@@ -14,4 +14,15 @@
         <PackageReference Include="Minio"/>
         <PackageReference Include="Tesseract" />
     </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="x64/*.so">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+        </Content>
+        <Content Include="tessdata/eng.traineddata">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <PackageCopyToOutput>true</PackageCopyToOutput>
+        </Content>
+    </ItemGroup>
 </Project>
