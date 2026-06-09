@@ -10,36 +10,33 @@ public static class ScanEndpoints {
     public static void MapScanEndpoints(this IEndpointRouteBuilder endpoints) {
         var group = endpoints.MapGroup("/scan").WithTags("Scan");
 
-        group.MapPost("/wuwa-bot/{id}", async (
-            IFormFile file,
-            IOCRService ocr,
-            ResSystemDbContext db,
-            ClaimsPrincipal principal,
-            CancellationToken ct,
-            [FromQuery] string id) => {
-                var userID = GetUserID(principal);
-                if (userID == null) return Results.Unauthorized();
-                if (file == null || file.Length == 0) return Results.BadRequest("No file provided");
-                if (file.Length > 10 * 1024 * 1024) return Results.BadRequest("File too large");
-
-                if (!ulong.TryParse(id, out var resonatorID)) return Results.BadRequest("Invalid resonator ID");
-                var resonator = db.Characters.FirstOrDefault(c => c.Id == resonatorID);
-                if (resonator == null) return Results.BadRequest("Resonator not found");
-
-                using var stream = new MemoryStream();
-                await file.CopyToAsync(stream);
-                var buffer = stream.ToArray();
-                if (!IsValidImageSignature(buffer)) return Results.BadRequest("Invalid image file. Allowed formats: JPEG, PNG");
-
-                var res = ocr.Process(buffer);
-                if (res == null) return Results.BadRequest("Failed to process image");
-                return Results.Ok(res);
-            }).DisableAntiforgery().Produces<OCRResultDTO>();
+        group.MapPost("/wuwa-bot/{id}", ScanWuWaBotImage).DisableAntiforgery().Produces<OCRResultDTO>();
     }
 
-    private static Guid? GetUserID(ClaimsPrincipal principal) {
-        var sub = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return sub is not null ? Guid.Parse(sub) : null;
+    private static async Task<IResult> ScanWuWaBotImage(
+        IFormFile file,
+        IOCRService ocr,
+        ResSystemDbContext db,
+        ClaimsPrincipal principal,
+        CancellationToken ct,
+        [FromQuery] string id) {
+        var userID = IdentityUtils.GetUserID(principal);
+        if (userID == null) return Results.Unauthorized();
+        if (file == null || file.Length == 0) return Results.BadRequest("No file provided");
+        if (file.Length > 10 * 1024 * 1024) return Results.BadRequest("File too large");
+
+        if (!ulong.TryParse(id, out var resonatorID)) return Results.BadRequest("Invalid resonator ID");
+        var resonator = db.Characters.FirstOrDefault(c => c.Id == resonatorID);
+        if (resonator == null) return Results.BadRequest("Resonator not found");
+
+        using var stream = new MemoryStream();
+        await file.CopyToAsync(stream);
+        var buffer = stream.ToArray();
+        if (!IsValidImageSignature(buffer)) return Results.BadRequest("Invalid image file. Allowed formats: JPEG, PNG");
+
+        var res = ocr.Process(buffer);
+        if (res == null) return Results.BadRequest("Failed to process image");
+        return Results.Ok(res);
     }
 
     /// <summary>

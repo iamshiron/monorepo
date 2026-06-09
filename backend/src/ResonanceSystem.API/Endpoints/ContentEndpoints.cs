@@ -11,42 +11,48 @@ public static class ContentEndpoints {
     public static void MapContentEndpoints(this IEndpointRouteBuilder endpoints) {
         var group = endpoints.MapGroup("/content").WithTags("Content");
 
-        group.MapGet("/resonators", async (
-            [FromQuery] string? name,
-            [FromQuery] Attribute? attribute,
-            [FromQuery] Rarity? rarity,
-            [FromQuery] WeaponType? weapon,
-            ResSystemDbContext db,
-            CancellationToken ct) => {
-                var query = db.Characters.AsQueryable();
+        group.MapGet("/resonators", GetResonators)
+            .Produces<IList<ResonatorDTO>>();
 
-                if (!string.IsNullOrWhiteSpace(name)) {
-                    query = query.Where(c => c.Name.Contains(name));
-                }
-                if (attribute.HasValue) {
-                    query = query.Where(c => c.Attribute == attribute);
-                }
-                if (rarity.HasValue) {
-                    query = query.Where(c => c.Rarity == rarity.Value);
-                }
-                if (weapon.HasValue) {
-                    query = query.Where(c => c.WeaponType == weapon);
-                }
+        group.MapGet("/resonators/{id}", GetResonator)
+            .Produces<ResonatorDTO>().Produces(404);
+    }
 
-                var resonators = await query.Select(c => c.ToDTO()).ToListAsync(ct);
-                return Results.Ok(resonators);
-            }).Produces<IList<ResonatorDTO>>();
+    private static async Task<IResult> GetResonators(
+        [FromQuery] string? name,
+        [FromQuery] Attribute? attribute,
+        [FromQuery] Rarity? rarity,
+        [FromQuery] WeaponType? weapon,
+        ResSystemDbContext db,
+        CancellationToken ct) {
+        var query = db.Characters.AsQueryable();
 
-        group.MapGet("/resonators/{id}", (string id, ResSystemDbContext db) => {
-            var c = db.Characters.FirstOrDefault(c => c.Id == ulong.Parse(id));
+        if (!string.IsNullOrWhiteSpace(name)) {
+            query = query.Where(c => c.Name.Contains(name));
+        }
+        if (attribute.HasValue) {
+            query = query.Where(c => c.Attribute == attribute);
+        }
+        if (rarity.HasValue) {
+            query = query.Where(c => c.Rarity == rarity.Value);
+        }
+        if (weapon.HasValue) {
+            query = query.Where(c => c.WeaponType == weapon);
+        }
 
-            if (c == null) {
-                return Results.NotFound(new {
-                    Message = "Resonator not found"
-                });
-            }
+        var resonators = await query.Select(c => c.ToDTO()).ToListAsync(ct);
+        return Results.Ok(resonators);
+    }
 
-            return Results.Ok(c.ToDTO());
-        }).Produces<ResonatorDTO>().Produces(404);
+    private static IResult GetResonator(string id, ResSystemDbContext db) {
+        var c = db.Characters.FirstOrDefault(c => c.Id == ulong.Parse(id));
+
+        if (c == null) {
+            return Results.NotFound(new {
+                Message = "Resonator not found"
+            });
+        }
+
+        return Results.Ok(c.ToDTO());
     }
 }
