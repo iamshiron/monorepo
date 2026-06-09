@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Shiron.ResonanceSystem.Core.DTOs;
 using Shiron.ResonanceSystem.DB;
+using Shiron.ResonanceSystem.DB.Schema;
 using Shiron.ResonanceSystem.Services;
 using SkiaSharp;
 using Tesseract;
@@ -12,6 +13,9 @@ namespace Shiron.ResonanceSystem.API.Endpoints;
 public static partial class ScanEndpoints {
     [GeneratedRegex("[\\w\\s]+\\w", RegexOptions.IgnoreCase)]
     private static partial Regex NameRegex();
+
+    [GeneratedRegex("([\\w \\.]+) (\\d+(?:\\.\\d)?%?)", RegexOptions.IgnoreCase)]
+    private static partial Regex SubStatRegex();
 
     public static void MapScanEndpoints(this IEndpointRouteBuilder endpoints) {
         var group = endpoints.MapGroup("/scan").WithTags("Scan");
@@ -44,7 +48,7 @@ public static partial class ScanEndpoints {
         if (res == null) return Results.BadRequest("Failed to process image");
         return Results.Ok(new {
             ResonatorName = ExtractResonatorName(image, ocr),
-            EchoSubStatLines = ExtractEchoSubStatLines(image, ocr, 0)
+            EchoSubStats = ExtractEchoSubStats(image, ocr)
         });
     }
 
@@ -56,14 +60,27 @@ public static partial class ScanEndpoints {
         return name.Value;
     }
 
-    private static List<string[]> ExtractEchoSubStatLines(SKBitmap image, IOCRService ocr, int echoIndex) {
-        var result = new List<string[]>(5);
+    private static List<object> ExtractEchoSubStats(SKBitmap image, IOCRService ocr) {
+        var result = new List<object>(5);
 
         int[] xValues = [64, 443, 815, 1190, 1565];
-        foreach (var xValue in xValues) {
-            var area = new Rect(xValue, 845, 310, 200);
+        for (var i = 0; i < xValues.Length; ++i) {
+            var area = new Rect(xValues[i], 880, 310, 160);
             var res = ocr.Process(image, area, PageSegMode.SingleBlock);
-            result.Add(res == null ? Array.Empty<string>() : res.Text.Split('\n'));
+            if (res == null) continue;
+
+            var echoSubStats = new List<Tuple<string, string>>(5);
+            var lines = res.Text.Split("\n");
+            foreach (var line in lines) {
+                Console.WriteLine($"Trying to match {line}");
+
+                var match = SubStatRegex().Match(line);
+                if (match.Success) {
+                    echoSubStats.Add(Tuple.Create(match.Groups[1].Value, match.Groups[2].Value));
+                }
+            }
+
+            result.Add(echoSubStats);
         }
 
         return result;
