@@ -10,4 +10,8 @@
         <ProjectReference Include="..\ResonanceSystem.DB\Shiron.ResonanceSystem.DB.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="FuzzySharp"/>
+    </ItemGroup>
+
 </Project>

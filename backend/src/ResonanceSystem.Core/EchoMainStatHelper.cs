@@ -1,36 +1,48 @@
+using FuzzySharp;
+using FuzzySharp.SimilarityRatio;
+using FuzzySharp.SimilarityRatio.Scorer.StrategySensitive;
 using Shiron.ResonanceSystem.DB.Schema;
 
 namespace Shiron.ResonanceSystem.Core;
 
 public class EchoMainStatHelper {
-    public static MainStatType? MainStatFromString(string type, bool isPercent) {
-        type = type.ToLower();
+    private static readonly Dictionary<string, MainStatType> KnownStats = new() {
+        { "ATK", MainStatType.AttackPercent },
+        { "DEF", MainStatType.DefencePercent },
+        { "HP", MainStatType.HPPercent },
+        { "GLACIO DMG BONUS", MainStatType.GlacioDMGPercent },
+        { "SPECTRO DMG BONUS", MainStatType.SpectroDMGPercent },
+        { "AERO DMG BONUS", MainStatType.AeroDMGPercent },
+        { "ELECTRO DMG BONUS", MainStatType.ElectroDMGPercent },
+        { "HAVOC DMG BONUS", MainStatType.HavocDMGPercent },
+        { "FUSION DMG BONUS", MainStatType.FusionDMGPercent },
+        { "ENERGY REGEN", MainStatType.EnergyRegen },
+        { "CRIT RATE", MainStatType.CritRate },
+        { "CRIT DMG", MainStatType.CritDMG },
+        { "HEALING BONUS", MainStatType.HealingBonus }
+    };
 
-        if (type.Contains("crit")) {
-            return type.Contains("dmg") || type.Contains("bmg") ? MainStatType.CritDMG : MainStatType.CritRate;
+    public static MainStatType? MainStatFromString(string type) {
+        if (string.IsNullOrWhiteSpace(type))
+            return null;
+
+        var normalized = type.ToUpperInvariant().Trim()
+            .Replace("0", "O")
+            .Replace("1", "I")
+            .Replace("8", "B")
+            .Replace("5", "S")
+            .Replace("!", "I");
+
+        var match = Process.ExtractOne(
+            normalized,
+            KnownStats.Keys,
+            scorer: ScorerCache.Get<TokenSetScorer>()
+        );
+
+        if (match.Score < 75) {
+            return null;
         }
 
-        switch (type) {
-            case "atk":
-                return MainStatType.AttackPercent;
-            case "def":
-                return MainStatType.DefencePercent;
-            case "hp":
-                return MainStatType.HPPercent;
-            case "crit. rate":
-                return MainStatType.CritRate;
-            case "energy regen":
-                return MainStatType.EnergyRegen;
-        }
-
-        if (type.Contains("fusion")) return MainStatType.FusionDMGPercent;
-        if (type.Contains("glacio")) return MainStatType.GlacioDMGPercent;
-        if (type.Contains("electro")) return MainStatType.ElectroDMGPercent;
-        if (type.Contains("havoc")) return MainStatType.HavocDMGPercent;
-        if (type.Contains("aero")) return MainStatType.AeroDMGPercent;
-        if (type.Contains("spectro")) return MainStatType.SpectroDMGPercent;
-        if (type.Contains("healing")) return MainStatType.HealingBonus;
-
-        return null;
+        return KnownStats[match.Value];
     }
 }

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
+using Shiron.ResonanceSystem.API.Exceptions;
 using Shiron.ResonanceSystem.Core;
 using Shiron.ResonanceSystem.Core.DTOs;
 using Shiron.ResonanceSystem.DB;
@@ -14,6 +15,7 @@ namespace Shiron.ResonanceSystem.API.Endpoints;
 public static partial class ScanEndpoints {
     private static readonly int[] EchoSubStatsXValues = [64, 443, 815, 1190, 1565];
     private static readonly int[] EchoMainStatsXValues = [215, 587, 962, 1337, 1711];
+    private static readonly int[] EchoCostXValues = [328, 705, 1082, 1455, 1828];
 
     [GeneratedRegex("[\\w\\s]+\\w", RegexOptions.IgnoreCase)]
     private static partial Regex NameRegex();
@@ -23,6 +25,9 @@ public static partial class ScanEndpoints {
 
     [GeneratedRegex("(\\d{1,2}(?:\\.\\d)?)%?")]
     private static partial Regex StatValueRegex();
+
+    [GeneratedRegex("[0-9]")]
+    private static partial Regex SingleDigitRegex();
 
     public static void MapScanEndpoints(this IEndpointRouteBuilder endpoints) {
         var group = endpoints.MapGroup("/scan").WithTags("Scan");
@@ -37,7 +42,7 @@ public static partial class ScanEndpoints {
         ResSystemDbContext db,
         ClaimsPrincipal principal,
         CancellationToken ct,
-        [FromQuery] byte threshold = 80) {
+        [FromQuery] byte threshold = 128) {
         var userID = IdentityUtils.GetUserID(principal);
         if (userID == null) return Results.Unauthorized();
         if (file == null || file.Length == 0) return Results.BadRequest("No file provided");
@@ -53,97 +58,129 @@ public static partial class ScanEndpoints {
 
         var res = ocr.Process(image);
         if (res == null) return Results.BadRequest("Failed to process image");
-        return Results.Ok(new {
-            ResonatorName = ExtractResonatorName(image, ocr),
-            EchoSubStats = ExtractEchoSubStats(image, ocr),
-            EchoMainStats = ParseMainStat(image, ocr)
-        });
+
+        try {
+            return Results.Ok(new {
+                ResonatorName = ParseResonatorName(image, ocr),
+                Echoes = await ParseEchoes(image, ocr).ToListAsync(ct)
+            });
+        } catch (OCRException ex) {
+            return Results.BadRequest(new { Error = ex.Message, RawData = ex.RawData });
+        }
     }
 
-    private static string? ExtractResonatorName(SKBitmap image, IOCRService ocr) {
+    private static async IAsyncEnumerable<AddEchoDTO> ParseEchoes(SKBitmap image, IOCRService ocr) {
+        for (var i = 0; i < 5; ++i) {
+            var echoCost = ParseEchoCost(image, ocr, i);
+            var (mainStatType, mainStatValue) = ParseEchoMainStat(image, ocr, i);
+            var subStats = ParseEchoSubStats(image, ocr, i);
+
+            yield return new AddEchoDTO {
+                Cost = echoCost,
+                Level = 0,
+                MainStatType = mainStatType,
+                MainStatValue = mainStatValue,
+                Name = $"Echo {i + 1}",
+                Index = i,
+                SubStats = subStats
+            };
+        }
+    }
+
+    private static EchoCost ParseEchoCost(SKBitmap image, IOCRService ocr, int index) {
+        if (index < 0 || index > 4)
+            throw new ArgumentOutOfRangeException(nameof(index), index, "Index must be between 0 and 4");
+
+        var res = ocr.Process(image, new Rect(EchoCostXValues[index], 675, 31, 27), PageSegMode.SingleChar);
+        if (res is null)
+            throw new EchoCostParseException(index, "(no OCR result)");
+
+        var cost = EchoCostHelper.CostFromString(res.Text);
+        if (cost is null)
+            throw new EchoCostParseException(index, res.Text);
+
+        return cost.Value;
+    }
+
+    private static string ParseResonatorName(SKBitmap image, IOCRService ocr) {
         var res = ocr.Process(image, Rect.FromCoords(70, 26, 1000, 86));
-        if (res == null) return null;
+        if (res is null)
+            throw new ResonatorNameParseException("(no OCR result)");
+
         var name = NameRegex().Match(res.Text);
-        if (!name.Success) return null;
+        if (!name.Success)
+            throw new ResonatorNameParseException(res.Text);
+
         return name.Value;
     }
 
-    private static List<object> ExtractEchoSubStats(SKBitmap image, IOCRService ocr) {
-        var result = new List<object>(5);
+    private static EchoSubStatDTO[] ParseEchoSubStats(SKBitmap image, IOCRService ocr, int index) {
+        if (index < 0 || index > 4)
+            throw new ArgumentOutOfRangeException(nameof(index), index, "Index must be between 0 and 4");
 
-        for (var i = 0; i < EchoSubStatsXValues.Length; ++i) {
-            var area = new Rect(EchoSubStatsXValues[i], 880, 310, 160);
-            var res = ocr.Process(image, area, PageSegMode.SingleBlock);
-            if (res == null) continue;
+        var area = new Rect(EchoSubStatsXValues[index], 880, 310, 160);
+        var res = ocr.Process(image, area, PageSegMode.SingleBlock);
+        if (res is null)
+            throw new EchoSubStatParseException(index, "(no OCR result)");
 
-            var echoSubStats = new List<EchoSubStatDTO>(5);
-            var lines = res.Text.Split("\n");
-            foreach (var line in lines) {
-                Console.WriteLine($"Trying to match {line}");
+        var subStats = new List<EchoSubStatDTO>();
 
-                var match = StatRegex().Match(line);
-                if (match.Success) {
-                    var statName = match.Groups[1].Value.Trim();
-                    var statValueString = match.Groups[2].Value.Trim();
+        foreach (var line in res.Text.Split("\n")) {
+            var match = StatRegex().Match(line);
+            if (!match.Success) continue;
 
-                    var statType = EchoSubStatHelper.SubStatFromString(statName, statValueString.Contains('%'));
-                    if (statType == null) {
-                        Console.WriteLine($"Unable to parse stat: {statName} {statValueString}");
-                        continue;
-                    }
+            var statName = match.Groups[1].Value.Trim();
+            var statValueString = match.Groups[2].Value.Trim();
 
-                    var statValue = decimal.Parse(StatValueRegex().Match(statValueString).Groups[1].Value);
-                    var stat = new EchoSubStatDTO {
-                        Type = statType.Value,
-                        Value = statValue,
-                        Index = 0
-                    };
+            var statType = EchoSubStatHelper.SubStatFromString(statName, statValueString.Contains('%'));
+            if (statType is null) continue;
 
-                    echoSubStats.Add(stat);
-                }
-            }
-
-            result.Add(echoSubStats);
+            var statValue = decimal.Parse(StatValueRegex().Match(statValueString).Groups[1].Value);
+            subStats.Add(new EchoSubStatDTO {
+                Type = statType.Value,
+                Value = statValue,
+                Index = subStats.Count
+            });
         }
 
-        return result;
+        if (subStats.Count == 0)
+            throw new EchoSubStatParseException(index, res.Text);
+
+        return [.. subStats];
     }
 
-    private static List<Tuple<MainStatType, decimal>> ParseMainStat(SKBitmap image, IOCRService ocr) {
-        var result = new List<Tuple<MainStatType, decimal>>(5);
-        for (var i = 0; i < EchoMainStatsXValues.Length; ++i) {
-            var statNameRes = ocr.Process(image, new Rect(EchoMainStatsXValues[i], 726, 185, 21), PageSegMode.SingleLine);
-            if (statNameRes == null) continue;
-            var statValueRes = ocr.Process(image, new Rect(EchoMainStatsXValues[i], 753, 165, 28), PageSegMode.SingleLine);
-            if (statValueRes == null) continue;
+    private static (MainStatType Type, decimal Value) ParseEchoMainStat(SKBitmap image, IOCRService ocr, int index) {
+        if (index < 0 || index > 4)
+            throw new ArgumentOutOfRangeException(nameof(index), index, "Index must be between 0 and 4");
 
-            var statValue = decimal.Parse(StatValueRegex().Match(statValueRes.Text).Groups[1].Value);
-            var statType = EchoMainStatHelper.MainStatFromString(statNameRes.Text.Trim(), true);
-            if (statType.HasValue) {
-                result.Add(new Tuple<MainStatType, decimal>(statType.Value, statValue));
-            }
-        }
-        return result;
+        var statNameRes = ocr.Process(image, new Rect(EchoMainStatsXValues[index], 726, 185, 21), PageSegMode.SingleLine);
+        if (statNameRes is null)
+            throw new EchoMainStatParseException(index, "(no OCR result for stat name)");
+
+        var statValueRes = ocr.Process(image, new Rect(EchoMainStatsXValues[index], 753, 165, 28), PageSegMode.SingleLine);
+        if (statValueRes is null)
+            throw new EchoMainStatParseException(index, $"(stat name: '{statNameRes.Text}', no OCR result for stat value)");
+
+        var rawData = $"{statNameRes.Text} {statValueRes.Text}";
+
+        var statType = EchoMainStatHelper.MainStatFromString(statNameRes.Text.Trim());
+        if (statType is null)
+            throw new EchoMainStatParseException(index, rawData);
+
+        var statValue = decimal.Parse(StatValueRegex().Match(statValueRes.Text).Groups[1].Value);
+        return (statType.Value, statValue);
     }
 
-    /// <summary>
-    /// Checks the first few bytes of the array against known image file signatures.
-    /// </summary>
     private static bool IsValidImageSignature(byte[] bytes) {
-        if (bytes == null || bytes.Length < 8) {
+        if (bytes == null || bytes.Length < 8)
             return false;
-        }
 
-        // JPEG Magic Number: FF D8 FF
-        if (bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF) {
+        if (bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF)
             return true;
-        }
 
-        // PNG Magic Number: 89 50 4E 47 0D 0A 1A 0A
         if (bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47 &&
-            bytes[4] == 0x0D && bytes[5] == 0x0A && bytes[6] == 0x1A && bytes[7] == 0x0A) {
+            bytes[4] == 0x0D && bytes[5] == 0x0A && bytes[6] == 0x1A && bytes[7] == 0x0A)
             return true;
-        }
 
         return false;
     }
