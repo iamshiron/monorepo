@@ -12,14 +12,17 @@ using Tesseract;
 namespace Shiron.ResonanceSystem.API.Endpoints;
 
 public static partial class ScanEndpoints {
+    private static readonly int[] EchoSubStatsXValues = [64, 443, 815, 1190, 1565];
+    private static readonly int[] EchoMainStatsXValues = [215, 587, 962, 1337, 1711];
+
     [GeneratedRegex("[\\w\\s]+\\w", RegexOptions.IgnoreCase)]
     private static partial Regex NameRegex();
 
     [GeneratedRegex("([\\w \\.]+) (\\d+(?:\\.\\d)?%?)", RegexOptions.IgnoreCase)]
-    private static partial Regex SubStatRegex();
+    private static partial Regex StatRegex();
 
-    [GeneratedRegex("(\\d+(?:\\.\\d)?)%?")]
-    private static partial Regex SubStatValueRegex();
+    [GeneratedRegex("(\\d{1,2}(?:\\.\\d)?)%?")]
+    private static partial Regex StatValueRegex();
 
     public static void MapScanEndpoints(this IEndpointRouteBuilder endpoints) {
         var group = endpoints.MapGroup("/scan").WithTags("Scan");
@@ -52,7 +55,8 @@ public static partial class ScanEndpoints {
         if (res == null) return Results.BadRequest("Failed to process image");
         return Results.Ok(new {
             ResonatorName = ExtractResonatorName(image, ocr),
-            EchoSubStats = ExtractEchoSubStats(image, ocr)
+            EchoSubStats = ExtractEchoSubStats(image, ocr),
+            EchoMainStats = ParseMainStat(image, ocr)
         });
     }
 
@@ -67,9 +71,8 @@ public static partial class ScanEndpoints {
     private static List<object> ExtractEchoSubStats(SKBitmap image, IOCRService ocr) {
         var result = new List<object>(5);
 
-        int[] xValues = [64, 443, 815, 1190, 1565];
-        for (var i = 0; i < xValues.Length; ++i) {
-            var area = new Rect(xValues[i], 880, 310, 160);
+        for (var i = 0; i < EchoSubStatsXValues.Length; ++i) {
+            var area = new Rect(EchoSubStatsXValues[i], 880, 310, 160);
             var res = ocr.Process(image, area, PageSegMode.SingleBlock);
             if (res == null) continue;
 
@@ -78,7 +81,7 @@ public static partial class ScanEndpoints {
             foreach (var line in lines) {
                 Console.WriteLine($"Trying to match {line}");
 
-                var match = SubStatRegex().Match(line);
+                var match = StatRegex().Match(line);
                 if (match.Success) {
                     var statName = match.Groups[1].Value.Trim();
                     var statValueString = match.Groups[2].Value.Trim();
@@ -89,7 +92,7 @@ public static partial class ScanEndpoints {
                         continue;
                     }
 
-                    var statValue = decimal.Parse(SubStatValueRegex().Match(statValueString).Groups[1].Value);
+                    var statValue = decimal.Parse(StatValueRegex().Match(statValueString).Groups[1].Value);
                     var stat = new EchoSubStatDTO {
                         Type = statType.Value,
                         Value = statValue,
@@ -103,6 +106,23 @@ public static partial class ScanEndpoints {
             result.Add(echoSubStats);
         }
 
+        return result;
+    }
+
+    private static List<Tuple<MainStatType, decimal>> ParseMainStat(SKBitmap image, IOCRService ocr) {
+        var result = new List<Tuple<MainStatType, decimal>>(5);
+        for (var i = 0; i < EchoMainStatsXValues.Length; ++i) {
+            var statNameRes = ocr.Process(image, new Rect(EchoMainStatsXValues[i], 726, 185, 21), PageSegMode.SingleLine);
+            if (statNameRes == null) continue;
+            var statValueRes = ocr.Process(image, new Rect(EchoMainStatsXValues[i], 753, 165, 28), PageSegMode.SingleLine);
+            if (statValueRes == null) continue;
+
+            var statValue = decimal.Parse(StatValueRegex().Match(statValueRes.Text).Groups[1].Value);
+            var statType = EchoMainStatHelper.MainStatFromString(statNameRes.Text.Trim(), true);
+            if (statType.HasValue) {
+                result.Add(new Tuple<MainStatType, decimal>(statType.Value, statValue));
+            }
+        }
         return result;
     }
 
