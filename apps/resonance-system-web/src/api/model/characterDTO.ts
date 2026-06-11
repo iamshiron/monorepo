@@ -4,6 +4,7 @@
  * Shiron.ResonanceSystem.API | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { Attribute } from "./attribute";
 import type { Rarity } from "./rarity";
 import type { WeaponType } from "./weaponType";
 
@@ -13,5 +14,6 @@ export interface CharacterDTO {
 	hash: string;
 	name: string;
 	weapon: WeaponType;
+	attribute: Attribute;
 	rarity: Rarity;
 }
