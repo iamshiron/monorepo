@@ -123,6 +123,9 @@ using (var scope = app.Services.CreateScope()) {
 using (var scope = app.Services.CreateScope()) {
     scope.ServiceProvider.SeedCharacters();
 }
+using (var scope = app.Services.CreateScope()) {
+    scope.ServiceProvider.SeedEchoSonatas();
+}
 
 if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();

@@ -16,6 +16,9 @@ public static class ContentEndpoints {
 
         group.MapGet("/resonators/{id}", GetResonator)
             .Produces<ResonatorDTO>().Produces(404);
+
+        group.MapGet("/sonatas", GetEchoSonatas)
+            .Produces<IList<EchoSonataDTO>>();
     }
 
     private static async Task<IResult> GetResonators(
@@ -54,5 +57,31 @@ public static class ContentEndpoints {
         }
 
         return Results.Ok(c.ToDTO());
+    }
+
+    private static async Task<IResult> GetEchoSonatas(
+        [FromQuery] string? name,
+        ResSystemDbContext db,
+        CancellationToken ct
+    ) {
+        var query = db.EchoSonatas.AsQueryable();
+        if (!string.IsNullOrWhiteSpace(name)) {
+            query = query.Where(c => c.Name.Contains(name));
+        }
+
+        var sonatas = await query
+            .Include(e => e.Echoes)
+            .Select(e => new EchoSonataDTO {
+                ID = e.ID,
+                Name = e.Name,
+                Echoes = e.Echoes.Select(e => new EchoDTO {
+                    ID = e.ID,
+                    Name = e.Name,
+                    Cost = e.Cost
+                }).ToList()
+            })
+            .ToListAsync(ct);
+
+        return Results.Ok(sonatas);
     }
 }
