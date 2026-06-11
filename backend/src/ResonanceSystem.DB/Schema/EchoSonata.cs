@@ -1,9 +1,10 @@
+using System.IO.Hashing;
+using System.Text;
+
 namespace Shiron.ResonanceSystem.DB.Schema;
 
-public class EchoSonata {
-    public Guid ID { get; set; } = Guid.CreateVersion7();
-
-    public required string Name { get; set; }
-
+public class EchoSonata(string name) {
+    public ulong Id { get; set; } = XxHash3.HashToUInt64(Encoding.UTF8.GetBytes(name));
+    public string Name { get; set; } = name;
     public IList<Echo> Echoes { get; set; } = [];
 }

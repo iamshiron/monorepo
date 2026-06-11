@@ -37,9 +37,16 @@ public class ResSystemDbContext(DbContextOptions<ResSystemDbContext> options) : 
         });
 
         builder.Entity<EchoSonata>(entity => {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.HasMany(e => e.Echoes)
                 .WithMany(s => s.Sonatas)
                 .UsingEntity(j => j.ToTable("EchoSonataLinks"));
+        });
+
+        builder.Entity<Echo>(entity => {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedNever();
         });
 
         builder.Entity<User>().ToTable("Users");

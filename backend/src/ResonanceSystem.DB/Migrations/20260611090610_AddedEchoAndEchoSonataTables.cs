@@ -1,4 +1,3 @@
-using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -11,50 +10,50 @@ namespace Shiron.ResonanceSystem.DB.Migrations {
             migrationBuilder.CreateTable(
                 name: "Echoes",
                 columns: table => new {
-                    ID = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Cost = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table => {
-                    table.PrimaryKey("PK_Echoes", x => x.ID);
+                    table.PrimaryKey("PK_Echoes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "EchoSonatas",
                 columns: table => new {
-                    ID = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table => {
-                    table.PrimaryKey("PK_EchoSonatas", x => x.ID);
+                    table.PrimaryKey("PK_EchoSonatas", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "EchoSonataLinks",
                 columns: table => new {
-                    EchoesID = table.Column<Guid>(type: "uuid", nullable: false),
-                    SonatasID = table.Column<Guid>(type: "uuid", nullable: false)
+                    EchoesId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    SonatasId = table.Column<decimal>(type: "numeric(20,0)", nullable: false)
                 },
                 constraints: table => {
-                    table.PrimaryKey("PK_EchoSonataLinks", x => new { x.EchoesID, x.SonatasID });
+                    table.PrimaryKey("PK_EchoSonataLinks", x => new { x.EchoesId, x.SonatasId });
                     table.ForeignKey(
-                        name: "FK_EchoSonataLinks_EchoSonatas_SonatasID",
-                        column: x => x.SonatasID,
+                        name: "FK_EchoSonataLinks_EchoSonatas_SonatasId",
+                        column: x => x.SonatasId,
                         principalTable: "EchoSonatas",
-                        principalColumn: "ID",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_EchoSonataLinks_Echoes_EchoesID",
-                        column: x => x.EchoesID,
+                        name: "FK_EchoSonataLinks_Echoes_EchoesId",
+                        column: x => x.EchoesId,
                         principalTable: "Echoes",
-                        principalColumn: "ID",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_EchoSonataLinks_SonatasID",
+                name: "IX_EchoSonataLinks_SonatasId",
                 table: "EchoSonataLinks",
-                column: "SonatasID");
+                column: "SonatasId");
         }
 
         /// <inheritdoc />

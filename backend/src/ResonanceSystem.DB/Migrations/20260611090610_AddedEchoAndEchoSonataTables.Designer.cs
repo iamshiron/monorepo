@@ -12,7 +12,7 @@ using Shiron.ResonanceSystem.DB;
 namespace Shiron.ResonanceSystem.DB.Migrations
 {
     [DbContext(typeof(ResSystemDbContext))]
-    [Migration("20260611083646_AddedEchoAndEchoSonataTables")]
+    [Migration("20260611090610_AddedEchoAndEchoSonataTables")]
     partial class AddedEchoAndEchoSonataTables
     {
         /// <inheritdoc />
@@ -27,15 +27,15 @@ namespace Shiron.ResonanceSystem.DB.Migrations
 
             modelBuilder.Entity("EchoEchoSonata", b =>
                 {
-                    b.Property<Guid>("EchoesID")
-                        .HasColumnType("uuid");
+                    b.Property<decimal>("EchoesId")
+                        .HasColumnType("numeric(20,0)");
 
-                    b.Property<Guid>("SonatasID")
-                        .HasColumnType("uuid");
+                    b.Property<decimal>("SonatasId")
+                        .HasColumnType("numeric(20,0)");
 
-                    b.HasKey("EchoesID", "SonatasID");
+                    b.HasKey("EchoesId", "SonatasId");
 
-                    b.HasIndex("SonatasID");
+                    b.HasIndex("SonatasId");
 
                     b.ToTable("EchoSonataLinks", (string)null);
                 });
@@ -196,9 +196,8 @@ namespace Shiron.ResonanceSystem.DB.Migrations
 
             modelBuilder.Entity("Shiron.ResonanceSystem.DB.Schema.Echo", b =>
                 {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<decimal>("Id")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<int>("Cost")
                         .HasColumnType("integer");
@@ -207,22 +206,21 @@ namespace Shiron.ResonanceSystem.DB.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
                     b.ToTable("Echoes");
                 });
 
             modelBuilder.Entity("Shiron.ResonanceSystem.DB.Schema.EchoSonata", b =>
                 {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<decimal>("Id")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
                     b.ToTable("EchoSonatas");
                 });
@@ -404,13 +402,13 @@ namespace Shiron.ResonanceSystem.DB.Migrations
                 {
                     b.HasOne("Shiron.ResonanceSystem.DB.Schema.Echo", null)
                         .WithMany()
-                        .HasForeignKey("EchoesID")
+                        .HasForeignKey("EchoesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Shiron.ResonanceSystem.DB.Schema.EchoSonata", null)
                         .WithMany()
-                        .HasForeignKey("SonatasID")
+                        .HasForeignKey("SonatasId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

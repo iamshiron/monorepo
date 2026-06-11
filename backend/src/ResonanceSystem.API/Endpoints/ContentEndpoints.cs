@@ -71,15 +71,7 @@ public static class ContentEndpoints {
 
         var sonatas = await query
             .Include(e => e.Echoes)
-            .Select(e => new EchoSonataDTO {
-                ID = e.ID,
-                Name = e.Name,
-                Echoes = e.Echoes.Select(e => new EchoDTO {
-                    ID = e.ID,
-                    Name = e.Name,
-                    Cost = e.Cost
-                }).ToList()
-            })
+            .Select(e => e.ToDTO())
             .ToListAsync(ct);
 
         return Results.Ok(sonatas);
