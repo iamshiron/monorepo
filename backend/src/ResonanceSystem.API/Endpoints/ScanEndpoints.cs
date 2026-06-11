@@ -32,7 +32,7 @@ public static partial class ScanEndpoints {
     public static void MapScanEndpoints(this IEndpointRouteBuilder endpoints) {
         var group = endpoints.MapGroup("/scan").WithTags("Scan");
 
-        group.MapPost("/wuwa-bot/{id}", ScanWuWaBotImage).DisableAntiforgery().Produces<OCRResultDTO>();
+        group.MapPost("/wuwa-bot", ScanWuWaBotImage).DisableAntiforgery().Produces<OCRResultDTO>();
     }
 
     private static async Task<IResult> ScanWuWaBotImage(

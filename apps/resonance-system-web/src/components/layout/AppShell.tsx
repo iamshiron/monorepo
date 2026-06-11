@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ModeToggle } from "@/components/layout/ModeToggle";
+import { UserMenu } from "@/components/layout/UserMenu";
 import { Button } from "@shiron/ui/components/ui/button";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -26,6 +27,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 					</div>
 					<div className="flex items-center gap-2">
 						<ModeToggle />
+						<UserMenu />
 					</div>
 				</div>
 			</header>

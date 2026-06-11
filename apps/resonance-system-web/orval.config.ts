@@ -4,7 +4,7 @@ export default defineConfig({
     "resonance-system": {
         output: {
             mode: 'tags-split',
-            target: 'src/api/resonance-syste,.ts',
+            target: 'src/api/resonance-system.ts',
             schemas: 'src/api/model',
             client: 'react-query',
             mock: false,
