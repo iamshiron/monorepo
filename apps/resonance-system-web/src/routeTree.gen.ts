@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CharactersRouteImport } from './routes/characters'
+import { Route as BuilderRouteImport } from './routes/builder'
 import { Route as UserRouteImport } from './routes/$user'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
@@ -23,6 +24,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const CharactersRoute = CharactersRouteImport.update({
   id: '/characters',
   path: '/characters',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BuilderRoute = BuilderRouteImport.update({
+  id: '/builder',
+  path: '/builder',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UserRoute = UserRouteImport.update({
@@ -44,6 +50,7 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$user': typeof UserRoute
+  '/builder': typeof BuilderRoute
   '/characters': typeof CharactersRoute
   '/dashboard': typeof DashboardRoute
   '/auth/login': typeof AuthLoginRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$user': typeof UserRoute
+  '/builder': typeof BuilderRoute
   '/characters': typeof CharactersRoute
   '/dashboard': typeof DashboardRoute
   '/auth/login': typeof AuthLoginRoute
@@ -59,21 +67,36 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$user': typeof UserRoute
+  '/builder': typeof BuilderRoute
   '/characters': typeof CharactersRoute
   '/dashboard': typeof DashboardRoute
   '/auth/login': typeof AuthLoginRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$user' | '/characters' | '/dashboard' | '/auth/login'
+  fullPaths:
+    | '/'
+    | '/$user'
+    | '/builder'
+    | '/characters'
+    | '/dashboard'
+    | '/auth/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$user' | '/characters' | '/dashboard' | '/auth/login'
-  id: '__root__' | '/' | '/$user' | '/characters' | '/dashboard' | '/auth/login'
+  to: '/' | '/$user' | '/builder' | '/characters' | '/dashboard' | '/auth/login'
+  id:
+    | '__root__'
+    | '/'
+    | '/$user'
+    | '/builder'
+    | '/characters'
+    | '/dashboard'
+    | '/auth/login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   UserRoute: typeof UserRoute
+  BuilderRoute: typeof BuilderRoute
   CharactersRoute: typeof CharactersRoute
   DashboardRoute: typeof DashboardRoute
   AuthLoginRoute: typeof AuthLoginRoute
@@ -93,6 +116,13 @@ declare module '@tanstack/react-router' {
       path: '/characters'
       fullPath: '/characters'
       preLoaderRoute: typeof CharactersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/builder': {
+      id: '/builder'
+      path: '/builder'
+      fullPath: '/builder'
+      preLoaderRoute: typeof BuilderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$user': {
@@ -122,6 +152,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   UserRoute: UserRoute,
+  BuilderRoute: BuilderRoute,
   CharactersRoute: CharactersRoute,
   DashboardRoute: DashboardRoute,
   AuthLoginRoute: AuthLoginRoute,

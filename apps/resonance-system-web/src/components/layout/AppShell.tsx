@@ -16,6 +16,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 					<div className="flex gap-2">
 						<nav className="flex items-center gap-1">
 							<Button asChild variant="ghost">
+								<Link to="/builder">Builder</Link>
+							</Button>
+						</nav>
+						<nav className="flex items-center gap-1">
+							<Button asChild variant="ghost">
 								<Link to="/dashboard">Dashboard</Link>
 							</Button>
 						</nav>
