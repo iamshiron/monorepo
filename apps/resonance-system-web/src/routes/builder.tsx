@@ -92,13 +92,13 @@ function BuilderPage() {
 							key={key}
 							value={String(key)}
 							aria-label={label}
-							className="flex-1"
+							className="flex-1 h-12 cursor-pointer"
 						>
 							<span
-								className="size-5 rounded-full"
+								className="size-7 rounded-full -mx-0.5"
 								style={{ backgroundColor: ATTRIBUTE_COLOR[key] }}
 							/>
-							{label}
+							<span className="ml-2">{label}</span>
 							<span className="text-muted-foreground">
 								{attributeCounts.get(key) ?? 0}
 							</span>
@@ -123,9 +123,9 @@ function BuilderPage() {
 								onClick={() => setSelectedId(isSelected ? null : c.id)}
 								className={`cursor-pointer transition-all duration-150 hover:scale-[1.03] hover:shadow-md ${isSelected ? "ring-2 ring-primary" : ""}`}
 							>
-								<CardContent className="flex flex-col items-center gap-2 py-3">
-									<span className="size-16 rounded-full bg-muted-foreground/20" />
-									<span className="text-sm font-medium">{c.name}</span>
+								<CardContent className="flex flex-col items-center gap-1 py-1">
+									<span className="size-20 rounded-full bg-muted-foreground/20" />
+									<span className="text-sm font-medium mt-1">{c.name}</span>
 									<span
 										className="text-xs"
 										style={{ color: ATTRIBUTE_COLOR[c.attribute] }}
