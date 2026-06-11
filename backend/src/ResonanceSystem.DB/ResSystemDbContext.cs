@@ -10,6 +10,8 @@ public class ResSystemDbContext(DbContextOptions<ResSystemDbContext> options) : 
     public DbSet<OwnedCharacter> OwnedCharacters => Set<OwnedCharacter>();
     public DbSet<OwnedEcho> OwnedEchos => Set<OwnedEcho>();
     public DbSet<EchoSubStat> EchoSubStats => Set<EchoSubStat>();
+    public DbSet<EchoSonata> EchoSonatas => Set<EchoSonata>();
+    public DbSet<Echo> Echoes => Set<Echo>();
 
     protected override void OnModelCreating(ModelBuilder builder) {
         base.OnModelCreating(builder);
@@ -32,6 +34,12 @@ public class ResSystemDbContext(DbContextOptions<ResSystemDbContext> options) : 
                 .WithOne(s => s.Echo)
                 .HasForeignKey(s => s.EchoID)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<EchoSonata>(entity => {
+            entity.HasMany(e => e.Echoes)
+                .WithMany(s => s.Sonatas)
+                .UsingEntity(j => j.ToTable("EchoSonataLinks"));
         });
 
         builder.Entity<User>().ToTable("Users");
