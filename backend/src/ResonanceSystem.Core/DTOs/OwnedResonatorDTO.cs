@@ -25,7 +25,7 @@ public record OwnedResonatorDTO : AddOwnedResonatorDTO {
 }
 
 public static class OwnedResonatorDTOExtensions {
-    public static OwnedResonatorDTO ToDTO(this OwnedCharacter data) {
+    public static OwnedResonatorDTO ToDTO(this CharacterInstance data) {
         return new OwnedResonatorDTO {
             ID = data.ID,
             Resonator = data.Character.ToDTO(),
@@ -37,7 +37,7 @@ public static class OwnedResonatorDTOExtensions {
             Forte2Level = data.Forte2Level,
             Forte3Level = data.Forte3Level,
             Forte4Level = data.Forte4Level,
-            Echoes = data.Echoes.Select(e => e.ToDTO()).ToList()
+            Echoes = data.EchoInstances.Select(e => e.ToDTO()).ToList()
         };
     }
 }

@@ -35,8 +35,8 @@ public static class InventoryEndpoints {
             });
         }
 
-        db.OwnedCharacters.Add(
-            new OwnedCharacter {
+        db.CharacterInstances.Add(
+            new CharacterInstance {
                 CharacterID = resonator.Id,
                 UserID = userID.Value,
                 SequenceChain = data.SequenceChain,
@@ -46,7 +46,7 @@ public static class InventoryEndpoints {
                 Forte2Level = data.Forte2Level,
                 Forte3Level = data.Forte3Level,
                 Forte4Level = data.Forte4Level,
-                Echoes = data.Echoes.Select(e => e.ToDatabase()).ToList()
+                EchoInstances = data.Echoes.Select(e => e.ToDatabase()).ToList()
             }
         );
         await db.SaveChangesAsync();
@@ -58,9 +58,9 @@ public static class InventoryEndpoints {
         var userID = IdentityUtils.GetUserID(user);
         if (userID is null) return Results.Unauthorized();
 
-        var characters = db.OwnedCharacters.Where(c => c.UserID == userID.Value)
+        var characters = db.CharacterInstances.Where(c => c.UserID == userID.Value)
             .Include(c => c.Character)
-            .Include(c => c.Echoes)
+            .Include(c => c.EchoInstances)
             .ThenInclude(e => e.SubStats)
             .Select(c => c.ToDTO());
 
@@ -71,9 +71,9 @@ public static class InventoryEndpoints {
         var userID = IdentityUtils.GetUserID(user);
         if (userID is null) return Results.Unauthorized();
 
-        var character = db.OwnedCharacters
+        var character = db.CharacterInstances
             .Include(c => c.Character)
-            .Include(c => c.Echoes)
+            .Include(c => c.EchoInstances)
             .ThenInclude(e => e.SubStats)
             .FirstOrDefault(c => c.UserID == userID.Value && c.ID == id);
 
@@ -90,13 +90,13 @@ public static class InventoryEndpoints {
         var userID = IdentityUtils.GetUserID(user);
         if (userID is null) return Results.Unauthorized();
 
-        var character = db.OwnedCharacters
-            .Include(c => c.Echoes)
+        var character = db.CharacterInstances
+            .Include(c => c.EchoInstances)
             .ThenInclude(e => e.SubStats)
             .FirstOrDefault(c => c.UserID == userID.Value && c.ID == id);
         if (character is null) return Results.NotFound();
 
-        character.Echoes.Clear();
+        character.EchoInstances.Clear();
         foreach (var dto in data) {
             var newEcho = dto.ToDatabase();
             newEcho.ID = Guid.Empty;
@@ -105,7 +105,7 @@ public static class InventoryEndpoints {
                 subStat.ID = Guid.Empty;
             }
 
-            character.Echoes.Add(newEcho);
+            character.EchoInstances.Add(newEcho);
         }
 
         await db.SaveChangesAsync();

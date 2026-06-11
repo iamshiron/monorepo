@@ -7,8 +7,8 @@ namespace Shiron.ResonanceSystem.DB;
 
 public class ResSystemDbContext(DbContextOptions<ResSystemDbContext> options) : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options) {
     public DbSet<Character> Characters => Set<Character>();
-    public DbSet<OwnedCharacter> OwnedCharacters => Set<OwnedCharacter>();
-    public DbSet<OwnedEcho> OwnedEchos => Set<OwnedEcho>();
+    public DbSet<CharacterInstance> CharacterInstances => Set<CharacterInstance>();
+    public DbSet<EchoInstance> EchoInstances => Set<EchoInstance>();
     public DbSet<EchoSubStat> EchoSubStats => Set<EchoSubStat>();
     public DbSet<EchoSonata> EchoSonatas => Set<EchoSonata>();
     public DbSet<Echo> Echoes => Set<Echo>();
@@ -22,17 +22,19 @@ public class ResSystemDbContext(DbContextOptions<ResSystemDbContext> options) : 
             entity.ToTable("Characters");
         });
 
-        builder.Entity<OwnedCharacter>(entity => {
-            entity.HasMany(c => c.Echoes)
-                .WithOne(e => e.Character)
-                .HasForeignKey(e => e.CharacterID)
+        builder.Entity<CharacterInstance>(entity => {
+            entity.ToTable("CharacterInstances");
+            entity.HasMany(c => c.EchoInstances)
+                .WithOne(e => e.CharacterInstance)
+                .HasForeignKey(e => e.CharacterInstanceID)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        builder.Entity<OwnedEcho>(entity => {
+        builder.Entity<EchoInstance>(entity => {
+            entity.ToTable("EchoInstances");
             entity.HasMany(e => e.SubStats)
-                .WithOne(s => s.Echo)
-                .HasForeignKey(s => s.EchoID)
+                .WithOne(s => s.EchoInstance)
+                .HasForeignKey(s => s.EchoInstanceID)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 

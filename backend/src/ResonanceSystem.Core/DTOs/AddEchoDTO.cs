@@ -15,8 +15,8 @@ public record AddEchoDTO {
 }
 
 public static class EchoDTOExtensions {
-    public static OwnedEcho ToDatabase(this AddEchoDTO dto) {
-        return new OwnedEcho {
+    public static EchoInstance ToDatabase(this AddEchoDTO dto) {
+        return new EchoInstance {
             Name = dto.Name,
             Level = dto.Level,
             Cost = dto.Cost,
@@ -27,7 +27,7 @@ public static class EchoDTOExtensions {
         };
     }
 
-    public static AddEchoDTO ToDTO(this OwnedEcho data) {
+    public static AddEchoDTO ToDTO(this EchoInstance data) {
         return new AddEchoDTO {
             Name = data.Name,
             Level = data.Level,

@@ -1,6 +1,6 @@
 namespace Shiron.ResonanceSystem.DB.Schema;
 
-public class OwnedCharacter {
+public class CharacterInstance {
     public Guid ID { get; set; } = Guid.CreateVersion7();
 
     public ulong CharacterID { get; set; }
@@ -17,5 +17,5 @@ public class OwnedCharacter {
     public int Forte3Level { get; set; }
     public int Forte4Level { get; set; }
 
-    public IList<OwnedEcho> Echoes { get; set; } = [];
+    public IList<EchoInstance> EchoInstances { get; set; } = [];
 }

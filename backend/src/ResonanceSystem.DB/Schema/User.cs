@@ -7,5 +7,5 @@ public class User : IdentityUser<Guid> {
     [MaxLength(32)] public required string DisplayName { get; set; }
     [MaxLength(32)] public override string? UserName { get; set; }
 
-    public IList<OwnedCharacter> OwnedCharacters { get; set; } = [];
+    public IList<CharacterInstance> CharacterInstances { get; set; } = [];
 }
