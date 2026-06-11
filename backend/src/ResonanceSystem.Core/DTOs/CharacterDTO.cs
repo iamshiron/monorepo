@@ -3,7 +3,7 @@ using Shiron.ResonanceSystem.DB.Schema;
 
 namespace Shiron.ResonanceSystem.Core.DTOs;
 
-public record ResonatorDTO {
+public record CharacterDTO {
     [JsonNumberHandling(JsonNumberHandling.WriteAsString)]
     public required ulong ID { get; init; }
     public required string Hash { get; init; }
@@ -12,9 +12,9 @@ public record ResonatorDTO {
     public required Rarity Rarity { get; init; }
 }
 
-public static class ResonatorDTOExtensions {
-    public static ResonatorDTO ToDTO(this Character c) {
-        return new ResonatorDTO {
+public static class CharacterDTOExtensions {
+    public static CharacterDTO ToDTO(this Character c) {
+        return new CharacterDTO {
             ID = c.Id,
             Hash = c.Id.ToString("X"),
             Name = c.Name,

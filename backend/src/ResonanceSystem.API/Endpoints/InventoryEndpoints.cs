@@ -13,22 +13,22 @@ public static class InventoryEndpoints {
         group.MapPost("/resonator", AddResonator);
 
         group.MapGet("/resonators", GetResonators)
-            .Produces<IList<OwnedResonatorDTO>>();
+            .Produces<IList<CharacterInstanceDTO>>();
 
         group.MapGet("/resonators/{id}", GetResonator)
-            .Produces<OwnedResonatorDTO>();
+            .Produces<CharacterInstanceDTO>();
 
         group.MapPost("/resonators/{id}/echoes", UpdateEchoes);
     }
 
     private static async Task<IResult> AddResonator(
-        AddOwnedResonatorDTO data,
+        CreateCharacterInstanceDTO data,
         ClaimsPrincipal user,
         ResSystemDbContext db) {
         var userID = IdentityUtils.GetUserID(user);
         if (userID is null) return Results.Unauthorized();
 
-        var resonator = db.Characters.FirstOrDefault(c => c.Id == data.ResonatorID);
+        var resonator = db.Characters.FirstOrDefault(c => c.Id == data.CharacterID);
         if (resonator == null) {
             return Results.BadRequest(new {
                 Message = "Resonator not found"
@@ -84,7 +84,7 @@ public static class InventoryEndpoints {
 
     private static async Task<IResult> UpdateEchoes(
         Guid id,
-        IList<AddEchoDTO> data,
+        IList<EchoInstanceDTO> data,
         ClaimsPrincipal user,
         ResSystemDbContext db) {
         var userID = IdentityUtils.GetUserID(user);

@@ -12,10 +12,10 @@ public static class ContentEndpoints {
         var group = endpoints.MapGroup("/content").WithTags("Content");
 
         group.MapGet("/resonators", GetResonators)
-            .Produces<IList<ResonatorDTO>>();
+            .Produces<IList<CharacterDTO>>();
 
         group.MapGet("/resonators/{id}", GetResonator)
-            .Produces<ResonatorDTO>().Produces(404);
+            .Produces<CharacterDTO>().Produces(404);
 
         group.MapGet("/sonatas", GetEchoSonatas)
             .Produces<IList<EchoSonataDTO>>();

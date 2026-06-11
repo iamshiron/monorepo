@@ -69,13 +69,13 @@ public static partial class ScanEndpoints {
         }
     }
 
-    private static async IAsyncEnumerable<AddEchoDTO> ParseEchoes(SKBitmap image, IOCRService ocr) {
+    private static async IAsyncEnumerable<EchoInstanceDTO> ParseEchoes(SKBitmap image, IOCRService ocr) {
         for (var i = 0; i < 5; ++i) {
             var echoCost = ParseEchoCost(image, ocr, i);
             var (mainStatType, mainStatValue) = ParseEchoMainStat(image, ocr, i);
             var subStats = ParseEchoSubStats(image, ocr, i);
 
-            yield return new AddEchoDTO {
+            yield return new EchoInstanceDTO {
                 Cost = echoCost,
                 Level = 0,
                 MainStatType = mainStatType,
