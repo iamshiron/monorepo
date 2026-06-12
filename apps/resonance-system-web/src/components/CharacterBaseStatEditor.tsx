@@ -19,6 +19,9 @@ import {
 	isSubStatPercent,
 	SubStatType,
 } from "@/lib/echoStats.ts";
+import { MainStatSelect } from "@/components/ui/MainStatSelect.tsx";
+import { SubStatSelect } from "@/components/ui/SubStatSelect.tsx";
+import { Separator } from "@shiron/ui/components/ui/separator.tsx";
 
 interface CharacterBaseStatEditorProps {
 	character: CharacterDTO;
@@ -194,19 +197,25 @@ export function CharacterBaseStatEditor({
 						/>
 					</div>
 				))}
+				number
 			</div>
 
 			<p>CV: {calculateTotalEchoCritValue(echoes)}</p>
-			<div className="flex flex-row w-full gap-4">
+			<div className="grid grid-cols-5 gap-2">
 				{echoes
 					.sort((a, b) => a.cost - b.cost)
 					.map((echo) => (
 						<div
 							key={echo.index}
-							className="flex flex-col gap-2 w-full bg-card p-4"
+							className="flex flex-col gap-2 w-full bg-card p-2 rounded-lg"
 						>
 							<p className="text-sm">{echo.name}</p>
-							<p>CV: {calculateEchoCritValue(echo)}</p>
+							<span className="flex flex-row justify-between">
+								<MainStatSelect value={echo.mainStatType} />
+								<p className="text-lg">{echo.mainStatValue}%</p>
+							</span>
+
+							<Separator />
 
 							{echo.subStats
 								?.sort((a, b) => a.index - b.index)
@@ -215,9 +224,7 @@ export function CharacterBaseStatEditor({
 										key={subStat.index}
 										className="flex flex-row justify-between gap-2"
 									>
-										<p className="text-lg">
-											{getSubStatName(subStat.type as SubStatType)}
-										</p>
+										<SubStatSelect value={subStat.type} />
 										<p className="text-lg">
 											{subStat.value}
 											{isSubStatPercent(subStat.type as SubStatType) && "%"}
