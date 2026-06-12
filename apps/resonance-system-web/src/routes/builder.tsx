@@ -42,7 +42,7 @@ function BuilderPage() {
 	}
 
 	return (
-		<div className="max-w-5xl mx-auto py-8 space-y-6">
+		<div className="w-full mx-auto py-8 space-y-6">
 			<h1 className="text-2xl font-bold">Characters</h1>
 
 			<CharacterSelector

@@ -1,7 +1,6 @@
 import { Input } from "@shiron/ui/components/ui/input";
 import { Slider } from "@shiron/ui/components/ui/slider.tsx";
-import { useMemo, useState } from "react";
-import type { CharacterInstanceDTO } from "@/api/model";
+import { useState } from "react";
 import type { CharacterDTO } from "@/api/model/characterDTO";
 import type { EchoInstanceDTO } from "@/api/model/echoInstanceDTO";
 import {
@@ -11,14 +10,7 @@ import {
 	WEAPON_MAX_LEVEL,
 	WEAPON_MAX_RANK,
 } from "@/lib/constants.ts";
-import { ATTRIBUTE_COLOR } from "@/types/attribute.ts";
-import {
-	calculateEchoCritValue,
-	calculateTotalEchoCritValue,
-	getSubStatName,
-	isSubStatPercent,
-	SubStatType,
-} from "@/lib/echoStats.ts";
+import { calculateTotalEchoCritValue } from "@/lib/echoStats.ts";
 import { MainStatSelect } from "@/components/ui/MainStatSelect.tsx";
 import { SubStatSelect } from "@/components/ui/SubStatSelect.tsx";
 import { Separator } from "@shiron/ui/components/ui/separator.tsx";
@@ -112,22 +104,22 @@ export function CharacterBaseStatEditor({
 					value: 10.1,
 				},
 				{
-					index: 0,
+					index: 1,
 					type: 4,
 					value: 40,
 				},
 				{
-					index: 0,
+					index: 2,
 					type: 1,
 					value: 17.4,
 				},
 				{
-					index: 0,
+					index: 3,
 					type: 5,
 					value: 8.6,
 				},
 				{
-					index: 0,
+					index: 4,
 					type: 7,
 					value: 9.3,
 				},
@@ -204,15 +196,31 @@ export function CharacterBaseStatEditor({
 			<div className="grid grid-cols-5 gap-2">
 				{echoes
 					.sort((a, b) => a.cost - b.cost)
-					.map((echo) => (
+					.map((echo, index) => (
 						<div
-							key={echo.index}
+							key={index}
 							className="flex flex-col gap-2 w-full bg-card p-2 rounded-lg"
 						>
 							<p className="text-sm">{echo.name}</p>
-							<span className="flex flex-row justify-between">
+							<span className="flex flex-row justify-between gap-4">
 								<MainStatSelect value={echo.mainStatType} />
-								<p className="text-lg">{echo.mainStatValue}%</p>
+								<span className="flex flex-row gap-1 items-center">
+									<Input
+										className="text-right w-16"
+										type="number"
+										value={echo.mainStatValue}
+										onChange={(e) => {
+											console.log(e.target.value);
+											const value = Number(e.target.value);
+											if (value >= 0) {
+												echo.mainStatValue = value;
+											}
+											echoes.sort((a, b) => a.cost - b.cost);
+											setEchoes([...echoes]);
+										}}
+									/>
+									<p>%</p>
+								</span>
 							</span>
 
 							<Separator />
@@ -225,10 +233,13 @@ export function CharacterBaseStatEditor({
 										className="flex flex-row justify-between gap-2"
 									>
 										<SubStatSelect value={subStat.type} />
-										<p className="text-lg">
-											{subStat.value}
-											{isSubStatPercent(subStat.type as SubStatType) && "%"}
-										</p>
+										<span className="flex flex-row">
+											<Input
+												className="text-right w-16"
+												type="number"
+												value={subStat.value}
+											/>
+										</span>
 									</div>
 								))}
 						</div>

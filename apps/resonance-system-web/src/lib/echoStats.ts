@@ -35,11 +35,11 @@ export enum SubStatType {
 export function getMainStatName(stat: MainStatType) {
 	switch (stat) {
 		case MainStatType.AttackPercent:
-			return "ATK";
+			return "ATK%";
 		case MainStatType.DefencsPercent:
-			return "DEF";
+			return "DEF%";
 		case MainStatType.HPPercent:
-			return "HP";
+			return "HP%";
 		case MainStatType.GlacioDMGPercent:
 			return "Glacio DMG Bonus";
 		case MainStatType.SpectroDMGPercent:
@@ -71,11 +71,11 @@ export function getSubStatName(stat: SubStatType) {
 		case SubStatType.HP:
 			return "HP";
 		case SubStatType.AttackPercent:
-			return "ATK";
+			return "ATK%";
 		case SubStatType.DefensePercent:
-			return "DEF";
+			return "DEF%";
 		case SubStatType.HPPercent:
-			return "HP";
+			return "HP%";
 		case SubStatType.CritRate:
 			return "Crit. Rate";
 		case SubStatType.CritDMG:
