@@ -176,20 +176,22 @@ export function CharacterBaseStatEditor({
 				</div>
 			</div>
 
-			<div className="flex flex-row gap-4 w-full">
-				{fortes.map((forte) => (
-					<div key={forte.key} className="flex w-full">
-						<Input
-							className="flex shrink"
-							type="number"
-							min={0}
-							max={FORTE_MAX_LEVEL}
-							value={forte.level}
-							onChange={(e) => forte.setLevel(Number(e.target.value))}
-						/>
-					</div>
-				))}
-				number
+			<div className="flex flex-col gap-2">
+				<h2 className="text-xl">Fortes</h2>
+				<div className="flex flex-row gap-4">
+					{fortes.map((forte) => (
+						<div key={forte.key} className="flex w-full">
+							<Input
+								className="flex shrink"
+								type="number"
+								min={0}
+								max={FORTE_MAX_LEVEL}
+								value={forte.level}
+								onChange={(e) => forte.setLevel(Number(e.target.value))}
+							/>
+						</div>
+					))}
+				</div>
 			</div>
 
 			<p>CV: {calculateTotalEchoCritValue(echoes)}</p>
