@@ -1,21 +1,21 @@
+import { Card, CardContent } from "@shiron/ui/components/ui/card";
+import { Input } from "@shiron/ui/components/ui/input";
+import {
+	ToggleGroup,
+	ToggleGroupItem,
+} from "@shiron/ui/components/ui/toggle-group";
 import { useMemo, useState } from "react";
-import type { CharacterDTO } from "@/api/model/characterDTO";
 import type { Attribute } from "@/api/model/attribute";
+import type { CharacterDTO } from "@/api/model/characterDTO";
 import {
 	ATTRIBUTE_COLOR,
 	ATTRIBUTE_ENTRIES,
 	getAttributeName,
 } from "@/types/attribute";
-import { Input } from "@shiron/ui/components/ui/input";
-import { Card, CardContent } from "@shiron/ui/components/ui/card";
-import {
-	ToggleGroup,
-	ToggleGroupItem,
-} from "@shiron/ui/components/ui/toggle-group";
 
 interface CharacterSelectorProps {
 	characters: CharacterDTO[];
-	onSelect?: (id: string | number | null) => void;
+	onSelect?: (id: string | number) => void;
 	selectedId?: string | number | null;
 }
 
@@ -55,10 +55,10 @@ export function CharacterSelector({
 		return { characters: filtered, attributeCounts: counts };
 	}, [all, nameFilter, attributeFilter]);
 
-	function handleSelect(id: string | number) {
+	function handleSelect(id: number | string) {
 		const newId = selectedId === id ? null : id;
 		setInternalSelectedId(newId);
-		onSelect?.(newId);
+		onSelect?.(id);
 	}
 
 	return (
