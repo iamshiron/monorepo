@@ -12,6 +12,13 @@ import {
 	WEAPON_MAX_RANK,
 } from "@/lib/constants.ts";
 import { ATTRIBUTE_COLOR } from "@/types/attribute.ts";
+import {
+	calculateEchoCritValue,
+	calculateTotalEchoCritValue,
+	getSubStatName,
+	isSubStatPercent,
+	SubStatType,
+} from "@/lib/echoStats.ts";
 
 interface CharacterBaseStatEditorProps {
 	character: CharacterDTO;
@@ -189,6 +196,7 @@ export function CharacterBaseStatEditor({
 				))}
 			</div>
 
+			<p>CV: {calculateTotalEchoCritValue(echoes)}</p>
 			<div className="flex flex-row w-full gap-4">
 				{echoes
 					.sort((a, b) => a.cost - b.cost)
@@ -198,6 +206,7 @@ export function CharacterBaseStatEditor({
 							className="flex flex-col gap-2 w-full bg-card p-4"
 						>
 							<p className="text-sm">{echo.name}</p>
+							<p>CV: {calculateEchoCritValue(echo)}</p>
 
 							{echo.subStats
 								?.sort((a, b) => a.index - b.index)
@@ -206,8 +215,13 @@ export function CharacterBaseStatEditor({
 										key={subStat.index}
 										className="flex flex-row justify-between gap-2"
 									>
-										<p className="text-lg">{subStat.type}</p>
-										<p className="text-lg">{subStat.value}</p>
+										<p className="text-lg">
+											{getSubStatName(subStat.type as SubStatType)}
+										</p>
+										<p className="text-lg">
+											{subStat.value}
+											{isSubStatPercent(subStat.type as SubStatType) && "%"}
+										</p>
 									</div>
 								))}
 						</div>
