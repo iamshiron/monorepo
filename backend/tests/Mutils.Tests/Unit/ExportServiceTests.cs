@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Shiron.Mutils.API.Services.Impl;
 using Xunit;
 
@@ -13,7 +12,7 @@ public class ExportServiceTests {
 
         var result = _service.ExportToCommaSeparated(characters);
 
-        result.Should().Be("Char1, Char2, Char3");
+        Assert.Equal("Char1, Char2, Char3", result);
     }
 
     [Fact]
@@ -22,7 +21,7 @@ public class ExportServiceTests {
 
         var result = _service.ExportToNewlineSeparated(characters);
 
-        result.Should().Be("Char1\nChar2\nChar3");
+        Assert.Equal("Char1\nChar2\nChar3", result);
     }
 
     [Fact]
@@ -31,13 +30,13 @@ public class ExportServiceTests {
 
         var result = _service.ExportToMudaeFormat(characters);
 
-        result.Should().Be("Char1, Char2");
+        Assert.Equal("Char1, Char2", result);
     }
 
     [Fact]
     public void Export_WithEmptyCollection_ReturnsEmptyString() {
         var result = _service.ExportToCommaSeparated(Array.Empty<string>());
-        result.Should().BeEmpty();
+        Assert.Empty(result);
     }
 
     [Fact]
@@ -46,6 +45,6 @@ public class ExportServiceTests {
 
         var result = _service.ExportToCommaSeparated(characters);
 
-        result.Should().Be("Char1, Char2");
+        Assert.Equal("Char1, Char2", result);
     }
 }

@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Shiron.Mutils.API.Services.Impl;
 using Shiron.Mutils.DB.Schema;
 using Xunit;
@@ -14,9 +13,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Blue);
-        result[0].Value.Should().Be(121);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Blue, result[0].Type);
+        Assert.Equal(121, result[0].Value);
     }
 
     [Fact]
@@ -25,9 +24,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Purple);
-        result[0].Value.Should().Be(110);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Purple, result[0].Type);
+        Assert.Equal(110, result[0].Value);
     }
 
     [Fact]
@@ -36,9 +35,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Teal);
-        result[0].Value.Should().Be(241);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Teal, result[0].Type);
+        Assert.Equal(241, result[0].Value);
     }
 
     [Fact]
@@ -47,9 +46,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Green);
-        result[0].Value.Should().Be(283);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Green, result[0].Type);
+        Assert.Equal(283, result[0].Value);
     }
 
     [Fact]
@@ -58,9 +57,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Yellow);
-        result[0].Value.Should().Be(458);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Yellow, result[0].Type);
+        Assert.Equal(458, result[0].Value);
     }
 
     [Fact]
@@ -69,9 +68,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Orange);
-        result[0].Value.Should().Be(776);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Orange, result[0].Type);
+        Assert.Equal(776, result[0].Value);
     }
 
     [Fact]
@@ -80,9 +79,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Red);
-        result[0].Value.Should().Be(1616);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Red, result[0].Type);
+        Assert.Equal(1616, result[0].Value);
     }
 
     [Fact]
@@ -91,9 +90,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Rainbow);
-        result[0].Value.Should().Be(3387);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Rainbow, result[0].Type);
+        Assert.Equal(3387, result[0].Value);
     }
 
     [Fact]
@@ -102,9 +101,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Light);
-        result[0].Value.Should().Be(760);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Light, result[0].Type);
+        Assert.Equal(760, result[0].Value);
     }
 
     [Fact]
@@ -113,9 +112,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Chaos);
-        result[0].Value.Should().Be(880);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Chaos, result[0].Type);
+        Assert.Equal(880, result[0].Value);
     }
 
     [Fact]
@@ -127,9 +126,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Dark);
-        result[0].Value.Should().Be(800);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Dark, result[0].Type);
+        Assert.Equal(800, result[0].Value);
     }
 
     [Fact]
@@ -141,9 +140,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Dark);
-        result[0].Value.Should().Be(110);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Dark, result[0].Type);
+        Assert.Equal(110, result[0].Value);
     }
 
     [Fact]
@@ -156,13 +155,13 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().HaveCount(3);
-        result[0].Type.Should().Be(KakeraType.Blue);
-        result[0].Value.Should().Be(121);
-        result[1].Type.Should().Be(KakeraType.Teal);
-        result[1].Value.Should().Be(241);
-        result[2].Type.Should().Be(KakeraType.Green);
-        result[2].Value.Should().Be(283);
+        Assert.Equal(3, result.Count);
+        Assert.Equal(KakeraType.Blue, result[0].Type);
+        Assert.Equal(121, result[0].Value);
+        Assert.Equal(KakeraType.Teal, result[1].Type);
+        Assert.Equal(241, result[1].Value);
+        Assert.Equal(KakeraType.Green, result[2].Type);
+        Assert.Equal(283, result[2].Value);
     }
 
     [Fact]
@@ -171,8 +170,8 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Value.Should().Be(1616);
+        Assert.Single(result);
+        Assert.Equal(1616, result[0].Value);
     }
 
     [Fact]
@@ -181,9 +180,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Purple);
-        result[0].Value.Should().Be(110);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Purple, result[0].Type);
+        Assert.Equal(110, result[0].Value);
     }
 
     [Fact]
@@ -196,15 +195,15 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Blue);
-        result[0].Value.Should().Be(121);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Blue, result[0].Type);
+        Assert.Equal(121, result[0].Value);
     }
 
     [Fact]
     public void ParseKakeraLog_WithEmptyData_ReturnsEmpty() {
         var result = _parser.ParseKakeraLog("").ToList();
-        result.Should().BeEmpty();
+        Assert.Empty(result);
     }
 
     [Fact]
@@ -226,11 +225,11 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().HaveCount(3);
-        result.Should().AllSatisfy(c => c.Type.Should().Be(KakeraType.Blue));
-        result[0].Value.Should().Be(121);
-        result[1].Value.Should().Be(142);
-        result[2].Value.Should().Be(147);
+        Assert.Equal(3, result.Count);
+        Assert.All(result, c => Assert.Equal(KakeraType.Blue, c.Type));
+        Assert.Equal(121, result[0].Value);
+        Assert.Equal(142, result[1].Value);
+        Assert.Equal(147, result[2].Value);
     }
 
     [Fact]
@@ -239,9 +238,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Light);
-        result[0].Value.Should().Be(606);
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Light, result[0].Type);
+        Assert.Equal(606, result[0].Value);
     }
 
     [Fact]
@@ -255,16 +254,16 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Blue);
-        result[0].Value.Should().Be(121);
-        result[0].ClaimedAt.Should().NotBeNull();
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Blue, result[0].Type);
+        Assert.Equal(121, result[0].Value);
+        Assert.NotNull(result[0].ClaimedAt);
         var claimedAt = result[0].ClaimedAt!.Value;
-        claimedAt.Month.Should().Be(10);
-        claimedAt.Day.Should().Be(22);
-        claimedAt.Year.Should().Be(2025);
-        claimedAt.Hour.Should().Be(19);
-        claimedAt.Minute.Should().Be(6);
+        Assert.Equal(10, claimedAt.Month);
+        Assert.Equal(22, claimedAt.Day);
+        Assert.Equal(2025, claimedAt.Year);
+        Assert.Equal(19, claimedAt.Hour);
+        Assert.Equal(6, claimedAt.Minute);
     }
 
     [Fact]
@@ -278,17 +277,17 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().ContainSingle();
-        result[0].Type.Should().Be(KakeraType.Light);
-        result[0].Value.Should().Be(606);
-        result[0].ClaimedAt.Should().NotBeNull();
+        Assert.Single(result);
+        Assert.Equal(KakeraType.Light, result[0].Type);
+        Assert.Equal(606, result[0].Value);
+        Assert.NotNull(result[0].ClaimedAt);
         var yesterday = DateTime.Today.AddDays(-1);
         var claimedAt = result[0].ClaimedAt!.Value;
-        claimedAt.Year.Should().Be(yesterday.Year);
-        claimedAt.Month.Should().Be(yesterday.Month);
-        claimedAt.Day.Should().Be(yesterday.Day);
-        claimedAt.Hour.Should().Be(12);
-        claimedAt.Minute.Should().Be(4);
+        Assert.Equal(yesterday.Year, claimedAt.Year);
+        Assert.Equal(yesterday.Month, claimedAt.Month);
+        Assert.Equal(yesterday.Day, claimedAt.Day);
+        Assert.Equal(12, claimedAt.Hour);
+        Assert.Equal(4, claimedAt.Minute);
     }
 
     [Fact]
@@ -302,9 +301,9 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().HaveCount(2);
-        result[0].ClaimedAt!.Value.Day.Should().Be(22);
-        result[1].ClaimedAt!.Value.Day.Should().Be(21);
+        Assert.Equal(2, result.Count);
+        Assert.Equal(22, result[0].ClaimedAt!.Value.Day);
+        Assert.Equal(21, result[1].ClaimedAt!.Value.Day);
     }
 
     [Fact]
@@ -320,23 +319,23 @@ public class KakeraLogParserTests {
 
         var result = _parser.ParseKakeraLog(data).ToList();
 
-        result.Should().HaveCount(2);
-        result[0].Type.Should().Be(KakeraType.Blue);
-        result[0].Value.Should().Be(163);
-        result[0].ClaimedAt.Should().NotBeNull();
-        result[0].ClaimedAt!.Value.Year.Should().Be(2025);
-        result[0].ClaimedAt!.Value.Month.Should().Be(10);
-        result[0].ClaimedAt!.Value.Day.Should().Be(11);
-        result[0].ClaimedAt!.Value.Hour.Should().Be(19);
-        result[0].ClaimedAt!.Value.Minute.Should().Be(8);
+        Assert.Equal(2, result.Count);
+        Assert.Equal(KakeraType.Blue, result[0].Type);
+        Assert.Equal(163, result[0].Value);
+        Assert.NotNull(result[0].ClaimedAt);
+        Assert.Equal(2025, result[0].ClaimedAt!.Value.Year);
+        Assert.Equal(10, result[0].ClaimedAt!.Value.Month);
+        Assert.Equal(11, result[0].ClaimedAt!.Value.Day);
+        Assert.Equal(19, result[0].ClaimedAt!.Value.Hour);
+        Assert.Equal(8, result[0].ClaimedAt!.Value.Minute);
 
-        result[1].Type.Should().Be(KakeraType.Teal);
-        result[1].Value.Should().Be(218);
-        result[1].ClaimedAt.Should().NotBeNull();
-        result[1].ClaimedAt!.Value.Year.Should().Be(2025);
-        result[1].ClaimedAt!.Value.Month.Should().Be(10);
-        result[1].ClaimedAt!.Value.Day.Should().Be(9);
-        result[1].ClaimedAt!.Value.Hour.Should().Be(16);
-        result[1].ClaimedAt!.Value.Minute.Should().Be(41);
+        Assert.Equal(KakeraType.Teal, result[1].Type);
+        Assert.Equal(218, result[1].Value);
+        Assert.NotNull(result[1].ClaimedAt);
+        Assert.Equal(2025, result[1].ClaimedAt!.Value.Year);
+        Assert.Equal(10, result[1].ClaimedAt!.Value.Month);
+        Assert.Equal(9, result[1].ClaimedAt!.Value.Day);
+        Assert.Equal(16, result[1].ClaimedAt!.Value.Hour);
+        Assert.Equal(41, result[1].ClaimedAt!.Value.Minute);
     }
 }
