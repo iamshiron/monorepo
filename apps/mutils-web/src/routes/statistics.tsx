@@ -522,7 +522,7 @@ function StatisticsPage() {
 	}));
 
 	const timeframeTotal = dailyData.reduce((sum, d) => sum + d.value, 0);
-	const cumulativeStart = stats.totalValue - timeframeTotal;
+	const cumulativeStart = Number(stats.totalValue) - timeframeTotal;
 
 	const cumulativeData = dailyData.reduce(
 		// biome-ignore lint/suspicious/noExplicitAny: complex reduce accumulator type
