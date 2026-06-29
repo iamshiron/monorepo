@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { ThemeProvider } from "next-themes";
+import { AuthProvider } from "@/hooks/useAuth";
 import "@/styles/globals.css";
 import { routeTree } from "./routeTree.gen";
 
@@ -34,7 +35,9 @@ createRoot(document.getElementById("root")!).render(
 			disableTransitionOnChange
 		>
 			<QueryClientProvider client={queryClient}>
-				<RouterProvider router={router} />
+				<AuthProvider>
+					<RouterProvider router={router} />
+				</AuthProvider>
 				<ReactQueryDevtools buttonPosition="bottom-right" />
 			</QueryClientProvider>
 		</ThemeProvider>
