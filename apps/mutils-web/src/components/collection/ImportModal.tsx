@@ -123,7 +123,7 @@ export function ImportModal({
 								onChange={(e) => setData(e.target.value)}
 								placeholder={`#72 - Gawr Gura => 67 al, 118 img + 12 gif, 14 series · :bronzekey:   (1) 792 ka - https://mudae.net/uploads/...
 #117 - Itsuki Nakano => 4 al, 58 img + 3 gif, 5 series 647 ka - https://mudae.net/uploads/...`}
-								className="h-48 font-mono text-sm resize-none"
+								className="h-48 max-h-[40vh] font-mono text-sm resize-none field-sizing-fixed overflow-y-auto"
 							/>
 
 							<div className="mt-4 pt-4 border-t border-border">
@@ -147,7 +147,7 @@ export function ImportModal({
 									placeholder={`Karlach  🚫
 Assassin Coli  🚫
 Elizabeth  🚫`}
-									className="h-32 font-mono text-sm resize-none"
+									className="h-32 max-h-[40vh] font-mono text-sm resize-none field-sizing-fixed overflow-y-auto"
 								/>
 							</div>
 

@@ -2312,7 +2312,7 @@ APP
  — 10/22/2025 7:06 PM
 :kakera:iamshiron +121 ($k)`}
 								rows={10}
-								className="font-mono text-sm resize-none"
+								className="font-mono text-sm resize-none field-sizing-fixed max-h-[50vh] overflow-y-auto"
 							/>
 						</div>
 					</div>
